@@ -31,7 +31,15 @@
     "code": "الكود",
     "privateCode": "الكود خاص",
     "role": "دوري",
-    "earlier": "مشاريع أقدم"
+    "earlier": "مشاريع أقدم",
+    "details": "التفاصيل",
+    "back": "كل المشاريع",
+    "overview": "نبذة",
+    "features": "بيعمل إيه",
+    "results": "النتايج",
+    "stack": "اتعمل بـ",
+    "links": "لينكات",
+    "notFound": "المشروع مش موجود"
   },
   "experience": {
     "title": "الخبرات",

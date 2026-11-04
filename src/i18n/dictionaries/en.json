@@ -31,7 +31,15 @@
     "code": "Code",
     "privateCode": "Private code",
     "role": "My role",
-    "earlier": "Earlier projects"
+    "earlier": "Earlier projects",
+    "details": "Details",
+    "back": "All projects",
+    "overview": "Overview",
+    "features": "What it does",
+    "results": "Results",
+    "stack": "Built with",
+    "links": "Links",
+    "notFound": "Project not found"
   },
   "experience": {
     "title": "Experience",

@@ -1,3 +1,5 @@
+import Image from "next/image";
+import Link from "next/link";
 import type { Locale } from "@/i18n/config";
 import type { Dictionary } from "@/i18n/dictionaries";
 import { earlierProjects, featuredProjects, type Project } from "@/content/projects";
@@ -38,20 +40,36 @@ export function Projects({ locale, dict }: { locale: Locale; dict: Dict }) {
 
 function ProjectCard({ project: p, locale, dict }: { project: Project; locale: Locale; dict: Dict }) {
   const title = pick(p.title, locale);
+  const href = `/${locale}/projects/${p.slug}`;
   return (
     <article className="group flex flex-col overflow-hidden rounded-2xl border border-border bg-surface/40 transition hover:-translate-y-1 hover:border-accent/50 hover:shadow-lg">
-      {/* Placeholder cover until real screenshots are added */}
-      <div className={`relative grid aspect-[16/9] place-items-center bg-gradient-to-br ${p.cover}`}>
-        <span className="px-6 text-center text-2xl font-bold text-white/95 drop-shadow">{title}</span>
+      <Link href={href} className={`relative block aspect-[16/10] overflow-hidden bg-gradient-to-br ${p.cover}`} tabIndex={-1}>
+        {p.image ? (
+          <Image
+            src={p.image}
+            alt={title}
+            fill
+            sizes="(min-width: 640px) 480px, 100vw"
+            className="object-cover object-top transition duration-500 group-hover:scale-[1.03]"
+          />
+        ) : (
+          <span className="absolute inset-0 grid place-items-center px-6 text-center text-2xl font-bold text-white/95 drop-shadow">
+            {title}
+          </span>
+        )}
         {p.badge && (
-          <span className="absolute top-3 start-3 rounded-full bg-black/40 px-3 py-1 text-xs font-medium text-white backdrop-blur">
+          <span className="absolute top-3 start-3 rounded-full bg-black/50 px-3 py-1 text-xs font-medium text-white backdrop-blur">
             {pick(p.badge, locale)}
           </span>
         )}
-      </div>
+      </Link>
 
       <div className="flex flex-1 flex-col p-6">
-        <h3 className="text-lg font-semibold">{title}</h3>
+        <h3 className="text-lg font-semibold">
+          <Link href={href} className="hover:text-accent">
+            {title}
+          </Link>
+        </h3>
         <p className="mt-2 flex-1 text-sm leading-relaxed text-muted">{pick(p.summary, locale)}</p>
         {p.role && (
           <p className="mt-3 text-sm">
@@ -64,6 +82,9 @@ function ProjectCard({ project: p, locale, dict }: { project: Project; locale: L
           ))}
         </div>
         <div className="mt-5 flex flex-wrap items-center gap-4 text-sm font-medium">
+          <Link href={href} className="inline-flex items-center gap-1 hover:text-accent">
+            {dict.details} <span className="inline-block rtl:rotate-180">→</span>
+          </Link>
           {p.live && (
             <a href={p.live} target="_blank" rel="noreferrer" className="inline-flex items-center gap-1.5 text-accent hover:underline">
               <ExternalIcon className="size-4" /> {dict.live}

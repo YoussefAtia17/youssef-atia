@@ -8,10 +8,10 @@ type Props = { locale: Locale; nav: Dictionary["nav"] };
 
 export function Navbar({ locale, nav }: Props) {
   const links = [
-    { href: "#about", label: nav.about },
-    { href: "#projects", label: nav.projects },
-    { href: "#experience", label: nav.experience },
-    { href: "#contact", label: nav.contact },
+    { href: `/${locale}#about`, label: nav.about },
+    { href: `/${locale}#projects`, label: nav.projects },
+    { href: `/${locale}#experience`, label: nav.experience },
+    { href: `/${locale}#contact`, label: nav.contact },
   ];
 
   return (
