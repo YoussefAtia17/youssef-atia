@@ -1,0 +1,51 @@
+{
+  "meta": {
+    "title": "يوسف عطية | مطوّر Full-stack",
+    "description": "مطوّر Full-stack ببني مشاريع ويب وموبايل وذكاء اصطناعي."
+  },
+  "nav": {
+    "about": "عنّي",
+    "projects": "المشاريع",
+    "experience": "الخبرات",
+    "contact": "تواصل",
+    "switchLanguage": "English",
+    "toggleTheme": "تبديل الوضع الليلي",
+    "openMenu": "افتح القائمة",
+    "closeMenu": "اقفل القائمة"
+  },
+  "hero": {
+    "greeting": "أهلًا، أنا",
+    "name": "يوسف عطية",
+    "tagline": "مطوّر Full-stack ببني مشاريع ويب وموبايل وذكاء اصطناعي.",
+    "ctaProjects": "شوف شغلي",
+    "ctaCv": "حمّل الـ CV"
+  },
+  "about": {
+    "title": "عنّي",
+    "skills": "المهارات"
+  },
+  "projects": {
+    "title": "المشاريع",
+    "subtitle": "حاجات عملتها لعملاء ومسابقات وأبحاث.",
+    "live": "شوفه لايف",
+    "code": "الكود",
+    "privateCode": "الكود خاص",
+    "role": "دوري",
+    "earlier": "مشاريع أقدم"
+  },
+  "experience": {
+    "title": "الخبرات",
+    "education": "التعليم",
+    "certifications": "الشهادات"
+  },
+  "contact": {
+    "title": "يلا نشتغل سوا",
+    "text": "متاح للتدريب والمشاريع الفريلانس والتعاون. أسرع طريقة توصلّي بيها هي الإيميل.",
+    "email": "ابعتلي إيميل",
+    "github": "GitHub"
+  },
+  "footer": {
+    "rights": "معمول بـ Next.js وTailwind.",
+    "top": "ارجع لفوق"
+  }
+}

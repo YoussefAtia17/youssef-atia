@@ -1,0 +1,51 @@
+{
+  "meta": {
+    "title": "Youssef Atia | Full-stack Developer",
+    "description": "Full-stack developer shipping web, mobile and AI projects."
+  },
+  "nav": {
+    "about": "About",
+    "projects": "Projects",
+    "experience": "Experience",
+    "contact": "Contact",
+    "switchLanguage": "العربية",
+    "toggleTheme": "Toggle dark mode",
+    "openMenu": "Open menu",
+    "closeMenu": "Close menu"
+  },
+  "hero": {
+    "greeting": "Hi, I'm",
+    "name": "Youssef Atia",
+    "tagline": "Full-stack developer shipping web, mobile and AI projects.",
+    "ctaProjects": "View my work",
+    "ctaCv": "Download CV"
+  },
+  "about": {
+    "title": "About me",
+    "skills": "Skills"
+  },
+  "projects": {
+    "title": "Projects",
+    "subtitle": "Things I've built for clients, competitions and research.",
+    "live": "Live demo",
+    "code": "Code",
+    "privateCode": "Private code",
+    "role": "My role",
+    "earlier": "Earlier projects"
+  },
+  "experience": {
+    "title": "Experience",
+    "education": "Education",
+    "certifications": "Certifications"
+  },
+  "contact": {
+    "title": "Let's work together",
+    "text": "Open to internships, freelance projects and collaborations. The fastest way to reach me is email.",
+    "email": "Send me an email",
+    "github": "GitHub"
+  },
+  "footer": {
+    "rights": "Built with Next.js & Tailwind.",
+    "top": "Back to top"
+  }
+}
