@@ -50,9 +50,26 @@
   },
   "contact": {
     "title": "Let's work together",
-    "text": "Open to internships, freelance projects and collaborations. The fastest way to reach me is email.",
-    "email": "Send me an email",
-    "github": "GitHub"
+    "text": "Open to internships, freelance projects and collaborations. Send me a message here and I'll reply by email.",
+    "github": "GitHub",
+    "form": {
+      "name": "Name",
+      "email": "Email",
+      "message": "Message",
+      "placeholder": "Tell me about your project or idea…",
+      "send": "Send message",
+      "sending": "Sending…",
+      "successTitle": "Message sent!",
+      "successText": "Thanks for reaching out. I'll get back to you by email soon.",
+      "again": "Send another message",
+      "or": "Or reach me directly",
+      "errors": {
+        "name": "Please enter your name.",
+        "email": "Please enter a valid email address.",
+        "message": "Your message should be at least 10 characters.",
+        "send": "Something went wrong. Please try again or email me directly."
+      }
+    }
   },
   "footer": {
     "rights": "Built with Next.js & Tailwind.",
