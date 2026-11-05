@@ -4,6 +4,7 @@ import { locales, dirOf } from "@/i18n/config";
 import { getDictionary, getLocale } from "@/i18n/dictionaries";
 import { Navbar } from "@/components/Navbar";
 import { Footer } from "@/components/Footer";
+import { ogLocale, siteUrl } from "@/lib/site";
 import "../globals.css";
 
 const inter = Inter({ variable: "--font-inter", subsets: ["latin"] });
@@ -21,11 +22,27 @@ export function generateStaticParams() {
 }
 
 export async function generateMetadata(): Promise<Metadata> {
+  const locale = await getLocale();
   const dict = await getDictionary();
   return {
+    metadataBase: siteUrl,
     title: dict.meta.title,
     description: dict.meta.description,
-    alternates: { languages: { en: "/en", ar: "/ar" } },
+    authors: [{ name: "Youssef Atia", url: siteUrl.href }],
+    alternates: {
+      canonical: `/${locale}`,
+      languages: { en: "/en", ar: "/ar", "x-default": "/en" },
+    },
+    openGraph: {
+      type: "website",
+      siteName: dict.hero.name,
+      title: dict.meta.title,
+      description: dict.meta.description,
+      url: `/${locale}`,
+      locale: ogLocale[locale],
+      alternateLocale: locale === "en" ? ogLocale.ar : ogLocale.en,
+    },
+    twitter: { card: "summary_large_image", title: dict.meta.title, description: dict.meta.description },
   };
 }
 

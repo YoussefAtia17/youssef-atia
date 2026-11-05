@@ -7,6 +7,7 @@ import { getDictionary, getLocale } from "@/i18n/dictionaries";
 import { featuredProjects } from "@/content/projects";
 import { pick } from "@/content/types";
 import { Tag } from "@/components/Section";
+import { ogLocale } from "@/lib/site";
 import { ExternalIcon, GithubIcon, LockIcon } from "@/components/icons";
 
 const findProject = (slug: string) => featuredProjects.find((p) => p.slug === slug);
@@ -21,10 +22,17 @@ export async function generateMetadata({ params }: PageProps<"/[locale]/projects
   if (!project) return {};
   const lang = locale === "ar" ? "ar" : "en";
   const dict = await getDictionary();
+  const title = `${pick(project.title, lang)} | ${dict.hero.name}`;
+  const description = pick(project.summary, lang);
   return {
-    title: `${pick(project.title, lang)} | ${dict.hero.name}`,
-    description: pick(project.summary, lang),
-    alternates: { languages: { en: `/en/projects/${slug}`, ar: `/ar/projects/${slug}` } },
+    title,
+    description,
+    alternates: {
+      canonical: `/${lang}/projects/${slug}`,
+      languages: { en: `/en/projects/${slug}`, ar: `/ar/projects/${slug}`, "x-default": `/en/projects/${slug}` },
+    },
+    openGraph: { type: "article", siteName: dict.hero.name, title, description, url: `/${lang}/projects/${slug}`, locale: ogLocale[lang] },
+    twitter: { card: "summary_large_image", title, description },
   };
 }
 
