@@ -34,12 +34,14 @@
     "earlier": "Earlier projects",
     "details": "Details",
     "back": "All projects",
-    "overview": "Overview",
-    "features": "What it does",
+    "overview": "How it works",
     "results": "Results",
     "stack": "Built with",
-    "links": "Links",
-    "notFound": "Project not found"
+    "notFound": "Project not found",
+    "context": "The problem",
+    "modules": "What's inside",
+    "engineering": "Under the hood",
+    "confidential": "This is client work, so the code and real data stay private. Everything below describes what the product does without exposing them."
   },
   "experience": {
     "title": "Experience",

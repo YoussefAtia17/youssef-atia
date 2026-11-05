@@ -95,6 +95,12 @@ async function ProjectDetails({ params }: { params: PageProps<"/[locale]/project
         )}
       </div>
 
+      {p.privateCode && (
+        <p className="mt-6 flex gap-3 rounded-2xl border border-border bg-surface/50 p-4 text-sm text-muted">
+          <LockIcon className="mt-0.5 size-4 shrink-0" /> {t.confidential}
+        </p>
+      )}
+
       {p.details.highlights && (
         <section className="mt-12">
           <h2 className="text-2xl font-semibold">{t.results}</h2>
@@ -110,18 +116,28 @@ async function ProjectDetails({ params }: { params: PageProps<"/[locale]/project
         </section>
       )}
 
+      <TextSection title={t.context} text={pick(p.details.context, locale)} />
+      <TextSection title={t.overview} text={pick(p.details.overview, locale)} />
+
       <section className="mt-12">
-        <h2 className="text-2xl font-semibold">{t.overview}</h2>
-        <p className="mt-4 leading-relaxed text-muted">{pick(p.details.overview, locale)}</p>
+        <h2 className="text-2xl font-semibold">{t.modules}</h2>
+        <div className="mt-6 grid gap-4 sm:grid-cols-2">
+          {p.details.modules.map((m) => (
+            <div key={m.title.en} className="rounded-2xl border border-border bg-surface/50 p-5">
+              <h3 className="font-semibold">{pick(m.title, locale)}</h3>
+              <p className="mt-2 text-sm leading-relaxed text-muted">{pick(m.body, locale)}</p>
+            </div>
+          ))}
+        </div>
       </section>
 
       <section className="mt-12">
-        <h2 className="text-2xl font-semibold">{t.features}</h2>
+        <h2 className="text-2xl font-semibold">{t.engineering}</h2>
         <ul className="mt-4 space-y-3">
-          {p.details.features.map((f) => (
+          {p.details.engineering.map((f) => (
             <li key={f.en} className="flex gap-3">
-              <span className="mt-2 size-1.5 shrink-0 rounded-full bg-accent" aria-hidden />
-              <span className="text-muted">{pick(f, locale)}</span>
+              <span className="mt-2.5 size-1.5 shrink-0 rounded-full bg-accent" aria-hidden />
+              <span className="leading-relaxed text-muted">{pick(f, locale)}</span>
             </li>
           ))}
         </ul>
@@ -136,5 +152,14 @@ async function ProjectDetails({ params }: { params: PageProps<"/[locale]/project
         </div>
       </section>
     </article>
+  );
+}
+
+function TextSection({ title, text }: { title: string; text: string }) {
+  return (
+    <section className="mt-12">
+      <h2 className="text-2xl font-semibold">{title}</h2>
+      <p className="mt-4 max-w-3xl leading-relaxed text-muted">{text}</p>
+    </section>
   );
 }
