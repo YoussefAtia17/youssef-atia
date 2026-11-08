@@ -14,7 +14,7 @@ export function LanguageSwitcher({ locale, label }: { locale: Locale; label: str
     <a
       href={href}
       lang={target}
-      className="rounded-full border border-border px-3 py-1.5 text-sm transition hover:bg-surface"
+      className="rounded-lg border border-border px-3 py-1.5 text-sm transition hover:bg-surface"
     >
       {label}
     </a>

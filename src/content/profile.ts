@@ -13,7 +13,7 @@ export const bio: Localized = {
 
 export const skillGroups: { title: Localized; items: string[] }[] = [
   { title: { en: "Languages", ar: "لغات البرمجة" }, items: ["Python", "JavaScript", "TypeScript", "Swift", "C++", "SQL", "Dart"] },
-  { title: { en: "Web & Mobile", ar: "ويب وموبايل" }, items: ["HTML", "CSS", "Tailwind", "Flask", "FastAPI", "SwiftUI"] },
+  { title: { en: "Web & Mobile", ar: "ويب وموبايل" }, items: ["HTML", "CSS", "Tailwind", "Flask", "FastAPI", "SwiftUI", "Flutter"] },
   { title: { en: "Data & Backend", ar: "داتا وباك إند" }, items: ["Supabase", "PostgreSQL", "MySQL", "Firebase"] },
   { title: { en: "AI & Automation", ar: "AI وأتمتة" }, items: ["Federated Learning", "NumPy", "Gemini API", "Ollama", "n8n"] },
   { title: { en: "Tools & Hardware", ar: "أدوات وهاردوير" }, items: ["Git", "Docker", "Vercel", "Raspberry Pi", "Arduino"] },

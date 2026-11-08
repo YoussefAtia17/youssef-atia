@@ -2,48 +2,67 @@ import type { Locale } from "@/i18n/config";
 import type { Dictionary } from "@/i18n/dictionaries";
 import { certifications, education, experience, type TimelineItem } from "@/content/profile";
 import { pick } from "@/content/types";
-import { Section } from "../Section";
+import { Section, Window } from "../Section";
+
+/** Stable fake commit hash so each entry reads like a git log line. */
+function shortHash(text: string) {
+  let h = 2166136261;
+  for (const c of text) h = Math.imul(h ^ c.charCodeAt(0), 16777619);
+  return (h >>> 0).toString(16).padStart(8, "0").slice(0, 7);
+}
 
 export function Experience({ locale, dict }: { locale: Locale; dict: Dictionary["experience"] }) {
   return (
-    <Section id="experience" title={dict.title}>
-      <ol className="relative space-y-10 border-s border-border ps-8">
-        {experience.map((item) => (
-          <TimelineEntry key={item.title.en} item={item} locale={locale} />
-        ))}
-      </ol>
+    <Section id="experience" index="03" title={dict.title}>
+      <Window title="git log --oneline --graph" bodyClassName="p-5 sm:p-8">
+        <ol className="relative space-y-8 border-s border-dashed border-border ps-7">
+          {experience.map((item, i) => (
+            <TimelineEntry key={item.title.en} item={item} locale={locale} head={i === 0} />
+          ))}
+        </ol>
+      </Window>
 
-      <div className="mt-16 grid gap-6 md:grid-cols-2">
-        <div className="rounded-2xl border border-border p-6">
-          <h3 className="mb-4 font-semibold">{dict.education}</h3>
-          <p className="font-medium">{pick(education.title, locale)}</p>
+      <div className="mt-6 grid gap-6 md:grid-cols-2">
+        <Window title="education.md" bodyClassName="p-6">
+          <p className="font-mono text-xs text-accent">{dict.education}</p>
+          <p className="mt-3 text-lg font-semibold">{pick(education.title, locale)}</p>
           <p className="text-sm text-muted">{pick(education.place, locale)}</p>
-          <p className="mt-1 text-sm text-accent">{pick(education.date, locale)}</p>
-        </div>
-        <div className="rounded-2xl border border-border p-6">
-          <h3 className="mb-4 font-semibold">{dict.certifications}</h3>
-          <ul className="space-y-2 text-sm">
+          <p className="mt-3 inline-block rounded-md bg-accent/10 px-2 py-1 font-mono text-xs text-accent">
+            {pick(education.date, locale)}
+          </p>
+        </Window>
+        <Window title="certifications.json" bodyClassName="p-6">
+          <p className="font-mono text-xs text-accent">{dict.certifications}</p>
+          <ul className="mt-3 divide-y divide-border text-sm">
             {certifications.map((c) => (
-              <li key={c.name} className="flex justify-between gap-4">
+              <li key={c.name} className="flex justify-between gap-4 py-2">
                 <span>{c.name}</span>
-                <span className="text-muted">{c.issuer}</span>
+                <span className="font-mono text-xs text-muted">{c.issuer}</span>
               </li>
             ))}
           </ul>
-        </div>
+        </Window>
       </div>
     </Section>
   );
 }
 
-function TimelineEntry({ item, locale }: { item: TimelineItem; locale: Locale }) {
+function TimelineEntry({ item, locale, head }: { item: TimelineItem; locale: Locale; head: boolean }) {
   return (
     <li className="relative">
-      <span className="absolute -start-[2.4rem] top-1.5 size-3 rounded-full border-2 border-background bg-accent ring-4 ring-accent/20" />
-      <div className="flex flex-wrap items-baseline justify-between gap-x-4">
-        <h3 className="text-lg font-semibold">{pick(item.title, locale)}</h3>
-        <span className="text-sm text-muted">{pick(item.date, locale)}</span>
-      </div>
+      <span
+        className={`absolute -start-[2.15rem] top-1.5 size-3 rounded-full border-2 ${
+          head ? "border-accent bg-accent shadow-[0_0_12px_var(--accent)]" : "border-muted bg-background"
+        }`}
+      />
+      <p className="flex flex-wrap items-center gap-x-3 gap-y-1 font-mono text-xs" dir="ltr">
+        <span className="text-[#e3b341]">{shortHash(item.title.en)}</span>
+        {head && <span className="text-accent-2">(HEAD -&gt; main)</span>}
+        <span className="text-muted" dir="auto">
+          {pick(item.date, locale)}
+        </span>
+      </p>
+      <h3 className="mt-2 text-lg font-semibold">{pick(item.title, locale)}</h3>
       <p className="text-sm text-accent">{pick(item.place, locale)}</p>
       {item.text && <p className="mt-2 max-w-2xl text-muted">{pick(item.text, locale)}</p>}
     </li>

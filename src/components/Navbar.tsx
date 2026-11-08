@@ -15,15 +15,18 @@ export function Navbar({ locale, nav }: Props) {
   ];
 
   return (
-    <header className="sticky top-0 z-50 border-b border-border bg-background/80 backdrop-blur">
-      <nav className="mx-auto flex h-16 max-w-5xl items-center justify-between gap-4 px-6">
-        <a href={`/${locale}`} className="text-lg font-bold">
-          YA<span className="text-accent">.</span>
+    <header className="sticky top-0 z-50 border-b border-border/70 bg-background/70 backdrop-blur-xl">
+      <nav className="mx-auto flex h-16 max-w-6xl items-center justify-between gap-4 px-6">
+        <a href={`/${locale}`} className="font-mono text-sm font-semibold" dir="ltr">
+          <span className="text-accent">~/</span>youssef-atia<span className="text-accent">_</span>
         </a>
-        <ul className="hidden items-center gap-6 text-sm text-muted md:flex">
-          {links.map((l) => (
+        <ul className="hidden items-center gap-7 text-sm text-muted md:flex">
+          {links.map((l, i) => (
             <li key={l.href}>
-              <a href={l.href} className="transition hover:text-foreground">
+              <a href={l.href} className="group transition hover:text-foreground">
+                <span className="font-mono text-xs text-accent/80 group-hover:text-accent" dir="ltr">
+                  0{i + 1}.
+                </span>{" "}
                 {l.label}
               </a>
             </li>

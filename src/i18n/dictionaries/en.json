@@ -18,7 +18,13 @@
     "name": "Youssef Atia",
     "tagline": "Full-stack developer shipping web, mobile and AI projects.",
     "ctaProjects": "View my work",
-    "ctaCv": "Download CV"
+    "ctaCv": "Download CV",
+    "status": "Available for freelance & internships",
+    "stats": {
+      "projects": "projects shipped",
+      "clients": "client products",
+      "langs": "Arabic + English"
+    }
   },
   "about": {
     "title": "About me",
@@ -41,7 +47,10 @@
     "context": "The problem",
     "modules": "What's inside",
     "engineering": "Under the hood",
-    "confidential": "This is client work, so the code and real data stay private. Everything below describes what the product does without exposing them."
+    "confidential": "This is client work, so the code and real data stay private. Everything below describes what the product does without exposing them.",
+    "gallery": "Screenshots",
+    "openImage": "Open full size",
+    "featured": "Featured"
   },
   "experience": {
     "title": "Experience",

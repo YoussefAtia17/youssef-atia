@@ -16,7 +16,7 @@ export function MobileMenu({ links, openLabel, closeLabel }: Props) {
         aria-expanded={open}
         aria-controls="mobile-menu"
         aria-label={open ? closeLabel : openLabel}
-        className="grid size-9 place-items-center rounded-full border border-border transition hover:bg-surface"
+        className="grid size-9 place-items-center rounded-lg border border-border transition hover:bg-surface"
       >
         {open ? <CloseIcon className="size-4" /> : <MenuIcon className="size-4" />}
       </button>

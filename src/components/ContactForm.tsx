@@ -7,7 +7,7 @@ import type { Dictionary } from "@/i18n/dictionaries";
 type Labels = Dictionary["contact"]["form"];
 
 const field =
-  "mt-2 block w-full rounded-xl border border-border bg-background px-4 py-3 text-foreground outline-none transition placeholder:text-muted/70 focus:border-accent focus:ring-2 focus:ring-accent/30 aria-[invalid=true]:border-red-500";
+  "mt-2 block w-full rounded-lg border border-border bg-background px-4 py-3 text-foreground outline-none transition placeholder:text-muted/70 focus:border-accent focus:ring-2 focus:ring-accent/25 aria-[invalid=true]:border-red-500";
 
 export function ContactForm({ t }: { t: Labels }) {
   const [state, action, pending] = useActionState<ContactState, FormData>(sendContactMessage, { status: "idle" });
@@ -25,8 +25,9 @@ export function ContactForm({ t }: { t: Labels }) {
 
   if (state.status === "success" && dismissed !== state) {
     return (
-      <div role="status" className="rounded-2xl border border-border bg-surface/50 p-8 text-center">
-        <p className="text-xl font-semibold">{t.successTitle}</p>
+      <div role="status" className="p-8 text-center">
+        <p className="font-mono text-sm text-accent" dir="ltr">✓ exit 0</p>
+        <p className="mt-3 text-xl font-semibold">{t.successTitle}</p>
         <p className="mt-2 text-muted">{t.successText}</p>
         <button type="button" onClick={() => setDismissed(state)} className="mt-6 text-sm font-medium text-accent hover:underline">
           {t.again}
@@ -39,7 +40,7 @@ export function ContactForm({ t }: { t: Labels }) {
   const invalid = (f: ContactField) => state.status === "invalid" && state.fields.includes(f);
 
   return (
-    <form action={submit} className="space-y-5 rounded-2xl border border-border bg-surface/40 p-6 text-start sm:p-8" noValidate>
+    <form action={submit} className="space-y-5 p-6 text-start sm:p-8" noValidate>
       <div className="grid gap-5 sm:grid-cols-2">
         <label className="block text-sm font-medium">
           {t.name}
@@ -70,9 +71,9 @@ export function ContactForm({ t }: { t: Labels }) {
         <button
           type="submit"
           disabled={pending}
-          className="inline-flex items-center gap-2 rounded-full bg-accent px-6 py-3 font-medium text-white transition hover:opacity-90 disabled:opacity-60"
+          className="inline-flex items-center gap-2 rounded-lg bg-accent px-6 py-3 font-medium text-black transition hover:brightness-110 disabled:opacity-60"
         >
-          {pending ? t.sending : t.send}
+          <span className="font-mono" dir="ltr">$</span> {pending ? t.sending : t.send}
         </button>
         <p aria-live="polite" className="text-sm text-red-500">
           {state.status === "error" && t.errors.send}

@@ -15,8 +15,10 @@ export type Project = {
   privateCode?: boolean;
   /** Tailwind gradient: card cover when there is no screenshot, and accent on the details page. */
   cover: string;
-  /** Screenshot in /public/projects. */
+  /** Cover screenshot in /public/projects. */
   image?: string;
+  /** Extra screenshots shown on the details page. */
+  gallery?: string[];
   details: ProjectDetails;
 };
 
@@ -36,6 +38,144 @@ export type ProjectDetails = {
 const GH = "https://github.com/YoussefAtia17";
 
 export const featuredProjects: Project[] = [
+  {
+    slug: "splitter",
+    title: { en: "Splitter: AI Bill Splitting", ar: "Splitter: تقسيم الفاتورة بالذكاء الاصطناعي" },
+    summary: {
+      en: "Mobile app that reads a restaurant receipt with AI, lets everyone tap what they ate, spreads service and tax fairly, and settles group balances in the fewest transfers, with InstaPay payments and spending insights.",
+      ar: "تطبيق موبايل بيقرا فاتورة المطعم بالذكاء الاصطناعي، كل واحد يختار اللي أكله، الخدمة والضريبة بتتوزع بالعدل، وحسابات الجروب بتتسوى بأقل عدد تحويلات، مع دفع بإنستاباي وتحليلات للمصاريف.",
+    },
+    badge: { en: "Product · iOS & Android", ar: "منتج · iOS وAndroid" },
+    stack: ["Flutter", "Dart", "Supabase", "AI OCR", "n8n"],
+    cover: "from-emerald-400 to-teal-600",
+    image: "/projects/splitter/00_cover.webp",
+    gallery: ["/projects/splitter/00_features.webp", "/projects/splitter/01_scan.webp", "/projects/splitter/02_split.webp", "/projects/splitter/03_groups.webp", "/projects/splitter/04_insights.webp"],
+    details: {
+      context: {
+        en: "Every outing with friends ends the same way: one person pays, then someone does math on a phone calculator, service and tax get split evenly even though one person only had water, and the money is chased over WhatsApp for days. Splitter turns the receipt itself into the source of truth, so who owes what is exact and settling up takes a tap.",
+        ar: "أي خروجة مع الصحاب بتخلص بنفس الشكل: واحد يدفع، وبعدين حد يقعد يحسب على الآلة الحاسبة، والخدمة والضريبة تتقسم بالتساوي حتى لو في واحد مشربش غير مياه، والفلوس تفضل تتلم على واتساب أيام. Splitter بيخلّي الفاتورة نفسها هي المرجع، فكل واحد عليه كام بيبقى مظبوط بالقرش، والتسوية بضغطة.",
+      },
+      overview: {
+        en: "You take a photo of the receipt (or pick one from the gallery). The AI reads the restaurant name, every item with its quantity and price, plus the service charge and tax, and shows them as a list. You pick a friend, then tap the items they had; shared items like a bottle of water can belong to several people, and anything nobody picked is flagged before you continue. The next screen shows what each person owes, with service and tax distributed in proportion to what they ordered. Add the bill to a group, and the group keeps a running balance across all its expenses, works out who pays whom with the fewest transfers, and lets each person pay through InstaPay with reminders for anyone who is late.",
+        ar: "بتصوّر الفاتورة (أو تختارها من المعرض). الذكاء الاصطناعي بيقرا اسم المكان وكل صنف بالكمية والسعر، والخدمة والضريبة، ويعرضهم في لستة. تختار صاحبك وتضغط على الأصناف اللي أكلها؛ والحاجات المشتركة زي إزازة المية ممكن تبقى على أكتر من حد، وأي صنف محدش اختاره بيتعلّم عليه قبل ما تكمّل. الشاشة اللي بعدها بتوريك كل واحد عليه كام، والخدمة والضريبة متوزعين بنسبة اللي طلبه. ولو ضفت الفاتورة لجروب، الجروب بيحسب الرصيد على كل المصاريف، ويطلّع مين يدفع لمين بأقل عدد تحويلات، وكل واحد يدفع بإنستاباي، ومع تذكير للي متأخر.",
+      },
+      modules: [
+        {
+          title: { en: "AI receipt scanning", ar: "مسح الفاتورة بالذكاء الاصطناعي" },
+          body: {
+            en: "Camera or gallery input; OCR extracts the venue, items, quantities, prices, service and tax, and the user can correct anything before splitting.",
+            ar: "من الكاميرا أو المعرض؛ الـ OCR بيطلّع اسم المكان والأصناف والكميات والأسعار والخدمة والضريبة، والمستخدم يقدر يعدّل أي حاجة قبل التقسيم.",
+          },
+        },
+        {
+          title: { en: "Who had what", ar: "مين أكل إيه" },
+          body: {
+            en: "Pick a person, tap their items. Items can be shared between people, and unclaimed items are highlighted so nothing is left unpaid.",
+            ar: "تختار الشخص وتضغط على أصنافه. الصنف ممكن يتقسم على أكتر من حد، والأصناف اللي محدش اختارها بتظهر بلون مختلف عشان مفيش حاجة تتنسي.",
+          },
+        },
+        {
+          title: { en: "Fair totals", ar: "حساب عادل" },
+          body: {
+            en: "Each person's share of service and tax follows the share of items they ordered, with a full breakdown per person.",
+            ar: "نصيب كل واحد من الخدمة والضريبة على حسب اللي طلبه، مع تفصيل كامل لكل شخص.",
+          },
+        },
+        {
+          title: { en: "Groups & settle-up", ar: "الجروبات والتسوية" },
+          body: {
+            en: "Groups for recurring circles (flatmates, a trip, Thursday nights) with running balances, a minimum-transfers settlement plan, InstaPay payments and reminders.",
+            ar: "جروبات للناس اللي بتتكرر (شقة، رحلة، سهرة الخميس) برصيد متجدد، وخطة تسوية بأقل عدد تحويلات، ودفع بإنستاباي وتذكيرات.",
+          },
+        },
+        {
+          title: { en: "Insights", ar: "التحليلات" },
+          body: {
+            en: "Spending by category and over the last six months, plus smart notes such as “eating out went up 35%” or “Ahmed is late settling up”.",
+            ar: "المصاريف بالتصنيف وعلى آخر 6 شهور، وملاحظات ذكية زي «الخروجات زادت 35%» أو «أحمد متأخر في التسوية».",
+          },
+        },
+        {
+          title: { en: "Pro plan", ar: "اشتراك Pro" },
+          body: {
+            en: "A free tier with ads, and a monthly Pro plan with unlimited scans, no ads, deeper insights and PDF/Excel export of balances.",
+            ar: "نسخة مجانية بإعلانات، واشتراك Pro شهري فيه مسح فواتير بلا حدود، من غير إعلانات، تحليلات أعمق، وتصدير الحسابات PDF وExcel.",
+          },
+        },
+      ],
+      engineering: [
+        { en: "Debt simplification: group balances are reduced to the smallest set of transfers that settles everyone", ar: "تبسيط الديون: أرصدة الجروب بتتحوّل لأقل عدد تحويلات يسوّي الكل" },
+        { en: "Service and tax distributed proportionally per person, so totals always add up to the receipt", ar: "الخدمة والضريبة بتتوزع بالنسبة على كل شخص، فالمجموع دايمًا بيطابق الفاتورة" },
+        { en: "Supabase for auth, groups, expenses and balances; n8n workflows for reminders and notifications", ar: "Supabase للحسابات والجروبات والمصاريف والأرصدة، وworkflows على n8n للتذكيرات والإشعارات" },
+        { en: "Arabic-first, right-to-left interface with Egyptian pound formatting", ar: "واجهة عربي من الأول، من اليمين للشمال، وبتنسيق الجنيه المصري" },
+      ],
+    },
+  },
+  {
+    slug: "playzone",
+    title: { en: "PlayZone: Gaming Café POS", ar: "PlayZone: كاشير محلات البلايستيشن" },
+    summary: {
+      en: "Cashier and management system for PlayStation, billiards and café shops: a live timer and hourly billing per device, orders and takeaway with stock that updates itself, printable receipts, expenses and daily/monthly profit reports.",
+      ar: "برنامج كاشير وإدارة لمحلات البلايستيشن والبلياردو والكافيهات: عدّاد لايف وحساب بالساعة لكل جهاز، طلبات وتيك أواي والمخزن بيتخصم لوحده، فواتير للطباعة، مصروفات، وتقارير ربح يومية وشهرية.",
+    },
+    badge: { en: "Client · Real shop", ar: "عميل · محل حقيقي" },
+    stack: ["JavaScript"],
+    cover: "from-orange-500 to-amber-600",
+    image: "/projects/playzone/00_cover.webp",
+    gallery: ["/projects/playzone/00_features.webp", "/projects/playzone/01_dashboard.webp", "/projects/playzone/02_device_orders.webp", "/projects/playzone/03_takeaway.webp", "/projects/playzone/04_receipt.webp", "/projects/playzone/05_report_day.webp", "/projects/playzone/06_report_month.webp", "/projects/playzone/07_stock.webp", "/projects/playzone/08_expenses.webp"],
+    details: {
+      context: {
+        en: "Gaming cafés run on a notebook and a wall clock: the cashier writes down when each PlayStation started, adds up drinks and snacks by hand, and the owner only finds out at the end of the month whether the place made money. This system was built for a real shop to replace that with one screen where every device, every order and every pound is counted automatically.",
+        ar: "محلات البلايستيشن ماشية بكشكول وساعة حيطة: الكاشير يكتب كل جهاز بدأ إمتى، ويجمع المشاريب والسناكس بإيده، وصاحب المحل مبيعرفش هو كسبان ولا لأ غير آخر الشهر. البرنامج ده اتعمل لمحل حقيقي عشان يبدّل ده بشاشة واحدة، كل جهاز وكل طلب وكل جنيه فيها بيتحسب لوحده.",
+      },
+      overview: {
+        en: "The dashboard shows every device (PS5, PS4…) with its hourly rate and a live timer, plus today's income, expenses, net and how many devices are busy. The cashier starts a session, adds orders to it from a categorized menu (hot drinks, cold drinks, shisha, snacks), and ends it: the system prices the play time by the hour, adds the orders and produces a receipt ready to print as PDF. Takeaway orders go through the same menu without a device. Every order deducts from stock, expenses are logged as they happen, and the reports page shows income, expenses and net profit for any day or month.",
+        ar: "لوحة التحكم بتعرض كل جهاز (PS5 وPS4…) بسعر الساعة وعدّاد لايف، ومعاهم دخل النهارده والمصروفات والصافي وكام جهاز شغال. الكاشير يبدأ القعدة، ويضيف عليها طلبات من منيو متقسّم (مشروبات سخنة وساقعة، شيشة، سناكس)، ويقفلها: البرنامج يحسب وقت اللعب بالساعة، ويجمع الطلبات، ويطلّع فاتورة جاهزة للطباعة PDF. التيك أواي بيمشي من نفس المنيو من غير جهاز. كل طلب بيتخصم من المخزن، والمصروفات بتتسجل أول بأول، وصفحة التقارير بتوريك الدخل والمصروفات وصافي الربح لأي يوم أو شهر.",
+      },
+      modules: [
+        {
+          title: { en: "Device board", ar: "لوحة الأجهزة" },
+          body: {
+            en: "Each device has its own hourly rate, a start/stop timer and its running orders; busy and free devices are visible at a glance.",
+            ar: "كل جهاز ليه سعر ساعة وعدّاد بدء وإنهاء والطلبات اللي عليه، والأجهزة الشغالة والفاضية باينة من أول نظرة.",
+          },
+        },
+        {
+          title: { en: "Orders & takeaway", ar: "الطلبات والتيك أواي" },
+          body: {
+            en: "A categorized menu with prices and stock levels, used both for orders on a device and for takeaway.",
+            ar: "منيو متقسّم بالأسعار والكميات المتاحة، بيتستخدم للطلبات على الجهاز وللتيك أواي.",
+          },
+        },
+        {
+          title: { en: "Receipts", ar: "الفواتير" },
+          body: {
+            en: "One receipt with play time, hourly rate, each order and the total, numbered and ready to print as PDF.",
+            ar: "فاتورة واحدة فيها وقت اللعب وسعر الساعة وكل طلب والإجمالي، مترقّمة وجاهزة للطباعة PDF.",
+          },
+        },
+        {
+          title: { en: "Stock", ar: "المخزن" },
+          body: {
+            en: "Every sale deducts from stock automatically, so the owner sees what is running low without counting.",
+            ar: "كل بيعة بتتخصم من المخزن أوتوماتيك، فصاحب المحل يعرف إيه اللي قرب يخلص من غير ما يعدّ.",
+          },
+        },
+        {
+          title: { en: "Expenses & reports", ar: "المصروفات والتقارير" },
+          body: {
+            en: "Expenses logged during the day; daily and monthly reports with income, expenses and net profit, plus a log of every receipt.",
+            ar: "المصروفات بتتسجل خلال اليوم، وتقارير يومية وشهرية بالدخل والمصروفات وصافي الربح، وسجل بكل الفواتير.",
+          },
+        },
+      ],
+      engineering: [
+        { en: "Billing computed from timestamps, so a session survives a page reload and the price is exact to the minute", ar: "الحساب معمول من وقت البداية والنهاية، فالقعدة مبتضيعش لو الصفحة اتعملها reload والسعر مظبوط بالدقيقة" },
+        { en: "Orders, stock and reports share one data model, so a sale updates the receipt, the stock and the day's numbers together", ar: "الطلبات والمخزن والتقارير على نفس الداتا، فأي بيعة بتحدّث الفاتورة والمخزن وأرقام اليوم مع بعض" },
+        { en: "Arabic, right-to-left cashier UI built for fast use on a single shop PC", ar: "واجهة كاشير عربي من اليمين للشمال، معمولة للاستخدام السريع على كمبيوتر واحد في المحل" },
+      ],
+    },
+  },
   {
     slug: "ara-fed",
     title: { en: "ARA-Fed", ar: "ARA-Fed" },
@@ -110,6 +250,8 @@ export const featuredProjects: Project[] = [
     stack: ["Swift", "SwiftUI", "Supabase", "PostgreSQL", "Edge Functions", "APNs"],
     privateCode: true,
     cover: "from-amber-500 to-rose-500",
+    image: "/projects/royal-palace/00_cover.webp",
+    gallery: ["/projects/royal-palace/00_features.webp", "/projects/royal-palace/01_gallery.webp", "/projects/royal-palace/02_details.webp", "/projects/royal-palace/03_chat.webp", "/projects/royal-palace/04_offers.webp", "/projects/royal-palace/05_selling.webp"],
     details: {
       context: {
         en: "Aser Watch deals in pre-owned luxury Swiss watches. Most of that market lives in WhatsApp groups and social posts: no structured details, no way to know if a seller is real, and negotiations scattered across chats. They wanted their own app where collectors can list watches properly, the business can vet every listing, and buyers and sellers can talk and negotiate in one place.",
@@ -326,7 +468,8 @@ export const featuredProjects: Project[] = [
     live: "https://qr-code-tan-tau.vercel.app/login",
     github: `${GH}/QR-Code`,
     cover: "from-emerald-500 to-teal-600",
-    image: "/projects/shop-qr.jpg",
+    image: "/projects/shop-qr/00_cover.webp",
+    gallery: ["/projects/shop-qr/00_features.webp", "/projects/shop-qr/01_customer.webp", "/projects/shop-qr/02_instapay.webp", "/projects/shop-qr/03_dashboard.webp", "/projects/shop-qr/04_multishop.webp", "/projects/shop-qr/05_sticker.webp"],
     details: {
       context: {
         en: "Small shops in Egypt take payments through InstaPay and mobile wallets, but they usually do it by writing phone numbers on paper by the cashier. Customers copy the number wrong, ask which wallet to use, or type the transfer code by hand. One printed QR code that does all of that is faster for everyone.",

@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Inter, IBM_Plex_Sans_Arabic } from "next/font/google";
+import { Inter, IBM_Plex_Sans_Arabic, JetBrains_Mono } from "next/font/google";
 import { locales, dirOf } from "@/i18n/config";
 import { getDictionary, getLocale } from "@/i18n/dictionaries";
 import { Navbar } from "@/components/Navbar";
@@ -8,14 +8,15 @@ import { ogLocale, siteUrl } from "@/lib/site";
 import "../globals.css";
 
 const inter = Inter({ variable: "--font-inter", subsets: ["latin"] });
+const mono = JetBrains_Mono({ variable: "--font-mono-jb", subsets: ["latin"] });
 const plexArabic = IBM_Plex_Sans_Arabic({
   variable: "--font-arabic",
   subsets: ["arabic"],
   weight: ["400", "500", "600", "700"],
 });
 
-// Saved choice wins; otherwise follow the OS. Runs before first paint.
-const themeScript = `(function(){try{var t=localStorage.getItem("theme");if(t!=="light"&&t!=="dark")t=matchMedia("(prefers-color-scheme: dark)").matches?"dark":"light";document.documentElement.setAttribute("data-theme",t)}catch(e){}})()`;
+// Saved choice wins; otherwise dark (the site is designed dark-first). Runs before first paint.
+const themeScript = `(function(){try{var t=localStorage.getItem("theme");if(t!=="light"&&t!=="dark")t="dark";document.documentElement.setAttribute("data-theme",t)}catch(e){}})()`;
 
 export function generateStaticParams() {
   return locales.map((locale) => ({ locale }));
@@ -54,9 +55,9 @@ export default async function RootLayout({ children }: LayoutProps<"/[locale]">)
     <html
       lang={locale}
       dir={dirOf(locale)}
-      data-theme="light"
+      data-theme="dark"
       suppressHydrationWarning
-      className={`${inter.variable} ${plexArabic.variable} h-full antialiased`}
+      className={`${inter.variable} ${plexArabic.variable} ${mono.variable} h-full antialiased`}
     >
       <head>
         <script dangerouslySetInnerHTML={{ __html: themeScript }} />
