@@ -108,6 +108,7 @@ export const featuredProjects: Project[] = [
     },
     badge: { en: "Client · Aser Watch", ar: "عميل · Aser Watch" },
     stack: ["Swift", "SwiftUI", "Supabase", "PostgreSQL", "Edge Functions", "APNs"],
+    live: "/demos/watch-app.html",
     privateCode: true,
     cover: "from-amber-500 to-rose-500",
     details: {
@@ -182,6 +183,7 @@ export const featuredProjects: Project[] = [
     },
     badge: { en: "Client · Aser Watch", ar: "عميل · Aser Watch" },
     stack: ["JavaScript", "Tailwind", "Supabase", "PostgreSQL", "SheetJS"],
+    live: "/demos/mrc/index.html",
     github: `${GH}/MRC`,
     cover: "from-yellow-500 to-amber-700",
     image: "/projects/mrc.jpg",

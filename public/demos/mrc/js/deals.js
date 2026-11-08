@@ -1,0 +1,568 @@
+// =========================================================================
+// إدارة الصفقات، الساعات السويسرية (مع الحفظ التلقائي للأنواع اليدوية)، والبحث الذكي
+// =========================================================================
+
+let searchTimer;
+function handleSearchDeals(q) {
+    clearTimeout(searchTimer);
+    searchTimer = setTimeout(() => renderDeals(q.trim()), 100);
+}
+
+// دالة توحيد الحروف العربية والإنجليزية لضمان دقة البحث 100% للأنواع اليدوية والجاهزة
+function normalizeSearchText(str) {
+    if (!str) return '';
+    return String(str)
+        .toLowerCase()
+        .trim()
+        .replace(/[أإآ]/g, 'ا')
+        .replace(/ة/g, 'ه')
+        .replace(/ى/g, 'ي');
+}
+
+// دمج الماركات السويسرية الأساسية مع أي ماركات يدوية تمت إضافتها سابقاً في الصفقات
+function getAllAvailableWatchBrands() {
+    const customBrandsFromDeals = state.deals
+        .map(d => d.watch_brand ? d.watch_brand.trim() : '')
+        .filter(b => b && !SWISS_BRANDS.includes(b));
+
+    return [...new Set([...SWISS_BRANDS, ...customBrandsFromDeals])];
+}
+
+function toggleWatchDropdown() {
+    const menu = document.getElementById('watchDropdownMenu');
+    const isHidden = menu.classList.contains('hidden');
+    if (isHidden) {
+        menu.classList.remove('hidden');
+        document.getElementById('watchBrandSearchInput').value = '';
+        filterWatchBrandsList('');
+        setTimeout(() => document.getElementById('watchBrandSearchInput').focus(), 50);
+    } else {
+        menu.classList.add('hidden');
+    }
+}
+
+function filterWatchBrandsList(query = '') {
+    const qRaw = query.trim();
+    const qNorm = normalizeSearchText(qRaw);
+    const container = document.getElementById('watchBrandsListItems');
+    const allBrands = getAllAvailableWatchBrands();
+
+    const filtered = allBrands.filter(b => normalizeSearchText(b).includes(qNorm));
+
+    // إذا كتب المستخدم نوعاً جديداً في خانة بحث القائمة، نضبطه تلقائياً كقيمة مختارة حتى لو لم يضغط على الزر
+    if (qRaw) {
+        document.getElementById('watchBrandSelect').value = 'custom';
+        document.getElementById('watchBrandCustom').value = qRaw;
+        document.getElementById('selectedWatchBrandLabel').textContent = `⌚ ${qRaw}`;
+        updateWhatsAppPreview();
+    }
+
+    let html = `<div onclick="selectWatchBrandOption('')" class="p-2.5 hover:bg-blue-50 cursor-pointer text-slate-500">-- بدون تحديد ماركة --</div>`;
+    html += filtered.map(b => {
+        const safeBrand = b.replace(/'/g, "\\'");
+        const isCustomSaved = !SWISS_BRANDS.includes(b);
+        return `
+        <div onclick="selectWatchBrandOption('${safeBrand}')" class="p-2.5 hover:bg-blue-50 cursor-pointer text-slate-800 flex justify-between items-center">
+            <span>${b}</span>
+            ${isCustomSaved ? '<span class="text-[10px] bg-amber-100 text-amber-800 px-2 py-0.5 rounded-full font-bold">مضاف يدوياً</span>' : ''}
+        </div>`;
+    }).join('');
+
+    const safeQuery = qRaw.replace(/'/g, "\\'");
+    html += `
+        <div onclick="selectWatchBrandOption('custom', '${safeQuery}')" class="p-2.5 bg-blue-50 hover:bg-blue-100 cursor-pointer text-blue-700 font-extrabold">
+            ➕ نوع آخر (إضافة يدوية)${qRaw ? `: "${qRaw}"` : '...'}
+        </div>`;
+
+    container.innerHTML = html;
+}
+
+function selectWatchBrandOption(val, prefillCustom = '') {
+    document.getElementById('watchBrandSelect').value = val;
+    document.getElementById('watchDropdownMenu').classList.add('hidden');
+    const customInput = document.getElementById('watchBrandCustom');
+    const label = document.getElementById('selectedWatchBrandLabel');
+
+    if (val === 'custom') {
+        customInput.classList.remove('hidden');
+        if (prefillCustom) {
+            customInput.value = prefillCustom;
+            label.textContent = `⌚ ${prefillCustom} (يدوي)`;
+        } else {
+            label.textContent = '➕ نوع آخر (اكتبه في الخانة بالأسفل)';
+        }
+        setTimeout(() => customInput.focus(), 50);
+    } else {
+        label.textContent = val || '-- اختر أو اكتب ماركة الساعة --';
+        customInput.classList.add('hidden');
+        customInput.value = '';
+    }
+    updateWhatsAppPreview();
+}
+
+function getSelectedWatchBrand() {
+    const sel = document.getElementById('watchBrandSelect').value;
+    const customVal = document.getElementById('watchBrandCustom').value.trim();
+    const searchInputVal = document.getElementById('watchBrandSearchInput')
+        ? document.getElementById('watchBrandSearchInput').value.trim()
+        : '';
+
+    // الأولوية للخانة اليدوية إذا كانت مكتوبة، ثم الاختيار، ثم نص البحث داخل القائمة
+    if (sel === 'custom' || customVal) {
+        return customVal || searchInputVal;
+    }
+    return sel || searchInputVal;
+}
+
+// طول ما الرسالة متولدة تلقائياً بتتحدث لوحدها مع تغيير الميعاد/اسم العميل/الساعة،
+// ولو اتعدلت بالإيد بتفضل زي ما هي لحد ما يدوس (توليد نص تلقائي)
+let reminderIsAuto = true;
+
+function formatMeetingParts(mt) {
+    if (!mt) return null;
+    const d = new Date(mt);
+    if (isNaN(d)) return null;
+    return {
+        day: d.toLocaleDateString('ar-EG', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' }),
+        time: d.toLocaleTimeString('ar-EG', { hour: 'numeric', minute: '2-digit' })
+    };
+}
+
+function buildReminderMessage() {
+    const client = document.getElementById('clientName').value.trim() || 'عميلنا العزيز';
+    const brand = getSelectedWatchBrand();
+    const when = formatMeetingParts(document.getElementById('meetingTime').value);
+    const lines = [
+        `أهلاً بحضرتك أستاذ ${client} 👋`,
+        '',
+        'بنأكد مع حضرتك ميعادنا في *ساعات النخبة - DEMO* ⌚',
+        '',
+        `🗓️ *اليوم:* ${when ? when.day : 'هيتحدد قريب'}`,
+        `⏰ *الساعة:* ${when ? when.time : 'هتتحدد قريب'}`
+    ];
+    if (brand) lines.push(`⌚ *بخصوص:* ${brand}`);
+    lines.push('', 'لو حابب تغيّر الميعاد ابعتلنا هنا في أي وقت 🙏', 'في انتظار حضرتك، وشكراً لثقتك فينا ✨');
+    return lines.join('\n');
+}
+
+// ===== رسالة المتابعة: بتتبعت كل كام يوم للعميل طول ما الديل لسه قيد التواصل =====
+let followupIsAuto = true;
+
+function buildFollowupMessage() {
+    const client = document.getElementById('clientName').value.trim() || 'عميلنا العزيز';
+    const brand = getSelectedWatchBrand();
+    const lines = [
+        `أهلاً بحضرتك أستاذ ${client} 👋`,
+        '',
+        'معاك *ساعات النخبة - DEMO* ⌚',
+        brand ? `حبينا نطمن على حضرتك ونتابع معاك بخصوص *${brand}*` : 'حبينا نطمن على حضرتك ونتابع معاك بخصوص طلبك',
+        '',
+        'لو لسه مهتم أو عندك أي استفسار، إحنا تحت أمرك في أي وقت 🙏',
+        'وشكراً لثقتك فينا ✨'
+    ];
+    return lines.join('\n');
+}
+
+function getFollowupIntervalDays() {
+    const days = Math.round(Number(document.getElementById('followupIntervalDays').value));
+    return days >= 1 ? Math.min(days, 365) : 15;
+}
+
+function fillDefaultFollowupText() {
+    followupIsAuto = true;
+    updateFollowupPreview();
+}
+
+function onFollowupTyped() {
+    followupIsAuto = false;
+    updateFollowupPreview();
+}
+
+function updateFollowupPreview() {
+    const box = document.getElementById('followupMessage');
+    if (followupIsAuto) box.value = buildFollowupMessage();
+    const msg = box.value.trim() || buildFollowupMessage();
+    document.getElementById('followupPreviewText').innerHTML = esc(msg).replace(/\*([^*\n]+)\*/g, '<b>$1</b>');
+    const days = getFollowupIntervalDays();
+    const status = document.getElementById('dealStatus').value;
+    const hint = status === 'in_progress'
+        ? `🔁 هتتبعت كل ${days} يوم طول ما الديل قيد التواصل، وبتقف أول ما يتقفل.`
+        : '⏸️ الديل مقفول، فرسالة المتابعة مش هتتبعت.';
+    document.getElementById('followupModeHint').textContent = hint + (followupIsAuto ? ' ✨ النص بيتحدث تلقائياً مع اسم العميل ونوع الساعة.' : ' ✍️ نص متعدل يدوياً.');
+}
+
+function fillDefaultReminderText() {
+    reminderIsAuto = true;
+    updateWhatsAppPreview();
+}
+
+function onReminderTyped() {
+    reminderIsAuto = false;
+    updateWhatsAppPreview();
+}
+
+function updateWhatsAppPreview() {
+    const customVal = document.getElementById('watchBrandCustom').value.trim();
+    if (customVal && document.getElementById('watchBrandSelect').value === 'custom') {
+        document.getElementById('selectedWatchBrandLabel').textContent = `⌚ ${customVal} (يدوي)`;
+    }
+
+    const reminderBox = document.getElementById('reminderMessage');
+    if (reminderIsAuto) reminderBox.value = buildReminderMessage();
+
+    // نفس تنسيق واتساب: *كلام* بيظهر Bold
+    const msg = reminderBox.value.trim() || buildReminderMessage();
+    document.getElementById('waPreviewText').innerHTML = esc(msg).replace(/\*([^*\n]+)\*/g, '<b>$1</b>');
+    updateFollowupPreview();
+    const hint = document.getElementById('reminderModeHint');
+    if (hint) hint.textContent = reminderIsAuto
+        ? '✨ الرسالة بتتحدث تلقائياً مع الميعاد واسم العميل'
+        : '✍️ رسالة متعدلة يدوياً — دوس (توليد نص تلقائي) عشان ترجع للشكل المنظم بالميعاد';
+}
+
+// المبلغ المدفوع مستقل عن الحالة: ممكن تدفع جزء والديل لسه قيد التواصل
+function onAmountPaidChange(val) {}
+
+function onDealStatusChange(status) {
+    const paidInput = document.getElementById('amountPaid');
+    updateFollowupPreview();
+    if (status === 'cancelled') {
+        paidInput.value = 0;
+        paidInput.disabled = true;
+    } else if (status === 'in_progress') {
+        paidInput.disabled = false;
+    } else if (status === 'completed') {
+        paidInput.disabled = false;
+        if (Number(paidInput.value) <= 0) paidInput.focus();
+    }
+}
+
+async function reopenCancelledDeal(dealId) {
+    const d = state.deals.find(x => x.id === dealId);
+    if (!d) return;
+
+    const { error } = await db.from('deals').update({ status: 'in_progress' }).eq('id', dealId);
+    if (error) return alert("❌ خطأ: " + error.message);
+
+    showToast(`🔄 تم الرجوع لديل العميل (${esc(d.client_name)}) وفتحه من جديد!`, "info");
+    await loadAllData();
+    openEditDeal(dealId);
+}
+
+// آخر 10 أرقام عشان 010... و +2010... و 2010... يتطابقوا
+function normalizePhone(phone) {
+    return String(phone || '').replace(/\D/g, '').slice(-10);
+}
+
+// لما تختار الموظف المسؤول، خط واتساب الشركة المسجل برقمه بيتختار لوحده
+function onDealEmployeeChange() {
+    const emp = state.employees.find(e => e.id === document.getElementById('dealEmployee').value);
+    const empPhone = normalizePhone(emp?.phone_whatsapp);
+    if (!empPhone) return;
+    const line = state.waInstances.find(w => normalizePhone(w.phone_number) === empPhone);
+    if (line) document.getElementById('dealWhatsappInstance').value = line.id;
+}
+
+function openNewDealModal() {
+    renderWhatsappInstances();
+    document.getElementById('dealForm').reset();
+    document.getElementById('editDealId').value = "";
+    document.getElementById('oldAmountPaid').value = "0";
+    document.getElementById('amountPaid').disabled = false;
+    document.getElementById('dealStatus').value = 'in_progress';
+    document.getElementById('dealWhatsappInstance').value = '';
+    if (document.getElementById('watchBrandSearchInput')) {
+        document.getElementById('watchBrandSearchInput').value = '';
+    }
+    selectWatchBrandOption('');
+    document.getElementById('dealModalTitle').textContent = "تسجيل ديل / ساعة جديدة";
+    dealImages = [];
+    renderDealImagesPreview();
+
+    const myEmp = state.employees.find(e => e.user_id === currentUser.id);
+    if (myEmp) document.getElementById('dealEmployee').value = myEmp.id;
+    onDealEmployeeChange();
+
+    reminderIsAuto = true;
+    followupIsAuto = true;
+    document.getElementById('followupIntervalDays').value = 15;
+    updateWhatsAppPreview();
+    openModal('dealModal');
+}
+
+function openEditDeal(dealId) {
+    renderWhatsappInstances();
+    const d = state.deals.find(x => x.id === dealId);
+    if (!d) return;
+
+    document.getElementById('editDealId').value = d.id;
+    document.getElementById('oldAmountPaid').value = d.amount_paid || 0;
+    document.getElementById('dealModalTitle').textContent = `تخليص / تعديل ديل العميل: ${d.client_name}`;
+
+    document.getElementById('clientName').value = d.client_name || '';
+    document.getElementById('clientPhone').value = d.client_phone || '';
+    document.getElementById('clientLocation').value = d.client_location || '';
+
+    if (document.getElementById('watchBrandSearchInput')) {
+        document.getElementById('watchBrandSearchInput').value = '';
+    }
+
+    const savedBrand = d.watch_brand || '';
+    if (!savedBrand || SWISS_BRANDS.includes(savedBrand)) {
+        selectWatchBrandOption(savedBrand);
+    } else {
+        selectWatchBrandOption('custom', savedBrand);
+    }
+
+    const myEmp = state.employees.find(e => e.user_id === currentUser.id);
+    document.getElementById('dealEmployee').value = d.employee_id || (myEmp ? myEmp.id : '');
+    document.getElementById('dealWhatsappInstance').value = d.whatsapp_instance_id || '';
+
+    document.getElementById('dealDetails').value = d.deal_details || '';
+    document.getElementById('amountRequested').value = d.amount_requested || 0;
+    document.getElementById('sellingPriceRange').value = d.selling_price_range || '';
+    document.getElementById('amountPaid').value = d.amount_paid || 0;
+    document.getElementById('dealStatus').value = d.status || 'in_progress';
+    document.getElementById('amountPaid').disabled = (d.status === 'cancelled');
+    document.getElementById('reminderMessage').value = d.reminder_message || '';
+    reminderIsAuto = !d.reminder_message;
+    document.getElementById('followupMessage').value = d.followup_message || '';
+    document.getElementById('followupIntervalDays').value = d.followup_interval_days || 15;
+    followupIsAuto = !d.followup_message;
+
+    if (d.meeting_time) {
+        const dt = new Date(d.meeting_time);
+        dt.setMinutes(dt.getMinutes() - dt.getTimezoneOffset());
+        document.getElementById('meetingTime').value = dt.toISOString().slice(0, 16);
+    } else {
+        document.getElementById('meetingTime').value = '';
+    }
+
+    dealImages = [...getDealImages(d)];
+    renderDealImagesPreview();
+
+    updateWhatsAppPreview();
+    openModal('dealModal');
+}
+
+async function saveDeal(e) {
+    e.preventDefault();
+    const editId = document.getElementById('editDealId').value;
+    let newPaid = Number(document.getElementById('amountPaid').value || 0);
+    let status = document.getElementById('dealStatus').value;
+
+    if (status === 'completed' && newPaid <= 0) {
+        document.getElementById('amountPaid').focus();
+        return alert("⚠️ طالما اخترت (تم الشراء وتخليص الديل)، لازم تكتب في خانة (أنا دفعتله كام) المبلغ اللي اشتريت بيه!");
+    }
+    if (status === 'cancelled') {
+        newPaid = 0;
+    }
+
+    const myEmp = state.employees.find(emp => emp.user_id === currentUser.id);
+    const selectedEmpId = document.getElementById('dealEmployee').value || (myEmp ? myEmp.id : null);
+    const selectedWaId = document.getElementById('dealWhatsappInstance').value;
+    const watchBrand = getSelectedWatchBrand();
+
+    const dealPayload = {
+        employee_id: selectedEmpId,
+        whatsapp_instance_id: selectedWaId ? Number(selectedWaId) : null,
+        assigned_by_name: currentUser.full_name,
+        assigned_by_role: currentUser.role,
+        client_name: document.getElementById('clientName').value.trim(),
+        client_phone: document.getElementById('clientPhone').value.trim(),
+        client_location: document.getElementById('clientLocation').value.trim(),
+        watch_brand: watchBrand || null,
+        deal_details: document.getElementById('dealDetails').value.trim(),
+        amount_paid: newPaid,
+        amount_requested: Number(document.getElementById('amountRequested').value || 0),
+        selling_price_range: document.getElementById('sellingPriceRange').value.trim() || null,
+        meeting_time: document.getElementById('meetingTime').value || null,
+        reminder_message: document.getElementById('reminderMessage').value.trim() || null,
+        followup_message: document.getElementById('followupMessage').value.trim() || null,
+        followup_interval_days: getFollowupIntervalDays(),
+        item_image_url: dealImages[0] || null,
+        item_images: dealImages,
+        status: status
+    };
+
+    const writeDeal = payload => editId
+        ? db.from('deals').update(payload).eq('id', editId)
+        : db.from('deals').insert([payload]);
+
+    let { error } = await writeDeal(dealPayload);
+    // لو أعمدة المتابعة لسه ما اتضافتش في الداتابيز، الديل يتحفظ من غيرها بدل ما يقف
+    let followupSkipped = false;
+    if (error && /followup/.test(error.message)) {
+        delete dealPayload.followup_message;
+        delete dealPayload.followup_interval_days;
+        followupSkipped = true;
+        ({ error } = await writeDeal(dealPayload));
+    }
+    if (error) {
+        delete dealPayload.assigned_by_name;
+        delete dealPayload.assigned_by_role;
+        ({ error } = await writeDeal(dealPayload));
+        if (error) return alert((editId ? "❌ خطأ أثناء تحديث الديل: " : "❌ خطأ أثناء حفظ الديل: ") + error.message);
+    }
+    if (followupSkipped) showToast("⚠️ الديل اتحفظ، بس رسالة المتابعة ما اتحفظتش لأن الداتابيز لسه محتاجة تتحدث.", "info");
+
+    showToast("✅ تم حفظ وتحديث بيانات الديل بنجاح!", "success");
+    dealImages = [];
+    document.getElementById('dealForm').reset();
+    renderDealImagesPreview();
+    closeModal('dealModal');
+    await loadAllData();
+    // إعادة تطبيق فلتر البحث الحالي بعد الحفظ مباشرة
+    const currentSearch = document.getElementById('dealSearchInput') ? document.getElementById('dealSearchInput').value.trim() : '';
+    renderDeals(currentSearch);
+}
+
+// آخر قائمة ديلز اتعرضت (بعد البحث والفلتر) — هي اللي بتتصدّر في الـ Excel
+let lastRenderedDeals = [];
+
+function getDealEmployeeName(d) {
+    const emp = state.employees.find(e => e.id === d.employee_id);
+    return emp ? emp.full_name : '';
+}
+
+function renderDealEmployeeFilter() {
+    const select = document.getElementById('dealEmployeeFilter');
+    if (!select) return '';
+    const current = select.value;
+    const countFor = id => state.deals.filter(d => d.employee_id === id).length;
+    const active = state.employees.filter(e => !e.archived_at);
+    const archived = state.employees.filter(e => e.archived_at && countFor(e.id) > 0);
+    select.innerHTML = `<option value="">👥 كل الموظفين (${state.deals.length})</option>`
+        + active.map(e => `<option value="${e.id}">👤 ${esc(e.full_name)} (${countFor(e.id)})</option>`).join('')
+        + archived.map(e => `<option value="${e.id}">🗂️ ${esc(e.full_name)} - محذوف (${countFor(e.id)})</option>`).join('')
+        + `<option value="none">⚠️ بدون موظف (${state.deals.filter(d => !d.employee_id).length})</option>`;
+    if ([...select.options].some(o => o.value === current)) select.value = current;
+    return select.value;
+}
+
+function renderDeals(query = '') {
+    const tbody = document.getElementById('dealsTableBody');
+    let list = state.deals;
+
+    const empFilter = renderDealEmployeeFilter();
+    if (empFilter === 'none') list = list.filter(d => !d.employee_id);
+    else if (empFilter) list = list.filter(d => d.employee_id === empFilter);
+
+    if (query) {
+        // تقسيم جملة البحث إلى كلمات وتوحيد الحروف العربية والإنجليزية للبحث في كل خانات الديل
+        const qWords = normalizeSearchText(query).split(/\s+/).filter(Boolean);
+        list = list.filter(d => {
+            const searchableContent = normalizeSearchText([
+                d.client_name,
+                d.client_phone,
+                d.watch_brand,
+                d.deal_details,
+                d.client_location,
+                d.selling_price_range,
+                getDealEmployeeName(d),
+                d.assigned_by_name
+            ].join(' '));
+
+            return qWords.every(word => searchableContent.includes(word));
+        });
+    }
+
+    lastRenderedDeals = list;
+    const summary = document.getElementById('dealsSummary');
+    if (summary) {
+        const by = s => list.filter(d => d.status === s).length;
+        const paid = list.reduce((s, d) => s + Number(d.amount_paid || 0), 0);
+        const filtered = list.length !== state.deals.length;
+        summary.innerHTML = `📊 ${filtered ? 'نتيجة الفلتر' : 'كل الديلز'}: <span class="text-slate-900">${list.length} ديل</span>
+            · <span class="text-emerald-700">✅ ${by('completed')} تم</span>
+            · <span class="text-amber-700">⏳ ${by('in_progress')} قيد التواصل</span>
+            · <span class="text-rose-700">❌ ${by('cancelled')} ملغي</span>
+            · <span class="text-blue-700">💵 مدفوع ${paid.toLocaleString()} ج.م</span>`;
+    }
+
+    if (list.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="8" class="p-6 text-center text-slate-400">لا توجد صفقات مطابقة للبحث</td></tr>`;
+        return;
+    }
+
+    tbody.innerHTML = list.map(d => {
+        const emp = state.employees.find(e => e.id === d.employee_id);
+        const waInst = state.waInstances.find(w => Number(w.id) === Number(d.whatsapp_instance_id));
+        let badge = '';
+        let rowBgClass = 'hover:bg-slate-50';
+        let actionButtons = '';
+
+        if (d.status === 'completed') {
+            rowBgClass = 'bg-emerald-50/50 hover:bg-emerald-50';
+            badge = `<span class="inline-block whitespace-nowrap bg-emerald-600 text-white px-3 py-1 rounded-full text-xs font-extrabold shadow-sm">✅ تم الشراء (Done)</span>`;
+            actionButtons = `
+                <div class="flex flex-col gap-1.5 items-start">
+                    <span class="whitespace-nowrap text-xs font-extrabold text-emerald-700 bg-emerald-100 px-3 py-1 rounded-lg border border-emerald-300 w-full text-center">
+                        ✔️ الديل منتهي (Done)
+                    </span>
+                    <button onclick="openEditDeal('${d.id}')" class="w-full text-xs bg-blue-600 hover:bg-blue-700 text-white px-2.5 py-1 rounded-lg font-bold">✏️ تعديل الديل</button>
+                    <button onclick="deleteRow('deals', '${d.id}')" class="w-full text-xs bg-rose-100 hover:bg-rose-200 text-rose-700 px-2.5 py-1 rounded-lg font-bold">حذف</button>
+                </div>`;
+        } else if (d.status === 'cancelled') {
+            rowBgClass = 'bg-rose-50/40 hover:bg-rose-50/70';
+            badge = `<span class="inline-block whitespace-nowrap bg-rose-100 text-rose-800 border border-rose-300 px-2.5 py-1 rounded-full text-xs font-extrabold">❌ لم يتم الاتفاق</span>`;
+            actionButtons = `
+                <div class="flex flex-col gap-1.5">
+                    <button onclick="reopenCancelledDeal('${d.id}')" class="whitespace-nowrap text-xs bg-indigo-600 hover:bg-indigo-700 text-white px-3 py-1.5 rounded-lg font-bold shadow">
+                        🔄 الرجوع للديل مرة أخرى
+                    </button>
+                    <button onclick="openEditDeal('${d.id}')" class="text-xs bg-blue-600 hover:bg-blue-700 text-white px-3 py-1.5 rounded-lg font-bold">✏️ تعديل البيانات</button>
+                    <button onclick="deleteRow('deals', '${d.id}')" class="text-xs bg-rose-100 hover:bg-rose-200 text-rose-700 px-2.5 py-1 rounded-lg font-bold">حذف</button>
+                </div>`;
+        } else {
+            badge = `<span class="inline-block whitespace-nowrap bg-amber-100 text-amber-800 px-2.5 py-1 rounded-full text-xs font-bold">⏳ قيد التواصل</span>`;
+            actionButtons = `
+                <div class="flex flex-col gap-1.5">
+                    <button onclick="openEditDeal('${d.id}')" class="whitespace-nowrap text-xs bg-blue-600 hover:bg-blue-700 text-white px-3 py-1.5 rounded-lg font-bold shadow-sm">
+                        ✏️ تخليص / تعديل الديل
+                    </button>
+                    <button onclick="deleteRow('deals', '${d.id}')" class="text-xs bg-rose-100 hover:bg-rose-200 text-rose-700 px-2.5 py-1 rounded-lg font-bold">حذف</button>
+                </div>`;
+        }
+
+        const images = getDealImages(d);
+        const imageHtml = images.length
+            ? `<div onclick="viewDealImage('${d.id}')" class="relative group cursor-pointer inline-block">
+                 <img src="${esc(images[0])}" class="h-14 w-14 rounded-lg object-cover border-2 border-slate-300 group-hover:border-blue-500 transition">
+                 ${images.length > 1 ? `<span class="absolute top-0 left-0 bg-slate-900/80 text-white text-[10px] font-bold px-1.5 rounded-br-lg rounded-tl-lg">${images.length}📷</span>` : ''}
+                 <span class="block text-[10px] text-blue-600 font-bold text-center mt-0.5">🔍 تكبير</span>
+               </div>`
+            : '<span class="text-xs text-slate-400">لا توجد</span>';
+
+        return `
+        <tr class="${rowBgClass} transition">
+            <td class="p-3.5">
+                <div class="font-bold text-slate-900">${esc(d.client_name)}</div>
+                <a href="https://wa.me/2${esc(d.client_phone)}" target="_blank" class="text-xs text-emerald-600 font-bold hover:underline">📱 ${esc(d.client_phone)}</a>
+            </td>
+            <td class="p-3.5">
+                <div class="font-extrabold text-blue-800">${esc(d.watch_brand) ? '⌚ ' + esc(d.watch_brand) : '-'}</div>
+                <div class="text-xs text-slate-500 mt-0.5">📍 ${esc(d.client_location) || 'غير محدد'}</div>
+            </td>
+            <td class="p-3.5 max-w-xs font-medium">${esc(d.deal_details)}</td>
+            <td class="p-3.5 space-y-0.5">
+                <div class="text-xs text-rose-600 font-bold">العميل طالب: ${Number(d.amount_requested || 0).toLocaleString()} ج.م</div>
+                <div class="text-xs text-indigo-700 font-bold">رينج البيع: ${esc(d.selling_price_range) || 'غير محدد'}</div>
+                <div class="text-xs text-emerald-700 font-bold">دفعتله: ${Number(d.amount_paid || 0).toLocaleString()} ج.م</div>
+            </td>
+            <td class="p-3.5 text-xs">
+                <div class="font-semibold text-blue-700">${d.meeting_time ? new Date(d.meeting_time).toLocaleString('ar-EG') : 'غير محدد'}</div>
+                <div class="text-[10px] text-slate-500 mt-0.5 font-bold">📲 خط الإرسال: ${waInst ? `${esc(waInst.instance_name)} (${esc(waInst.phone_number)})` : 'توزيع تلقائي'}</div>
+                ${esc(d.reminder_message) ? `<div class="mt-1 text-[10px] bg-emerald-50 text-emerald-900 p-1.5 rounded border border-emerald-200 max-w-[180px] truncate" title="${esc(d.reminder_message)}">💬 ${esc(d.reminder_message)}</div>` : ''}
+                ${d.followup_message && d.status === 'in_progress' ? `<div class="mt-1 text-[10px] bg-sky-50 text-sky-900 p-1.5 rounded border border-sky-200 max-w-[180px] truncate" title="${esc(d.followup_message)}">🔁 متابعة كل ${Number(d.followup_interval_days) || 15} يوم</div>` : ''}
+            </td>
+            <td class="p-3.5">${imageHtml}</td>
+            <td class="p-3.5">
+                ${badge}
+                <div class="text-xs text-slate-500 mt-1">${emp ? '👤 ' + esc(emp.full_name) : '<span class="text-amber-600">بدون موظف</span>'}</div>
+            </td>
+            <td class="p-3.5">${actionButtons}</td>
+        </tr>`;
+    }).join('');
+}
