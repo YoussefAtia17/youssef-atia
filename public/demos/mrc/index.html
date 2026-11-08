@@ -1,0 +1,808 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MRC Demo — نظام إدارة صفقات الساعات</title>
+    <link rel="stylesheet" href="css/tailwind.css">
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js" defer></script>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+<body class="text-slate-800 min-h-screen" onclick="handleOutsideClick(event)">
+
+    <!-- ================================================================= -->
+    <!-- شاشة الافتتاحية الملكية (Royal Opening Splash Screen)             -->
+    <!-- ================================================================= -->
+    <div id="royalSplashScreen" class="fixed inset-0 z-[100] bg-slate-950 flex flex-col items-center justify-center p-6 select-none">
+        <!-- خلفية إضاءة ذهبية خافتة -->
+        <div class="absolute w-80 h-80 bg-amber-500/10 rounded-full blur-3xl pointer-events-none"></div>
+
+        <!-- لوجو الساعة السويسرية والتاج الملكي (SVG) -->
+        <div class="watch-logo-glow relative mb-5">
+            <svg width="125" height="125" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <!-- التاج الملكي العلوي -->
+                <path d="M36 16L43 22L50 12L57 22L64 16L61 26H39L36 16Z" fill="#F59E0B" stroke="#FDE68A" stroke-width="1.5"/>
+                <!-- الإطار الخارجي للساعة السويسرية -->
+                <circle cx="50" cy="54" r="34" fill="#0F172A" stroke="url(#goldGrad)" stroke-width="4"/>
+                <circle cx="50" cy="54" r="29" stroke="#F59E0B" stroke-width="1" stroke-dasharray="3 3" opacity="0.7"/>
+                <!-- علامات الساعات الذهبية -->
+                <line x1="50" y1="27" x2="50" y2="31" stroke="#FDE68A" stroke-width="2.5" stroke-linecap="round"/>
+                <line x1="50" y1="77" x2="50" y2="81" stroke="#FDE68A" stroke-width="2.5" stroke-linecap="round"/>
+                <line x1="23" y1="54" x2="27" y2="54" stroke="#FDE68A" stroke-width="2.5" stroke-linecap="round"/>
+                <line x1="73" y1="54" x2="77" y2="54" stroke="#FDE68A" stroke-width="2.5" stroke-linecap="round"/>
+                <!-- عقرب الساعات والدقائق -->
+                <line x1="50" y1="54" x2="40" y2="44" stroke="#FDE68A" stroke-width="2.5" stroke-linecap="round"/>
+                <line x1="50" y1="54" x2="63" y2="42" stroke="#F59E0B" stroke-width="2" stroke-linecap="round"/>
+                <!-- عقرب الثواني المتحرك -->
+                <line class="watch-second-hand" x1="50" y1="54" x2="50" y2="32" stroke="#EF4444" stroke-width="1.5" stroke-linecap="round"/>
+                <circle cx="50" cy="54" r="3" fill="#FDE68A"/>
+                <defs>
+                    <linearGradient id="goldGrad" x1="16" y1="20" x2="84" y2="88" gradientUnits="userSpaceOnUse">
+                        <stop stop-color="#FDE68A"/>
+                        <stop offset="0.5" stop-color="#F59E0B"/>
+                        <stop offset="1" stop-color="#B45309"/>
+                    </linearGradient>
+                </defs>
+            </svg>
+        </div>
+
+        <!-- اسم المكان والشعار -->
+        <h1 class="royal-gold-text font-extrabold text-3xl md:text-4xl tracking-wide text-center">
+            ساعات النخبة
+        </h1>
+        <p class="text-amber-400/90 font-extrabold text-sm md:text-base tracking-[0.25em] mt-1">
+            DEMO
+        </p>
+
+        <div class="mt-3 flex items-center gap-2 bg-slate-900/90 border border-amber-500/40 px-4 py-1.5 rounded-full shadow-lg">
+            <span class="text-amber-400 text-xs">⌚</span>
+            <span class="text-slate-200 text-xs font-bold">نسخة تجريبية ببيانات وهمية</span>
+        </div>
+
+        <!-- شريط التحميل الذهبي -->
+        <div class="w-56 h-1.5 bg-slate-800 rounded-full overflow-hidden mt-7 border border-slate-700">
+            <div class="splash-progress-bar h-full bg-gradient-to-r from-amber-600 via-amber-400 to-yellow-200 rounded-full"></div>
+        </div>
+    </div>
+
+    <!-- حاوية الإشعارات المنبثقة اللحظية -->
+    <div id="toastContainer" class="fixed top-16 left-4 z-50 space-y-2 max-w-sm w-full pointer-events-none"></div>
+
+    <!-- ================================================================= -->
+    <!-- شاشة تسجيل الدخول بالهوية الجديدة (ساعات النخبة - DEMO)     -->
+    <!-- ================================================================= -->
+    <div id="authScreen" class="min-h-screen flex items-center justify-center p-4 bg-slate-950">
+        <div class="bg-white rounded-2xl shadow-2xl max-w-md w-full p-6 space-y-5 border-2 border-amber-500/60">
+            <div class="text-center">
+                <!-- مصغر اللوجو الملكي -->
+                <div class="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-slate-950 border-2 border-amber-400 shadow-lg mb-2">
+                    <svg width="42" height="42" viewBox="0 0 100 100" fill="none">
+                        <path d="M36 16L43 22L50 12L57 22L64 16L61 26H39L36 16Z" fill="#F59E0B"/>
+                        <circle cx="50" cy="54" r="32" stroke="#F59E0B" stroke-width="5"/>
+                        <line x1="50" y1="54" x2="40" y2="43" stroke="#FDE68A" stroke-width="4" stroke-linecap="round"/>
+                        <line x1="50" y1="54" x2="64" y2="42" stroke="#F59E0B" stroke-width="3.5" stroke-linecap="round"/>
+                        <circle cx="50" cy="54" r="4" fill="#FDE68A"/>
+                    </svg>
+                </div>
+                <h1 class="font-extrabold text-2xl text-slate-900">ساعات النخبة <span class="text-amber-600 text-base font-bold">| DEMO</span></h1>
+                <p class="text-xs font-bold text-amber-700 bg-amber-50 inline-block px-3 py-0.5 rounded-full border border-amber-200 mt-1">
+                    نسخة تجريبية ببيانات وهمية
+                </p>
+                <p class="text-xs text-slate-500 mt-2">تسجيل دخول الإدارة والموظفين (بالاسم أو البريد الإلكتروني)</p>
+            </div>
+
+            <form id="signinForm" onsubmit="submitOnce(event, handleSignIn)" class="space-y-4 text-sm">
+                <div>
+                    <label class="block font-bold mb-1">اسم المستخدم أو البريد الإلكتروني *</label>
+                    <input type="text" id="loginIdentifier" required placeholder="اكتب اسمك أو الإيميل..." class="w-full border border-slate-300 rounded-xl p-3 outline-none focus:ring-2 focus:ring-amber-500">
+                </div>
+                <div>
+                    <label class="block font-bold mb-1">كلمة المرور (Password) *</label>
+                    <input type="password" id="loginPassword" required placeholder="••••••" class="w-full border border-slate-300 rounded-xl p-3 outline-none focus:ring-2 focus:ring-amber-500">
+                </div>
+                <button type="submit" id="btnSignInSubmit" class="w-full bg-gradient-to-r from-slate-900 via-slate-800 to-slate-900 hover:from-amber-600 hover:to-amber-700 text-amber-300 hover:text-white border border-amber-500/50 font-extrabold py-3 rounded-xl shadow-lg transition">
+                    دخول للنظام الملكي
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- ================================================================= -->
+    <!-- التطبيق الرئيسي بعد تسجيل الدخول                                   -->
+    <!-- ================================================================= -->
+    <div id="appScreen" class="hidden pb-20">
+        <!-- الشريط العلوي باللوجو والاسم الجديد -->
+        <header class="bg-slate-950 text-white shadow-lg sticky top-0 z-40 border-b border-amber-500/30">
+            <div class="max-w-7xl mx-auto px-4 py-3 flex flex-wrap justify-between items-center gap-3">
+                <div class="flex items-center gap-3">
+                    <!-- اللوجو في الهيدر -->
+                    <div class="flex items-center gap-2.5 bg-slate-900 border border-amber-500/50 px-3 py-1.5 rounded-xl shadow">
+                        <svg width="28" height="28" viewBox="0 0 100 100" fill="none">
+                            <path d="M36 16L43 22L50 12L57 22L64 16L61 26H39L36 16Z" fill="#F59E0B"/>
+                            <circle cx="50" cy="54" r="32" stroke="#F59E0B" stroke-width="6"/>
+                            <line x1="50" y1="54" x2="40" y2="43" stroke="#FDE68A" stroke-width="5" stroke-linecap="round"/>
+                            <line x1="50" y1="54" x2="64" y2="42" stroke="#F59E0B" stroke-width="4" stroke-linecap="round"/>
+                        </svg>
+                        <div class="leading-tight">
+                            <div class="font-extrabold text-sm text-amber-400">ساعات النخبة <span class="text-[11px] text-white font-bold">| DEMO</span></div>
+                            <div class="text-[10px] text-slate-400">خبراء الساعات السويسرية</div>
+                        </div>
+                    </div>
+
+                    <div class="flex items-center gap-2">
+                        <span id="currentUserName" class="font-bold text-sm md:text-base"></span>
+                        <span id="currentUserRoleBadge" class="text-xs px-2.5 py-0.5 rounded-full font-bold bg-amber-600 text-white"></span>
+                    </div>
+                </div>
+
+                <div class="flex items-center gap-2">
+                    <button onclick="openProfileModal()" class="bg-slate-800 hover:bg-slate-700 text-xs px-3 py-2 rounded-lg border border-slate-700 font-bold">
+                        ⚙️ الإعدادات / حسابي
+                    </button>
+                    <button onclick="loadAllData()" class="bg-slate-800 hover:bg-slate-700 text-xs px-3 py-2 rounded-lg border border-slate-700">🔄 تحديث</button>
+                    <button onclick="logout()" class="bg-rose-600 hover:bg-rose-700 text-xs font-bold px-3 py-2 rounded-lg">تسجيل خروج</button>
+                </div>
+            </div>
+
+            <!-- التبويبات -->
+            <div class="bg-slate-900 border-t border-slate-800">
+                <div class="max-w-7xl mx-auto px-4 flex overflow-x-auto gap-2 py-2">
+                    <button onclick="switchPage('deals')" id="tab-deals" class="tab-btn tab-active px-4 py-2 rounded-lg text-sm whitespace-nowrap">
+                        ⌚ 1. الصفقات والعملاء (Deals)
+                    </button>
+                    <button onclick="switchPage('employees')" id="tab-employees" class="tab-btn text-slate-300 hover:bg-slate-800 px-4 py-2 rounded-lg text-sm whitespace-nowrap">
+                        👥 2. الإدارة والموظفين والسلف
+                    </button>
+                    <button onclick="requestTreasuryAccess()" id="tab-treasury" class="tab-btn text-slate-300 hover:bg-slate-800 px-4 py-2 rounded-lg text-sm whitespace-nowrap flex items-center gap-1">
+                        <span>🔒 3. الخزنة والتقفيل اليومي/الشهري</span>
+                    </button>
+                    <button onclick="requestWhatsappAccess()" id="tab-whatsapp" class="tab-btn text-slate-300 hover:bg-slate-800 px-4 py-2 rounded-lg text-sm whitespace-nowrap flex items-center gap-1">
+                        <span>🔒 4. أرقام واتساب الشركة (WA Senders)</span>
+                    </button>
+                    <button onclick="switchPage('users')" id="tab-users" class="tab-btn owner-only text-slate-300 hover:bg-slate-800 px-4 py-2 rounded-lg text-sm whitespace-nowrap">
+                        🔐 5. حسابات النظام
+                    </button>
+                </div>
+            </div>
+        </header>
+
+        <main class="max-w-7xl mx-auto px-4 py-6">
+            <!-- PAGE 1: الصفقات والعملاء -->
+            <section id="page-deals" class="space-y-6">
+                <div class="bg-white p-4 rounded-xl shadow-sm border border-slate-200 space-y-3">
+                    <div class="flex flex-col md:flex-row gap-3 items-stretch md:items-center">
+                        <div class="relative w-full md:flex-1">
+                            <input type="text" id="dealSearchInput" oninput="handleSearchDeals(this.value)"
+                                placeholder="🔍 ابحث بالاسم، رقم التليفون، نوع الساعة (مثل: رولكس)، اسم الموظف، أو أي كلمة في تفاصيل الديل..."
+                                class="w-full bg-slate-50 border border-slate-300 rounded-xl px-4 py-2.5 text-sm outline-none focus:ring-2 focus:ring-blue-500">
+                        </div>
+                        <select id="dealEmployeeFilter" onchange="renderDeals(document.getElementById('dealSearchInput').value.trim())"
+                            class="w-full md:w-56 bg-slate-50 border border-slate-300 rounded-xl px-3 py-2.5 text-sm font-semibold outline-none focus:ring-2 focus:ring-blue-500">
+                            <option value="">👥 كل الموظفين</option>
+                        </select>
+                        <button onclick="exportToExcel()" class="w-full md:w-auto bg-emerald-600 hover:bg-emerald-700 text-white font-bold px-4 py-2.5 rounded-xl text-sm shadow whitespace-nowrap">
+                            📥 تصدير Excel
+                        </button>
+                        <button onclick="openNewDealModal()" class="w-full md:w-auto bg-blue-600 hover:bg-blue-700 text-white font-bold px-5 py-2.5 rounded-xl text-sm shadow whitespace-nowrap">
+                            + تسجيل ديل / ساعة جديدة
+                        </button>
+                    </div>
+                    <div id="dealsSummary" class="text-xs font-bold text-slate-600"></div>
+                </div>
+
+                <div class="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-right text-sm">
+                            <thead class="bg-slate-100 text-slate-700 border-b">
+                                <tr>
+                                    <th class="p-3.5">العميل والتليفون</th>
+                                    <th class="p-3.5">نوع الساعة والمكان</th>
+                                    <th class="p-3.5">تفاصيل الـ Deal (الوصف)</th>
+                                    <th class="p-3.5">الأسعار (المطلوب / رينج البيع / المدفوع)</th>
+                                    <th class="p-3.5">المعاد ورقم الإرسال (Reminder)</th>
+                                    <th class="p-3.5">الصورة</th>
+                                    <th class="p-3.5">الحالة والمسؤول</th>
+                                    <th class="p-3.5">إجراءات الديل</th>
+                                </tr>
+                            </thead>
+                            <tbody id="dealsTableBody" class="divide-y divide-slate-100"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+
+            <!-- PAGE 2: الإدارة والموظفين والسلف -->
+            <section id="page-employees" class="hidden space-y-6">
+                <div class="flex flex-wrap justify-between items-center gap-3 bg-white p-4 rounded-xl shadow-sm border">
+                    <div>
+                        <h2 class="font-bold text-lg">إدارة الأونرز، الموظفين، السلف، والمرتبات</h2>
+                        <p class="text-xs text-blue-600 font-semibold">💡 اضغط على أي كارت لإظهار سجل السلف والبونص الخاص به، واضغط مرة أخرى أو خارج الكارت لإغلاقه</p>
+                    </div>
+                    <div class="flex flex-wrap gap-2">
+                        <button onclick="openEmpFinancialModal()" class="bg-emerald-600 hover:bg-emerald-700 text-white font-bold px-4 py-2 rounded-xl text-sm shadow">
+                            💸 سحب سلفة فورية / إضافة بونص
+                        </button>
+                        <button onclick="openAddEmployeeModal()" class="owner-only bg-slate-900 hover:bg-slate-800 text-white font-bold px-4 py-2 rounded-xl text-sm shadow">
+                            + إنشاء حساب جديد (موظف / أونر)
+                        </button>
+                    </div>
+                </div>
+
+                <div id="employeesCardsContainer" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4"></div>
+                <div id="archivedEmployeesBox" class="hidden"></div>
+
+                <div id="selectedEmployeeHistoryBox" class="hidden bg-white rounded-2xl shadow-lg border-2 border-blue-500 overflow-hidden transition-all" onclick="event.stopPropagation()">
+                    <div class="p-4 border-b bg-blue-50 flex justify-between items-center">
+                        <span id="selectedEmpHistoryTitle" class="font-extrabold text-sm text-blue-900">📅 سجل السلف والبونص</span>
+                        <button onclick="closeEmployeeHistory()" class="text-xs bg-rose-100 text-rose-700 px-3 py-1 rounded-lg font-bold">إغلاق السجل ✕</button>
+                    </div>
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-right text-sm">
+                            <thead class="bg-slate-100 text-slate-700">
+                                <tr>
+                                    <th class="p-3">نوع العملية</th>
+                                    <th class="p-3">المبلغ</th>
+                                    <th class="p-3">البيان / الملاحظات</th>
+                                    <th class="p-3">التاريخ والوقت</th>
+                                    <th class="p-3">الحالة</th>
+                                    <th class="p-3 owner-only">حذف (للأونر)</th>
+                                </tr>
+                            </thead>
+                            <tbody id="empFinancialsTableBody" class="divide-y divide-slate-100"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+
+            <!-- PAGE 3: الخزنة والتقفيل اليومي والشهري -->
+            <section id="page-treasury" class="hidden space-y-6">
+                <div class="bg-slate-900 text-white p-4 rounded-xl flex flex-wrap justify-between items-center gap-3">
+                    <div class="flex items-center gap-2">
+                        <span class="text-xl">🔓</span>
+                        <div>
+                            <h2 class="font-bold text-sm md:text-base">الخزنة مفتوحة الآن</h2>
+                            <p class="text-xs text-slate-400">التقفيل اليومي والشهري مضبوط بالتوقيت المحلي ليظهر متطابقاً على جميع الأجهزة</p>
+                        </div>
+                    </div>
+                    <div class="flex gap-2">
+                        <button onclick="openModal('changeTreasuryPassModal')" class="owner-only bg-amber-600 hover:bg-amber-500 text-white text-xs font-bold px-3 py-2 rounded-lg">
+                            🔑 تغيير باسورد الخزنة
+                        </button>
+                        <button onclick="lockTreasury()" class="bg-rose-600 hover:bg-rose-700 text-white text-xs font-bold px-3 py-2 rounded-lg">
+                            🔒 قفل الخزنة الآن
+                        </button>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <div class="bg-white p-5 rounded-xl shadow-sm border-r-4 border-blue-600">
+                        <h3 class="text-xs font-bold text-slate-500 mb-2">📅 التقفيل اليومي (حسابات النهاردة)</h3>
+                        <div class="flex justify-between text-sm mb-1"><span>دخل اليوم:</span><span id="dailyIn" class="font-bold text-emerald-600">0 ج.م</span></div>
+                        <div class="flex justify-between text-sm mb-2"><span>اتصرف اليوم:</span><span id="dailyOut" class="font-bold text-rose-600">0 ج.م</span></div>
+                        <div class="border-t pt-2 flex justify-between font-extrabold"><span>صافي اليوم:</span><span id="dailyNet" class="text-blue-600">0 ج.م</span></div>
+                    </div>
+
+                    <div class="bg-white p-5 rounded-xl shadow-sm border-r-4 border-emerald-600">
+                        <h3 class="text-xs font-bold text-slate-500 mb-2">🗓️ التقفيل الشهري (هذا الشهر)</h3>
+                        <div class="flex justify-between text-sm mb-1"><span>إجمالي دخل الشهر:</span><span id="monthlyIn" class="font-bold text-emerald-600">0 ج.م</span></div>
+                        <div class="flex justify-between text-sm mb-2"><span>إجمالي مصروفات الشهر:</span><span id="monthlyOut" class="font-bold text-rose-600">0 ج.م</span></div>
+                        <div class="border-t pt-2 flex justify-between font-extrabold"><span>الرصيد الفعلي بالخزنة:</span><span id="monthlyNet" class="text-emerald-700">0 ج.م</span></div>
+                    </div>
+
+                    <div class="bg-white p-5 rounded-xl shadow-sm border flex flex-col justify-between">
+                        <div>
+                            <h3 class="font-bold text-base text-slate-900">إيداع أو صرف من الخزنة</h3>
+                            <p class="text-xs text-slate-500 mt-1">أضف فلوس للخزنة أو سجل أي مصروفات بتفاصيلها لتظهر في التقفيل.</p>
+                        </div>
+                        <button onclick="openModal('treasuryModal')" class="mt-4 w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-2.5 rounded-xl text-sm shadow">
+                            + إضافة حركة خزنة (إيداع / صرف)
+                        </button>
+                    </div>
+                </div>
+
+                <div class="bg-white rounded-xl shadow-sm border overflow-hidden">
+                    <div class="p-4 border-b flex flex-wrap justify-between items-center gap-2 bg-slate-50">
+                        <span class="font-bold text-sm">📖 دفتر تفصيل حركات الخزنة (التقفيل اليومي والشهري)</span>
+                        <select id="treasuryFilter" onchange="renderTreasury()" class="border rounded-lg px-3 py-1.5 text-xs bg-white font-semibold">
+                            <option value="all">كل الحركات (التقفيل العام)</option>
+                            <option value="today">حركات النهاردة فقط (التقفيل اليومي)</option>
+                            <option value="month">حركات هذا الشهر (التقفيل الشهري)</option>
+                            <option value="in">اللي دخل الخزنة فقط (إيداع)</option>
+                            <option value="out">اللي اتصرف فقط (سلف / بونص / صفقات / مصاريف)</option>
+                        </select>
+                    </div>
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-right text-sm">
+                            <thead class="bg-slate-100 text-slate-700">
+                                <tr>
+                                    <th class="p-3.5">النوع</th>
+                                    <th class="p-3.5">المبلغ</th>
+                                    <th class="p-3.5">التفصيل الكامل (البيان)</th>
+                                    <th class="p-3.5">التاريخ والوقت</th>
+                                    <th class="p-3.5 owner-only">حذف</th>
+                                </tr>
+                            </thead>
+                            <tbody id="treasuryTableBody" class="divide-y divide-slate-100"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+
+            <!-- PAGE 4: إدارة أرقام واتساب الشركة + الصفقات المربوطة -->
+            <section id="page-whatsapp" class="hidden space-y-6">
+                <div class="bg-slate-900 text-white p-4 rounded-xl flex flex-wrap justify-between items-center gap-3">
+                    <div class="flex items-center gap-2">
+                        <span class="text-xl">📱</span>
+                        <div>
+                            <h2 class="font-bold text-sm md:text-base">إدارة أرقام واتساب الشركة مفتوحة الآن</h2>
+                            <p class="text-xs text-slate-400">اضغط على كارت أي رقم بالأسفل لرؤية الصفقات (Deals) المربوطة به ومن قام بربطها (أونر أو موظف)</p>
+                        </div>
+                    </div>
+                    <div class="flex gap-2">
+                        <button onclick="openModal('changeWaPassModal')" class="owner-only bg-amber-600 hover:bg-amber-500 text-white text-xs font-bold px-3 py-2 rounded-lg">
+                            🔑 تغيير باسورد أرقام الواتساب
+                        </button>
+                        <button onclick="lockWhatsappPage()" class="bg-rose-600 hover:bg-rose-700 text-white text-xs font-bold px-3 py-2 rounded-lg">
+                            🔒 قفل الصفحة الآن
+                        </button>
+                    </div>
+                </div>
+
+                <div class="bg-white p-5 rounded-xl shadow-sm border flex flex-wrap justify-between items-center gap-4">
+                    <div>
+                        <h3 class="font-bold text-base text-slate-900">خطوط واتساب البيزنس الخاصة بالشركة</h3>
+                        <p class="text-xs text-emerald-700 font-semibold mt-1">💡 اضغط على كارت الرقم لعرض سجل الـ Deals المربوطة به، واضغط مرة أخرى أو خارج الكارت لإغلاقه</p>
+                    </div>
+                    <button onclick="openModal('addWhatsappModal')" class="bg-emerald-600 hover:bg-emerald-700 text-white font-bold px-5 py-2.5 rounded-xl text-sm shadow">
+                        + إضافة رقم واتساب للشركة
+                    </button>
+                </div>
+
+                <div id="waInstancesGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4"></div>
+
+                <div id="selectedWaDealsBox" class="hidden bg-white rounded-2xl shadow-lg border-2 border-emerald-500 overflow-hidden transition-all" onclick="event.stopPropagation()">
+                    <div class="p-4 border-b bg-emerald-50 flex justify-between items-center">
+                        <span id="selectedWaDealsTitle" class="font-extrabold text-sm text-emerald-900">📱 الصفقات المربوطة بهذا الرقم</span>
+                        <button onclick="closeWaDealsHistory()" class="text-xs bg-rose-100 text-rose-700 px-3 py-1 rounded-lg font-bold">إغلاق القائمة ✕</button>
+                    </div>
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-right text-sm">
+                            <thead class="bg-slate-100 text-slate-700">
+                                <tr>
+                                    <th class="p-3">العميل والتليفون</th>
+                                    <th class="p-3">نوع الساعة وتفاصيل الديل</th>
+                                    <th class="p-3">مين ربط الرقم بالديل (أونر / موظف)</th>
+                                    <th class="p-3">ميعاد الـ Reminder</th>
+                                    <th class="p-3">حالة الديل</th>
+                                    <th class="p-3">إجراء</th>
+                                </tr>
+                            </thead>
+                            <tbody id="waLinkedDealsTableBody" class="divide-y divide-slate-100"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+
+            <!-- PAGE 5: جدول حسابات النظام -->
+            <section id="page-users" class="hidden space-y-6">
+                <div class="bg-white rounded-xl shadow-sm border overflow-hidden">
+                    <div class="p-4 border-b bg-slate-50 flex justify-between items-center">
+                        <span class="font-bold text-sm">🔐 حسابات الدخول المسجلة في النظام (أونر / موظفين)</span>
+                        <button onclick="openAddEmployeeModal()" class="bg-slate-900 text-white text-xs font-bold px-3 py-1.5 rounded-lg">+ إضافة حساب جديد</button>
+                    </div>
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-right text-sm">
+                            <thead class="bg-slate-100 text-slate-700">
+                                <tr>
+                                    <th class="p-3">اسم المستخدم (Username)</th>
+                                    <th class="p-3">الإيميل</th>
+                                    <th class="p-3">رقم الواتساب</th>
+                                    <th class="p-3">الصلاحية (Role)</th>
+                                    <th class="p-3">تاريخ التسجيل</th>
+                                    <th class="p-3">إجراء</th>
+                                </tr>
+                            </thead>
+                            <tbody id="usersTableBody" class="divide-y divide-slate-100"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <!-- ================================================================= -->
+    <!-- النوافذ المنبثقة (Modals)                                          -->
+    <!-- ================================================================= -->
+
+    <!-- نافذة باسورد صفحة أرقام الواتساب -->
+    <div id="waPasswordModal" class="fixed inset-0 bg-black/70 hidden items-center justify-center z-50 p-4">
+        <div class="bg-white rounded-2xl max-w-sm w-full p-6 space-y-4 text-center shadow-2xl">
+            <div class="w-12 h-12 bg-emerald-100 text-emerald-600 rounded-full flex items-center justify-center mx-auto text-2xl">📱</div>
+            <h3 class="font-bold text-lg text-slate-900">أرقام الواتساب محمية بباسورد</h3>
+            <p class="text-xs text-slate-500">أدخل باسورد أرقام الواتساب للدخول وإدارة خطوط الشركة</p>
+            <form onsubmit="submitOnce(event, verifyWhatsappPassword)" class="space-y-3">
+                <input type="password" id="waPassInput" required placeholder="أدخل الباسورد..." class="w-full border-2 border-slate-300 rounded-xl p-3 text-center font-bold outline-none focus:border-emerald-600">
+                <div class="flex gap-2 pt-2">
+                    <button type="button" onclick="closeModal('waPasswordModal')" class="w-1/2 py-2.5 rounded-xl bg-slate-200 font-bold text-xs">إلغاء</button>
+                    <button type="submit" class="w-1/2 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs shadow">فتح الصفحة</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- نافذة تغيير باسورد صفحة أرقام الواتساب -->
+    <div id="changeWaPassModal" class="fixed inset-0 bg-black/60 hidden items-center justify-center z-50 p-4">
+        <div class="bg-white rounded-2xl max-w-sm w-full p-6 space-y-4">
+            <h3 class="font-bold text-lg border-b pb-2">🔑 تغيير باسورد صفحة أرقام الواتساب</h3>
+            <form onsubmit="submitOnce(event, saveNewWhatsappPassword)" class="space-y-3 text-sm">
+                <div>
+                    <label class="block font-bold mb-1">الباسورد الجديد لأرقام الواتساب *</label>
+                    <input type="text" id="newWaPass" required minlength="3" placeholder="اكتب الباسورد الجديد..." class="w-full border rounded-xl p-2.5 font-bold">
+                </div>
+                <div class="flex justify-end gap-2 pt-2 border-t">
+                    <button type="button" onclick="closeModal('changeWaPassModal')" class="px-4 py-2 rounded-lg bg-slate-200">إلغاء</button>
+                    <button type="submit" class="px-5 py-2 rounded-lg bg-emerald-600 text-white font-bold">حفظ الباسورد</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- نافذة إضافة رقم واتساب للشركة -->
+    <div id="addWhatsappModal" class="fixed inset-0 bg-black/60 hidden items-center justify-center z-50 p-4">
+        <div class="bg-white rounded-2xl max-w-md w-full p-6 space-y-4">
+            <h3 class="font-bold text-lg border-b pb-2">📱 إضافة رقم واتساب بيزنس للشركة</h3>
+            <form onsubmit="submitOnce(event, saveWhatsappInstance)" class="space-y-3 text-sm">
+                <div>
+                    <label class="block font-bold mb-1">اسم الخط / الـ Instance (لربطه بالـ VPS) *</label>
+                    <input type="text" id="waInstanceName" required placeholder="مثال: wa1 أو خط مبيعات 1" class="w-full border rounded-xl p-2.5">
+                </div>
+                <div>
+                    <label class="block font-bold mb-1">رقم الواتساب *</label>
+                    <input type="text" id="waPhoneNumber" required placeholder="مثال: 010xxxxxxxx" class="w-full border rounded-xl p-2.5">
+                </div>
+                <div>
+                    <label class="block font-bold mb-1">الحالة الحالية</label>
+                    <select id="waStatus" class="w-full border rounded-xl p-2.5 bg-white font-bold">
+                        <option value="connected">🟢 متصل ونشط (Connected)</option>
+                        <option value="disconnected">🔴 غير متصل مؤقتاً (Disconnected)</option>
+                    </select>
+                </div>
+                <div class="flex justify-end gap-2 pt-3 border-t">
+                    <button type="button" onclick="closeModal('addWhatsappModal')" class="px-4 py-2 rounded-lg bg-slate-200">إلغاء</button>
+                    <button type="submit" class="px-5 py-2 rounded-lg bg-emerald-600 text-white font-bold">حفظ الرقم</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- نافذة البروفايل وإعدادات الحساب الشخصي -->
+    <div id="profileModal" class="fixed inset-0 bg-black/60 hidden items-center justify-center z-50 p-4">
+        <div class="bg-white rounded-2xl max-w-md w-full p-6 space-y-4">
+            <h3 class="font-bold text-lg border-b pb-2">⚙️ إعدادات حسابي (Profile & Settings)</h3>
+            <form onsubmit="submitOnce(event, saveProfileSettings)" class="space-y-3 text-sm">
+                <div>
+                    <label class="block font-bold mb-1">الاسم / اسم المستخدم (Username) *</label>
+                    <input type="text" id="profName" required class="w-full border rounded-xl p-2.5">
+                </div>
+                <div>
+                    <label class="block font-bold mb-1">البريد الإلكتروني (اختياري)</label>
+                    <input type="email" id="profEmail" placeholder="يمكن تركه فارغاً والاعتماد على الاسم" class="w-full border rounded-xl p-2.5">
+                </div>
+                <div>
+                    <label class="block font-bold mb-1">رقم التليفون / الواتساب *</label>
+                    <input type="text" id="profPhone" required class="w-full border rounded-xl p-2.5">
+                </div>
+                <div>
+                    <label class="block font-bold mb-1 text-blue-700">🔑 كلمة مرور جديدة (اختياري)</label>
+                    <input type="password" id="profPassword" autocomplete="new-password" placeholder="سيبها فاضية لو مش عايز تغيرها" class="w-full border-2 border-blue-400 rounded-xl p-2.5 font-bold">
+                </div>
+                <div class="flex justify-end gap-2 pt-3 border-t">
+                    <button type="button" onclick="closeModal('profileModal')" class="px-4 py-2 rounded-lg bg-slate-200">إلغاء</button>
+                    <button type="submit" class="px-5 py-2 rounded-lg bg-blue-600 text-white font-bold">حفظ التعديلات</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- نافذة إدخال باسورد الخزنة -->
+    <div id="treasuryPasswordModal" class="fixed inset-0 bg-black/70 hidden items-center justify-center z-50 p-4">
+        <div class="bg-white rounded-2xl max-w-sm w-full p-6 space-y-4 text-center shadow-2xl">
+            <div class="w-12 h-12 bg-amber-100 text-amber-600 rounded-full flex items-center justify-center mx-auto text-2xl">🔒</div>
+            <h3 class="font-bold text-lg text-slate-900">الخزنة محمية بكلمة مرور</h3>
+            <p class="text-xs text-slate-500">أدخل باسورد الخزنة للدخول إلى الحسابات والتقفيل اليومي والشهري</p>
+            <form onsubmit="submitOnce(event, verifyTreasuryPassword)" class="space-y-3">
+                <input type="password" id="treasuryPassInput" required placeholder="أدخل باسورد الخزنة..." class="w-full border-2 border-slate-300 rounded-xl p-3 text-center font-bold outline-none focus:border-blue-600">
+                <div class="flex gap-2 pt-2">
+                    <button type="button" onclick="closeModal('treasuryPasswordModal')" class="w-1/2 py-2.5 rounded-xl bg-slate-200 font-bold text-xs">إلغاء</button>
+                    <button type="submit" class="w-1/2 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs shadow">فتح الخزنة</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- نافذة تغيير باسورد الخزنة -->
+    <div id="changeTreasuryPassModal" class="fixed inset-0 bg-black/60 hidden items-center justify-center z-50 p-4">
+        <div class="bg-white rounded-2xl max-w-sm w-full p-6 space-y-4">
+            <h3 class="font-bold text-lg border-b pb-2">🔑 تغيير باسورد الخزنة</h3>
+            <form onsubmit="submitOnce(event, saveNewTreasuryPassword)" class="space-y-3 text-sm">
+                <div>
+                    <label class="block font-bold mb-1">باسورد الخزنة الجديد *</label>
+                    <input type="text" id="newTreasuryPass" required minlength="3" placeholder="اكتب الباسورد الجديد..." class="w-full border rounded-xl p-2.5 font-bold">
+                </div>
+                <div class="flex justify-end gap-2 pt-2 border-t">
+                    <button type="button" onclick="closeModal('changeTreasuryPassModal')" class="px-4 py-2 rounded-lg bg-slate-200">إلغاء</button>
+                    <button type="submit" class="px-5 py-2 rounded-lg bg-amber-600 text-white font-bold">حفظ الباسورد</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- نافذة عرض الصورة المكبرة -->
+    <div id="imageViewerModal" onclick="closeModal('imageViewerModal')" class="fixed inset-0 bg-black/85 hidden items-center justify-center z-50 p-4 cursor-zoom-out">
+        <div class="relative max-w-3xl w-full bg-slate-900 p-3 rounded-2xl shadow-2xl border border-slate-700" onclick="event.stopPropagation()">
+            <div class="flex justify-between items-center text-white pb-2 mb-2 border-b border-slate-700 px-2">
+                <span id="lightboxCaption" class="font-bold text-sm">صورة الساعة / الديل</span>
+                <button onclick="closeModal('imageViewerModal')" class="bg-rose-600 hover:bg-rose-700 text-white px-3 py-1 rounded-lg text-xs font-bold">إغلاق ✕</button>
+            </div>
+            <div class="relative">
+                <img id="lightboxImg" src="" alt="صورة الديل" class="max-h-[75vh] w-auto mx-auto rounded-xl object-contain">
+                <button id="lightboxPrev" onclick="showLightboxImage(lightboxIndex - 1)" class="hidden absolute top-1/2 -translate-y-1/2 right-2 bg-black/60 hover:bg-black/80 text-white w-10 h-10 rounded-full text-xl font-bold">›</button>
+                <button id="lightboxNext" onclick="showLightboxImage(lightboxIndex + 1)" class="hidden absolute top-1/2 -translate-y-1/2 left-2 bg-black/60 hover:bg-black/80 text-white w-10 h-10 rounded-full text-xl font-bold">‹</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 1. نافذة إضافة / تعديل وتخليص ديل -->
+    <div id="dealModal" class="fixed inset-0 bg-black/60 hidden items-center justify-center z-50 p-4">
+        <div class="bg-white rounded-2xl max-w-2xl w-full p-6 space-y-4 max-h-[92vh] overflow-y-auto">
+            <h3 id="dealModalTitle" class="font-bold text-lg border-b pb-2">تسجيل بيانات عميل وديل جديد</h3>
+            <form id="dealForm" onsubmit="submitOnce(event, saveDeal)" class="space-y-3.5 text-sm">
+                <input type="hidden" id="editDealId">
+                <input type="hidden" id="oldAmountPaid" value="0">
+
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
+                    <div>
+                        <label class="block font-semibold mb-1">اسم العميل</label>
+                        <input type="text" id="clientName" oninput="updateWhatsAppPreview()" class="w-full border rounded-lg p-2">
+                    </div>
+                    <div>
+                        <label class="block font-semibold mb-1">رقم التليفون (واتساب)</label>
+                        <input type="text" id="clientPhone" placeholder="010xxxxxxxx" class="w-full border rounded-lg p-2">
+                    </div>
+                    <div>
+                        <label class="block font-semibold mb-1">العميل منين (المكان)</label>
+                        <input type="text" id="clientLocation" class="w-full border rounded-lg p-2">
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-3 bg-blue-50/60 p-3 rounded-xl border border-blue-200">
+                    <div class="relative" id="watchBrandDropdownContainer">
+                        <label class="block font-bold mb-1 text-blue-900">⌚ نوع الساعة (السويسرية)</label>
+                        <div onclick="toggleWatchDropdown()" class="w-full border rounded-lg p-2 bg-white font-semibold flex justify-between items-center cursor-pointer">
+                            <span id="selectedWatchBrandLabel">-- اختر أو اكتب ماركة الساعة --</span>
+                            <span class="text-slate-400 text-xs">▼</span>
+                        </div>
+
+                        <div id="watchDropdownMenu" class="hidden absolute left-0 right-0 mt-1 bg-white border-2 border-blue-500 rounded-xl shadow-2xl z-50 overflow-hidden">
+                            <div class="p-2 bg-slate-50 border-b">
+                                <input type="text" id="watchBrandSearchInput" oninput="filterWatchBrandsList(this.value)" placeholder="🔍 ابحث عن ماركة أو اكتب نوع جديد..." class="w-full border rounded-lg px-2.5 py-1.5 text-xs outline-none focus:border-blue-600">
+                            </div>
+                            <div id="watchBrandsListItems" class="max-h-52 overflow-y-auto divide-y divide-slate-100 text-xs font-semibold"></div>
+                        </div>
+
+                        <input type="text" id="watchBrandCustom" oninput="updateWhatsAppPreview()" placeholder="اكتب نوع الساعة وموديلها يدوياً هنا..." class="hidden mt-2 w-full border-2 border-blue-500 rounded-lg p-2 bg-white font-bold">
+                        <input type="hidden" id="watchBrandSelect" value="">
+                    </div>
+
+                    <div>
+                        <label class="block font-semibold mb-1">الموظف / المسؤول عن الديل</label>
+                        <select id="dealEmployee" onchange="onDealEmployeeChange()" class="w-full border rounded-lg p-2 bg-white"></select>
+                    </div>
+                </div>
+
+                <div>
+                    <label class="block font-semibold mb-1">تفاصيل الـ Deal اللي حصل ما بينا (الوصف - متاح في البحث)</label>
+                    <textarea id="dealDetails" rows="2" placeholder="مثال: عايز يبيع ساعة رولكس ديت جاست حالة زيرو بالبوكس والضمان..." class="w-full border rounded-lg p-2"></textarea>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-3 bg-slate-50 p-3 rounded-xl border">
+                    <div>
+                        <label class="block font-bold mb-1 text-rose-700">🏷️ العميل طالب كام (ج.م)</label>
+                        <input type="number" id="amountRequested" value="0" min="0" class="w-full border rounded-lg p-2 font-bold bg-white">
+                    </div>
+                    <div>
+                        <label class="block font-bold mb-1 text-indigo-700">📊 سعر البيع (رينج سعر الساعة)</label>
+                        <input type="text" id="sellingPriceRange" placeholder="مثال: 45,000 - 50,000" class="w-full border border-indigo-300 rounded-lg p-2 font-bold bg-white">
+                    </div>
+                    <div>
+                        <label class="block font-bold mb-1 text-emerald-700">💵 أنا دفعتله كام (ج.م)</label>
+                        <input type="number" id="amountPaid" value="0" min="0" oninput="onAmountPaidChange(this.value)" class="w-full border border-emerald-400 rounded-lg p-2 font-bold bg-white">
+                        <span class="text-[10px] text-slate-500 font-semibold">للتسجيل في الديل بس، مش بيتخصم من الخزنة</span>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
+                    <div>
+                        <label class="block font-semibold mb-1">⏰ المعاد المتفق عليه (Reminder)</label>
+                        <input type="datetime-local" id="meetingTime" oninput="updateWhatsAppPreview()" class="w-full border rounded-lg p-2">
+                    </div>
+                    <div>
+                        <label class="block font-bold mb-1 text-emerald-800">📱 رقم واتساب الشركة المُرسل</label>
+                        <select id="dealWhatsappInstance" class="w-full border border-emerald-400 rounded-lg p-2 bg-white font-semibold"></select>
+                    </div>
+                    <div>
+                        <label class="block font-bold mb-1 text-blue-700">حالة الديل</label>
+                        <select id="dealStatus" onchange="onDealStatusChange(this.value)" class="w-full border border-blue-400 rounded-lg p-2 bg-white font-bold">
+                            <option value="in_progress">⏳ لسه مخلصش (قيد التواصل)</option>
+                            <option value="completed">✅ تم الشراء وتخليص الديل (Done)</option>
+                            <option value="cancelled">❌ لم يتم الاتفاق (الديل مكملش)</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="bg-emerald-50/70 p-3.5 rounded-xl border border-emerald-200 space-y-2">
+                    <div class="flex justify-between items-center">
+                        <label class="block font-bold text-emerald-900">💬 رسالة التذكير للعميل (تُرسل من رقم الشركة المختار)</label>
+                        <button type="button" onclick="fillDefaultReminderText()" class="text-[11px] bg-emerald-600 text-white px-2.5 py-1 rounded-lg font-bold">توليد نص تلقائي</button>
+                    </div>
+                    <textarea id="reminderMessage" rows="6" oninput="onReminderTyped()" placeholder="اكتب الرسالة التي ستُرسل للعميل في ميعاده..." class="w-full border border-emerald-300 rounded-lg p-2 bg-white"></textarea>
+
+                    <div id="reminderModeHint" class="text-[11px] font-bold text-emerald-700"></div>
+                    <div class="wa-preview-bg p-3 rounded-xl border border-slate-300">
+                        <div class="text-[10px] text-slate-500 font-bold mb-1">📱 معاينة شكل الرسالة على واتساب العميل (Preview):</div>
+                        <div class="bg-[#dcf8c6] text-slate-900 p-2.5 rounded-xl rounded-tr-none shadow-sm max-w-md text-xs leading-relaxed whitespace-pre-line relative">
+                            <span id="waPreviewText">أهلاً بك، نذكرك بموعدنا بخصوص الساعة...</span>
+                            <div class="text-[9px] text-slate-500 text-left mt-1 font-semibold">12:00 م ✓✓</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="bg-sky-50/70 p-3.5 rounded-xl border border-sky-200 space-y-2">
+                    <div class="flex justify-between items-center gap-2">
+                        <label class="block font-bold text-sky-900">🔁 رسالة المتابعة للعميل (بتتبعت لو الديل لسه مخلصش)</label>
+                        <button type="button" onclick="fillDefaultFollowupText()" class="text-[11px] bg-sky-600 text-white px-2.5 py-1 rounded-lg font-bold shrink-0">توليد نص تلقائي</button>
+                    </div>
+                    <div class="flex items-center gap-2 text-xs font-bold text-sky-900">
+                        <span>تتبعت كل</span>
+                        <input type="number" id="followupIntervalDays" value="15" min="1" max="365" oninput="updateFollowupPreview()" class="w-20 border border-sky-300 rounded-lg p-1.5 text-center bg-white font-bold">
+                        <span>يوم طول ما الديل (قيد التواصل)</span>
+                    </div>
+                    <textarea id="followupMessage" rows="6" oninput="onFollowupTyped()" placeholder="اكتب رسالة المتابعة اللي هتتبعت للعميل..." class="w-full border border-sky-300 rounded-lg p-2 bg-white"></textarea>
+                    <div id="followupModeHint" class="text-[11px] font-bold text-sky-700"></div>
+                    <div class="wa-preview-bg p-3 rounded-xl border border-slate-300">
+                        <div class="text-[10px] text-slate-500 font-bold mb-1">📱 معاينة رسالة المتابعة على واتساب العميل (Preview):</div>
+                        <div class="bg-[#dcf8c6] text-slate-900 p-2.5 rounded-xl rounded-tr-none shadow-sm max-w-md text-xs leading-relaxed whitespace-pre-line relative">
+                            <span id="followupPreviewText"></span>
+                            <div class="text-[9px] text-slate-500 text-left mt-1 font-semibold">12:00 م ✓✓</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div>
+                    <label class="block font-semibold mb-1">صور الساعة / الحاجة اللي عليها الديل (تقدر تختار كذا صورة) <span id="imageCountLabel" class="text-blue-700"></span></label>
+                    <input type="file" accept="image/*" multiple onchange="compressAndPreviewImage(event)" class="w-full text-xs">
+                    <div id="imagePreview" class="hidden mt-3 flex flex-wrap gap-3"></div>
+                </div>
+
+                <div class="flex justify-end gap-2 pt-3 border-t">
+                    <button type="button" onclick="closeModal('dealModal')" class="px-4 py-2 rounded-lg bg-slate-200">إلغاء</button>
+                    <button type="submit" id="saveDealBtn" class="px-5 py-2 rounded-lg bg-blue-600 text-white font-bold">حفظ الديل</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- 2. نافذة إنشاء أكونت جديد (موظف أو أونر) -->
+    <div id="addEmployeeModal" class="fixed inset-0 bg-black/60 hidden items-center justify-center z-50 p-4">
+        <div class="bg-white rounded-2xl max-w-md w-full p-6 space-y-4">
+            <h3 class="font-bold text-lg border-b pb-2">إنشاء حساب جديد في النظام (للأونر فقط)</h3>
+            <p class="text-xs text-slate-500">يظهر للأونر كارت ذهبي مميز، وللموظف كارت رواتب وسلف، ويمكن الدخول بالاسم أو الإيميل.</p>
+            <form id="addEmployeeForm" onsubmit="submitOnce(event, ownerCreateEmployee)" autocomplete="off" class="space-y-3 text-sm">
+                <div>
+                    <label class="block font-bold mb-1 text-blue-800">نوع الحساب / الصلاحية (Role) *</label>
+                    <select id="empRole" onchange="toggleSalaryFieldByRole(this.value)" class="w-full border-2 border-blue-400 rounded-lg p-2 bg-white font-bold">
+                        <option value="employee">💼 موظف (Employee)</option>
+                        <option value="owner">👑 أونر / مدير (Owner - Full Admin)</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block font-bold mb-1">الاسم / اسم المستخدم للدخول (Username) * [إجباري]</label>
+                    <input type="text" id="empName" name="mrc-new-emp-name" autocomplete="off" data-lpignore="true" data-1p-ignore data-form-type="other" required placeholder="مثال: ahmed (يُستخدم لتسجيل الدخول)" class="w-full border rounded-lg p-2">
+                </div>
+                <div>
+                    <label class="block font-bold mb-1 text-emerald-700">رقم التليفون / الواتساب * [إجباري]</label>
+                    <input type="tel" id="empPhone" name="mrc-new-emp-phone" autocomplete="off" data-lpignore="true" data-1p-ignore data-form-type="other" required placeholder="010xxxxxxxx (لتنبيهات الـ 24 ساعة وبيانات الموظف)" class="w-full border-2 border-emerald-400 rounded-lg p-2 font-bold">
+                </div>
+                <div>
+                    <label class="block font-bold mb-1 text-rose-700">باسورد الحساب (Password) * [إجباري]</label>
+                    <input type="text" id="empPassword" name="mrc-new-emp-pass" autocomplete="new-password" data-lpignore="true" data-1p-ignore data-form-type="other" required placeholder="اكتب الباسورد هنا..." class="w-full border-2 border-rose-400 rounded-lg p-2 font-bold">
+                </div>
+                <div>
+                    <label class="block font-semibold mb-1">البريد الإلكتروني (اختياري)</label>
+                    <input type="email" id="empEmail" name="mrc-new-emp-email" autocomplete="off" data-lpignore="true" data-1p-ignore data-form-type="other" placeholder="اختياري..." class="w-full border rounded-lg p-2">
+                </div>
+                <div id="empSalaryWrapper">
+                    <label class="block font-semibold mb-1">المرتب الأساسي الشهري (ج.م)</label>
+                    <input type="number" id="empSalary" value="0" autocomplete="off" class="w-full border rounded-lg p-2">
+                </div>
+                <div class="flex justify-end gap-2 pt-3 border-t">
+                    <button type="button" onclick="closeModal('addEmployeeModal')" class="px-4 py-2 rounded-lg bg-slate-200">إلغاء</button>
+                    <button type="submit" class="px-5 py-2 rounded-lg bg-slate-900 text-white font-bold">إنشاء الحساب</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- 3. نافذة السلف الفورية والبونص -->
+    <div id="empFinancialModal" class="fixed inset-0 bg-black/60 hidden items-center justify-center z-50 p-4">
+        <div class="bg-white rounded-2xl max-w-md w-full p-6 space-y-4">
+            <h3 class="font-bold text-lg border-b pb-2">تسجيل سلفة فورية أو بونص</h3>
+            <form onsubmit="submitOnce(event, saveEmpFinancial)" class="space-y-3 text-sm">
+                <div>
+                    <label class="block font-semibold mb-1">اختر الاسم *</label>
+                    <select id="finEmpId" required class="w-full border rounded-lg p-2 bg-white"></select>
+                </div>
+                <div>
+                    <label class="block font-semibold mb-1">نوع العملية *</label>
+                    <select id="finType" class="w-full border rounded-lg p-2 bg-white">
+                        <option value="loan">🔻 سحب سلفة (تُخصم فوراً من الخزنة ومن المرتب)</option>
+                        <option value="bonus" class="owner-only">🎁 إضافة بونص / مكافأة (للأونر فقط)</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block font-semibold mb-1">المبلغ (ج.م) *</label>
+                    <input type="number" id="finAmount" required min="1" class="w-full border rounded-lg p-2">
+                </div>
+                <div>
+                    <label class="block font-semibold mb-1">البيان / الملاحظات</label>
+                    <input type="text" id="finNotes" placeholder="مثال: سلفة شخصية..." class="w-full border rounded-lg p-2">
+                </div>
+                <div class="flex justify-end gap-2 pt-3 border-t">
+                    <button type="button" onclick="closeModal('empFinancialModal')" class="px-4 py-2 rounded-lg bg-slate-200">إلغاء</button>
+                    <button type="submit" class="px-5 py-2 rounded-lg bg-emerald-600 text-white font-bold">تأكيد وخصم من الخزنة</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- 4. نافذة الخزنة -->
+    <div id="treasuryModal" class="fixed inset-0 bg-black/60 hidden items-center justify-center z-50 p-4">
+        <div class="bg-white rounded-2xl max-w-md w-full p-6 space-y-4">
+            <h3 class="font-bold text-lg border-b pb-2">تسجيل حركة في الخزنة</h3>
+            <form onsubmit="submitOnce(event, saveTreasuryTransaction)" class="space-y-3 text-sm">
+                <div>
+                    <label class="block font-semibold mb-1">نوع الحركة *</label>
+                    <select id="trType" class="w-full border rounded-lg p-2 bg-white">
+                        <option value="in">🟢 دخلت الخزنة (إيداع)</option>
+                        <option value="out">🔴 صرفت من الخزنة (مصروفات)</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block font-semibold mb-1">المبلغ (ج.م) *</label>
+                    <input type="number" id="trAmount" required min="1" class="w-full border rounded-lg p-2">
+                </div>
+                <div>
+                    <label class="block font-semibold mb-1">التفصيل الكامل (البيان) *</label>
+                    <textarea id="trDesc" required rows="2" placeholder="اكتب تفصيل الحركة ليظهر في التقفيل اليومي والشهري..." class="w-full border rounded-lg p-2"></textarea>
+                </div>
+                <div class="flex justify-end gap-2 pt-3 border-t">
+                    <button type="button" onclick="closeModal('treasuryModal')" class="px-4 py-2 rounded-lg bg-slate-200">إلغاء</button>
+                    <button type="submit" class="px-5 py-2 rounded-lg bg-blue-600 text-white font-bold">حفظ بالخزنة</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- ربط ملفات الجافاسكريبت المقسمة بالترتيب -->
+    <script src="js/demo-db.js"></script>
+    <script src="js/config.js"></script>
+    <script src="js/utils.js"></script>
+    <script src="js/treasury_wa.js"></script>
+    <script src="js/deals.js"></script>
+    <script src="js/employees.js"></script>
+    <script src="js/auth.js"></script>
+    <script src="js/export.js"></script>
+</body>
+</html>

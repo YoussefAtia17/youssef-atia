@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Splitter — تقسيم الفواتير بالذكاء الاصطناعي (نسخة تجريبية)</title>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@400;500;600;700&family=Inter:wght@500;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#07100e;--card:rgba(255,255,255,.05);--line:rgba(255,255,255,.08);--em:#10b981;--tq:#2dd4bf;--t2:rgba(255,255,255,.58);--red:#f87171;--f:"IBM Plex Sans Arabic","Inter",system-ui,sans-serif}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+body{margin:0;min-height:100vh;font-family:var(--f);background:#030706;color:#fff;display:flex;align-items:center;justify-content:center;gap:56px;padding:24px}
+button,input{font-family:inherit;color:inherit}
+button{border:0;background:none;cursor:pointer;padding:0}
+.side{max-width:330px;color:#a7b6b1;font-size:15px;line-height:1.8}
+.side h1{color:#fff;font-size:30px;line-height:1.35;margin:0 0 8px}.side h1 span{background:linear-gradient(90deg,var(--em),var(--tq));-webkit-background-clip:text;color:transparent}
+.side .pill{display:inline-block;border:1px solid var(--em);color:var(--em);border-radius:99px;padding:2px 14px;font-size:13px;font-weight:700;margin-bottom:12px}
+.side ul{padding:0 18px;margin:8px 0}.side .reset{margin-top:10px;border:1px solid #1f2e2a;border-radius:10px;padding:7px 14px;font-size:13px;color:#a7b6b1}
+.phone{width:400px;height:860px;border-radius:60px;background:#111;padding:11px;box-shadow:inset 0 0 0 2px #2a2a2a,0 40px 90px rgba(0,0,0,.7);flex-shrink:0}
+.screen{width:100%;height:100%;border-radius:50px;overflow:hidden;position:relative;background:radial-gradient(500px 400px at 100% 0,rgba(16,185,129,.16),transparent),radial-gradient(400px 400px at 0 100%,rgba(45,212,191,.08),transparent),var(--bg)}
+.island{position:absolute;top:11px;left:50%;transform:translateX(-50%);width:120px;height:34px;border-radius:20px;background:#000;z-index:50}
+.status{position:absolute;top:0;left:0;right:0;height:52px;display:flex;justify-content:space-between;align-items:center;padding:4px 32px 0;direction:ltr;font:600 16px Inter,sans-serif;z-index:40}
+.view{position:absolute;top:52px;left:0;right:0;bottom:0;overflow-y:auto;scrollbar-width:none;padding:6px 18px 120px}.view::-webkit-scrollbar{display:none}
+.hdr{display:flex;align-items:center;justify-content:space-between;margin:6px 0 16px}
+.hdr h2{margin:0;font-size:24px;font-weight:700}.hdr .sub{font-size:13px;color:var(--t2)}
+.ib{width:42px;height:42px;border-radius:14px;background:var(--card);border:1px solid var(--line);display:grid;place-items:center}
+.glass{background:var(--card);border:1px solid var(--line);border-radius:22px;backdrop-filter:blur(20px)}
+.bal{padding:18px;background:linear-gradient(135deg,rgba(16,185,129,.22),rgba(45,212,191,.06));border:1px solid rgba(45,212,191,.25);border-radius:24px;margin-bottom:18px}
+.bal .t{font-size:13px;color:var(--t2)}.bal .v{font-size:34px;font-weight:800;font-family:Inter,var(--f);margin:2px 0 12px;direction:ltr;text-align:right}
+.bal .row2{display:flex;gap:10px}.bal .row2>div{flex:1;background:rgba(0,0,0,.25);border-radius:14px;padding:10px 12px}
+.bal .row2 b{display:block;font-size:17px;font-family:Inter,var(--f)}.bal .row2 span{font-size:12px;color:var(--t2)}
+.sec{display:flex;justify-content:space-between;align-items:center;margin:4px 2px 10px;font-weight:700}.sec a{font-size:13px;color:var(--tq);font-weight:600;cursor:pointer}
+.grp{display:flex;align-items:center;gap:12px;padding:14px;margin-bottom:10px;width:100%;text-align:right}
+.gi{width:46px;height:46px;border-radius:15px;display:grid;place-items:center;font-size:22px;flex-shrink:0}
+.grp .n{font-weight:700;font-size:15px}.grp .m{font-size:12px;color:var(--t2)}
+.amt{font-family:Inter,var(--f);font-weight:700;font-size:15px;direction:ltr;white-space:nowrap}
+.pos{color:var(--em)}.neg{color:var(--red)}
+.avs{display:flex;direction:ltr}.avs i{width:22px;height:22px;border-radius:50%;border:2px solid var(--bg);margin-left:-7px;font-style:normal;font-size:10px;font-weight:700;display:grid;place-items:center;color:#062019}
+.scanhero{display:flex;align-items:center;gap:14px;padding:16px;margin-bottom:18px;width:100%;text-align:right;background:linear-gradient(135deg,#0f2a23,#0b1915);border:1px solid rgba(16,185,129,.35);border-radius:22px}
+.scanhero .ic{width:52px;height:52px;border-radius:16px;background:linear-gradient(135deg,var(--em),var(--tq));display:grid;place-items:center;color:#04120e;flex-shrink:0}
+.tabbar{position:absolute;left:16px;right:16px;bottom:20px;height:70px;border-radius:26px;background:rgba(14,22,20,.82);backdrop-filter:blur(24px);border:1px solid var(--line);display:grid;grid-template-columns:repeat(5,1fr);align-items:center;z-index:30}
+.tb{display:flex;flex-direction:column;align-items:center;gap:2px;font-size:10.5px;font-weight:600;color:var(--t2)}.tb.on{color:var(--tq)}
+.fab{width:58px;height:58px;border-radius:20px;margin:-26px auto 0;background:linear-gradient(135deg,var(--em),var(--tq));color:#04120e;display:grid;place-items:center;box-shadow:0 10px 30px rgba(16,185,129,.45)}
+.homebar{position:absolute;bottom:7px;left:50%;transform:translateX(-50%);width:130px;height:5px;border-radius:3px;background:#fff;opacity:.85;z-index:60}
+/* scan */
+.cam{position:relative;height:440px;border-radius:26px;overflow:hidden;background:#000;margin-bottom:14px;display:grid;place-items:center}
+.receipt{width:230px;background:#f6f3ea;color:#222;font-family:"Courier New",monospace;font-size:12px;padding:14px 14px 18px;transform:rotate(-2deg);box-shadow:0 20px 40px rgba(0,0,0,.6);position:relative;direction:rtl}
+.receipt h5{margin:0 0 2px;text-align:center;font-size:14px;font-family:var(--f)}.receipt .c{text-align:center;font-size:10px;color:#666;margin-bottom:8px}
+.receipt .l{display:flex;justify-content:space-between;font-family:var(--f);font-size:12px;padding:1px 0}.receipt .l span:last-child{font-family:"Courier New",monospace;direction:ltr}
+.receipt hr{border:0;border-top:1px dashed #999;margin:6px 0}
+.receipt::after{content:'';position:absolute;bottom:-8px;left:0;right:0;height:8px;background:radial-gradient(circle at 5px 0,transparent 5px,#f6f3ea 5px) 0 0/10px 8px}
+.frame{position:absolute;inset:22px;border-radius:18px;pointer-events:none;background:linear-gradient(var(--tq),var(--tq)) 0 0/34px 4px no-repeat,linear-gradient(var(--tq),var(--tq)) 0 0/4px 34px no-repeat,linear-gradient(var(--tq),var(--tq)) 100% 0/34px 4px no-repeat,linear-gradient(var(--tq),var(--tq)) 100% 0/4px 34px no-repeat,linear-gradient(var(--tq),var(--tq)) 0 100%/34px 4px no-repeat,linear-gradient(var(--tq),var(--tq)) 0 100%/4px 34px no-repeat,linear-gradient(var(--tq),var(--tq)) 100% 100%/34px 4px no-repeat,linear-gradient(var(--tq),var(--tq)) 100% 100%/4px 34px no-repeat}
+.beam{position:absolute;left:30px;right:30px;height:3px;background:var(--tq);box-shadow:0 0 22px 6px rgba(45,212,191,.6);top:30px;animation:beam 1.6s ease-in-out infinite alternate;display:none}
+.scanning .beam{display:block}
+@keyframes beam{to{top:400px}}
+.aitag{position:absolute;top:34px;right:34px;background:rgba(0,0,0,.6);backdrop-filter:blur(8px);border:1px solid rgba(45,212,191,.4);border-radius:99px;padding:5px 12px;font-size:12px;font-weight:600;color:var(--tq);display:flex;gap:6px;align-items:center}
+.big{width:100%;height:54px;border-radius:18px;background:linear-gradient(135deg,var(--em),var(--tq));color:#04120e;font-size:16px;font-weight:700;display:flex;align-items:center;justify-content:center;gap:8px}
+.big.ghost{background:var(--card);color:#fff;border:1px solid var(--line)}
+/* items */
+.ppl{display:flex;gap:8px;overflow-x:auto;scrollbar-width:none;margin-bottom:14px;padding-bottom:2px}
+.pp{display:flex;flex-direction:column;align-items:center;gap:4px;font-size:11px;color:var(--t2);flex-shrink:0;width:56px}
+.pp i{width:44px;height:44px;border-radius:50%;display:grid;place-items:center;font-style:normal;font-weight:700;color:#062019;font-size:16px;outline:2px solid transparent;outline-offset:2px}
+.pp.on i{outline-color:var(--tq)}.pp.on{color:#fff}
+.item{padding:12px 14px;margin-bottom:8px;display:flex;align-items:center;gap:10px}
+.item .nm{flex:1;font-size:14px;font-weight:600}.item .q{color:var(--t2);font-size:12px}
+.item .who{display:flex;gap:4px;margin-top:6px;flex-wrap:wrap}
+.item .who i{width:22px;height:22px;border-radius:50%;font-style:normal;font-size:10px;font-weight:700;display:grid;place-items:center;color:#062019}
+.item.unassigned{border-color:rgba(248,113,113,.4)}
+.addbtn{width:34px;height:34px;border-radius:12px;background:rgba(45,212,191,.12);color:var(--tq);display:grid;place-items:center;font-size:20px;flex-shrink:0}
+.addbtn.on{background:var(--tq);color:#04120e}
+.sum{padding:14px;margin:12px 0}
+.sum .l{display:flex;justify-content:space-between;font-size:13px;color:var(--t2);padding:3px 0}.sum .l b{color:#fff;font-family:Inter,var(--f);direction:ltr}
+.res{display:flex;align-items:center;gap:12px;padding:12px 14px;margin-bottom:8px}
+.res .av{width:40px;height:40px;border-radius:50%;display:grid;place-items:center;font-weight:700;color:#062019;flex-shrink:0}
+.bar{height:6px;border-radius:3px;background:rgba(255,255,255,.08);overflow:hidden;margin-top:6px}.bar b{display:block;height:100%;background:linear-gradient(90deg,var(--em),var(--tq));border-radius:3px}
+.settle{display:flex;align-items:center;gap:10px;padding:12px 14px;margin-bottom:8px}
+.settle .arrow{color:var(--t2);font-size:13px;flex:1}
+.pay{background:rgba(16,185,129,.15);color:var(--em);font-size:12px;font-weight:700;padding:7px 12px;border-radius:10px}
+.pay.done{background:rgba(255,255,255,.06);color:var(--t2)}
+.exp{display:flex;align-items:center;gap:12px;padding:12px 4px;border-bottom:1px solid var(--line)}
+.exp:last-child{border:0}.exp .e{width:40px;height:40px;border-radius:13px;background:var(--card);display:grid;place-items:center;font-size:18px}
+.chips{display:flex;gap:8px;margin-bottom:14px}.chip{font-size:13px;font-weight:600;padding:7px 14px;border-radius:99px;background:var(--card);border:1px solid var(--line);color:var(--t2)}.chip.on{background:rgba(45,212,191,.14);color:var(--tq);border-color:rgba(45,212,191,.4)}
+.insight{padding:14px;margin-bottom:10px;display:flex;gap:12px;align-items:flex-start}
+.insight .ic{width:36px;height:36px;border-radius:12px;background:rgba(45,212,191,.12);color:var(--tq);display:grid;place-items:center;flex-shrink:0;font-size:17px}
+.insight b{display:block;font-size:14px;margin-bottom:2px}.insight span{font-size:12.5px;color:var(--t2);line-height:1.6}
+.donut{display:flex;align-items:center;gap:18px;padding:16px;margin-bottom:14px}
+.leg{flex:1;display:flex;flex-direction:column;gap:8px;font-size:13px}.leg div{display:flex;align-items:center;gap:8px}.leg i{width:10px;height:10px;border-radius:3px}.leg b{margin-inline-start:auto;font-family:Inter,var(--f);font-weight:600}
+.bars{display:flex;align-items:flex-end;gap:10px;height:120px;padding:14px 16px 8px;margin-bottom:14px}
+.bars div{flex:1;display:flex;flex-direction:column;align-items:center;gap:6px;font-size:10px;color:var(--t2);height:100%;justify-content:flex-end}
+.bars div b{width:100%;border-radius:8px 8px 4px 4px;background:rgba(255,255,255,.12)}.bars div.on b{background:linear-gradient(180deg,var(--tq),var(--em))}
+.pro{padding:18px;border-radius:24px;background:linear-gradient(135deg,rgba(45,212,191,.2),rgba(16,185,129,.05));border:1px solid rgba(45,212,191,.35);margin-bottom:14px}
+.toast{position:absolute;top:60px;left:50%;transform:translateX(-50%) translateY(-10px);background:rgba(20,32,29,.95);border:1px solid rgba(45,212,191,.3);color:#fff;border-radius:99px;padding:10px 18px;font-size:13.5px;font-weight:600;opacity:0;transition:.25s;z-index:80;white-space:nowrap;pointer-events:none}
+.toast.on{opacity:1;transform:translateX(-50%)}
+.steps{display:flex;gap:6px;margin:0 0 14px}.steps i{flex:1;height:4px;border-radius:2px;background:rgba(255,255,255,.1)}.steps i.on{background:var(--tq)}
+.ad{display:flex;align-items:center;gap:10px;padding:10px 12px;margin:14px 0;border:1px dashed rgba(255,255,255,.15);border-radius:16px;font-size:12px;color:var(--t2)}
+.ad b{background:#fbbf24;color:#1a1200;font-size:10px;border-radius:5px;padding:1px 6px}
+@media(max-width:900px){.side{display:none}}
+@media(max-width:480px){body{padding:0;display:block}.phone{width:100%;height:100dvh;border-radius:0;padding:0;background:none;box-shadow:none}.screen{border-radius:0}.island,.status,.homebar{display:none}.view{top:0;padding-top:16px}}
+</style>
+</head>
+<body>
+<div class="side">
+  <div class="pill">نسخة تجريبية تفاعلية</div>
+  <h1>Splitter: قسّم الفاتورة <span>في ثواني</span></h1>
+  <div>صوّر الفاتورة، والذكاء الاصطناعي يقرأ الأصناف والأسعار والخدمة والضريبة، وكل واحد يختار اللي أكله.</div>
+  <ul><li>اضغط زرار المسح في النص وجرّب الفاتورة</li><li>وزّع الأصناف على الناس وشوف كل واحد عليه كام</li><li>شوف حسابات الجروب والتحليلات</li></ul>
+  <div style="font-size:13px;color:#6b7c77">بيانات وهمية للعرض.</div>
+  <button class="reset" onclick="resetAll()">إعادة البيانات</button>
+</div>
+<div class="phone"><div class="screen" id="screen">
+  <div class="island"></div>
+  <div class="status"><span id="clock">9:41</span><span style="display:flex;gap:6px;align-items:center"><svg width="17" height="11" viewBox="0 0 18 12" fill="#fff"><rect y="8" width="3" height="4" rx="1"/><rect x="5" y="5.5" width="3" height="6.5" rx="1"/><rect x="10" y="3" width="3" height="9" rx="1"/><rect x="15" width="3" height="12" rx="1"/></svg><svg width="25" height="12" viewBox="0 0 27 13"><rect x=".5" y=".5" width="23" height="12" rx="3.5" fill="none" stroke="#fff" stroke-opacity=".4"/><rect x="2" y="2" width="17" height="9" rx="2" fill="#fff"/></svg></span></div>
+  <div class="view" id="view"></div>
+  <nav class="tabbar" id="tabbar"></nav>
+  <div class="toast" id="toast"></div>
+  <div class="homebar"></div>
+</div></div>
+<script>
+const C={me:'#2dd4bf',a:'#fbbf24',k:'#a78bfa',s:'#f9a8d4',m:'#93c5fd'};
+const PEOPLE={me:'أنت',a:'أحمد',k:'كريم',s:'سارة',m:'مريم'};const INI={me:'ي',a:'أ',k:'ك',s:'س',m:'م'};
+const I={home:'<path d="M3 11l9-7 9 7v9a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1z" fill="currentColor"/>',groups:'<circle cx="9" cy="8" r="3.5" fill="currentColor"/><circle cx="17" cy="9" r="2.6" fill="currentColor" opacity=".7"/><path d="M2.5 19c.6-3.6 3.3-5.5 6.5-5.5s5.9 1.9 6.5 5.5zM15.5 13.6c2.9-.3 5.3 1.3 6 4.4h-4.6" fill="currentColor"/>',scan:'<path d="M4 8V5a1 1 0 0 1 1-1h3M16 4h3a1 1 0 0 1 1 1v3M20 16v3a1 1 0 0 1-1 1h-3M8 20H5a1 1 0 0 1-1-1v-3M4 12h16" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"/>',chart:'<rect x="3" y="12" width="4" height="9" rx="1.5" fill="currentColor"/><rect x="10" y="7" width="4" height="14" rx="1.5" fill="currentColor"/><rect x="17" y="3" width="4" height="18" rx="1.5" fill="currentColor"/>',user:'<circle cx="12" cy="8" r="4.2" fill="currentColor"/><path d="M3.5 21c.7-4.4 4.2-7 8.5-7s7.8 2.6 8.5 7z" fill="currentColor"/>',back:'<path d="M9 5l7 7-7 7" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>',spark:'<path d="M12 2l2.2 6.8L21 11l-6.8 2.2L12 20l-2.2-6.8L3 11l6.8-2.2z" fill="currentColor"/>',bell:'<path d="M12 3a6 6 0 0 0-6 6v4l-2 3h16l-2-3V9a6 6 0 0 0-6-6zM10 19a2 2 0 0 0 4 0" fill="currentColor"/>'};
+const ic=(n,s=22)=>`<svg width="${s}" height="${s}" viewBox="0 0 24 24">${I[n]}</svg>`;
+const av=(p,s=22)=>`<i style="background:${C[p]};width:${s}px;height:${s}px">${INI[p]}</i>`;
+const money=n=>(n<0?'-':'')+Math.abs(Math.round(n)).toLocaleString('en-US')+' ج.م';
+const RECEIPT={name:'كافيه نخلة',items:[{n:'بيتزا مارجريتا',q:1,p:185},{n:'برجر كلاسيك',q:1,p:165},{n:'باستا ألفريدو',q:1,p:150},{n:'سلطة سيزر',q:1,p:95},{n:'عصير مانجو',q:3,p:45},{n:'مياه معدنية',q:2,p:15}],service:.12,vat:.14};
+function seed(){return{
+ groups:[
+  {id:'g1',name:'سهرة الخميس',emoji:'🍕',color:'rgba(251,191,36,.15)',members:['me','a','k','s'],exps:[{t:'فاتورة كافيه نخلة',e:'🧾',by:'me',amt:1032,d:'النهارده',split:{me:258,a:258,k:258,s:258}},{t:'أوبر الرجوع',e:'🚗',by:'a',amt:180,d:'النهارده',split:{me:45,a:45,k:45,s:45}}]},
+  {id:'g2',name:'شقة الشباب',emoji:'🏠',color:'rgba(45,212,191,.13)',members:['me','a','k'],exps:[{t:'فاتورة الكهربا',e:'⚡',by:'k',amt:690,d:'امبارح',split:{me:230,a:230,k:230}},{t:'سوبر ماركت',e:'🛒',by:'me',amt:840,d:'من 3 أيام',split:{me:280,a:280,k:280}},{t:'إنترنت',e:'📶',by:'a',amt:450,d:'من أسبوع',split:{me:150,a:150,k:150}}]},
+  {id:'g3',name:'رحلة الساحل',emoji:'🏖️',color:'rgba(147,197,253,.14)',members:['me','s','m','a'],exps:[{t:'الشاليه',e:'🏡',by:'s',amt:4800,d:'من أسبوعين',split:{me:1200,s:1200,m:1200,a:1200}},{t:'بنزين',e:'⛽',by:'me',amt:900,d:'من أسبوعين',split:{me:225,s:225,m:225,a:225}}]}],
+ paid:{}}}
+let db;try{db=JSON.parse(localStorage.getItem('splitter_demo'))}catch(e){} if(!db)db=seed();
+const save=()=>{try{localStorage.setItem('splitter_demo',JSON.stringify(db))}catch(e){}};
+let tab='home',stack=[],scan={step:0,assign:{},sel:'me',people:['me','a','k','s']};
+const $=id=>document.getElementById(id);
+function toast(m){const t=$('toast');t.textContent=m;t.classList.add('on');clearTimeout(t._h);t._h=setTimeout(()=>t.classList.remove('on'),2200)}
+function balances(g){const b={};g.members.forEach(p=>b[p]=0);g.exps.forEach(x=>{b[x.by]+=x.amt;for(const p in x.split)b[p]-=x.split[p]});return b}
+function settlements(g){const b=balances(g),cr=[],dr=[];for(const p in b){if(b[p]>.5)cr.push([p,b[p]]);else if(b[p]<-.5)dr.push([p,-b[p]])}
+ cr.sort((x,y)=>y[1]-x[1]);dr.sort((x,y)=>y[1]-x[1]);const out=[];let i=0,j=0;
+ while(i<dr.length&&j<cr.length){const a=Math.min(dr[i][1],cr[j][1]);out.push({from:dr[i][0],to:cr[j][0],amt:a});dr[i][1]-=a;cr[j][1]-=a;if(dr[i][1]<.5)i++;if(cr[j][1]<.5)j++}return out}
+function myNet(g){const s=settlements(g).filter(x=>!db.paid[g.id+x.from+x.to]);let n=0;s.forEach(x=>{if(x.to==='me')n+=x.amt;if(x.from==='me')n-=x.amt});return n}
+function go(v,a){stack.push({v,a});render();$('view').scrollTop=0}
+function back(){stack.pop();render()}
+function setTab(t){if(t==='scan'){startScan();return}tab=t;stack=[];render();$('view').scrollTop=0}
+function render(){const top=stack.at(-1);const v=top?top.v:tab;
+ $('view').innerHTML=({home:vHome,groups:vGroups,insights:vInsights,profile:vProfile,group:vGroup,scan:vScan})[v](top&&top.a);
+ const T=[['home','home','الرئيسية'],['groups','groups','الجروبات'],['scan','scan',''],['insights','chart','التحليلات'],['profile','user','حسابي']];
+ $('tabbar').style.display=v==='scan'?'none':'grid';
+ $('tabbar').innerHTML=T.map(([k,i,l])=>k==='scan'?`<button onclick="setTab('scan')" aria-label="امسح فاتورة"><div class="fab">${ic('scan',28)}</div></button>`:`<button class="tb ${tab===k&&!stack.length?'on':''}" onclick="setTab('${k}')">${ic(i,24)}<span>${l}</span></button>`).join('');
+}
+function vHome(){let owed=0,owe=0;db.groups.forEach(g=>{const n=myNet(g);if(n>0)owed+=n;else owe-=n});
+ return `<div class="hdr"><div><div class="sub">مساء الخير</div><h2>يوسف 👋</h2></div><button class="ib" onclick="toast('3 إشعارات جديدة')">${ic('bell',20)}</button></div>
+ <div class="bal"><div class="t">صافي حسابك مع الكل</div><div class="v ${owed-owe>=0?'pos':'neg'}">${money(owed-owe)}</div>
+ <div class="row2"><div><span>ليك عند الناس</span><b class="pos">${money(owed)}</b></div><div><span>عليك</span><b class="neg">${money(owe)}</b></div></div></div>
+ <button class="scanhero" onclick="startScan()"><div class="ic">${ic('scan',28)}</div><div style="flex:1"><b style="font-size:16px">صوّر الفاتورة وقسّمها</b><div style="font-size:12.5px;color:var(--t2)">الذكاء الاصطناعي بيقرا الأصناف والضريبة والخدمة</div></div><span style="color:var(--tq);display:flex;transform:scaleX(-1)">${ic('back',20)}</span></button>
+ <div class="sec">جروباتك<a onclick="setTab('groups')">الكل</a></div>
+ ${db.groups.map(grpRow).join('')}
+ <div class="ad"><b>إعلان</b><span style="flex:1">النسخة المجانية فيها إعلان بسيط. Splitter Pro من غير إعلانات.</span></div>`}
+function grpRow(g){const n=myNet(g);return `<button class="glass grp" onclick="go('group','${g.id}')"><div class="gi" style="background:${g.color}">${g.emoji}</div><div style="flex:1"><div class="n">${g.name}</div><div class="m" style="display:flex;align-items:center;gap:8px"><span class="avs">${g.members.map(p=>av(p)).join('')}</span>${g.exps.length} مصاريف</div></div><div style="text-align:left"><div class="amt ${n>=0?'pos':'neg'}">${Math.abs(n)<1?'متسوّي':money(Math.abs(n))}</div><div class="m">${Math.abs(n)<1?'':n>0?'ليك':'عليك'}</div></div></button>`}
+function vGroups(){return `<div class="hdr"><h2>الجروبات</h2><button class="ib" onclick="toast('في التطبيق بتعمل جروب وتضيف صحابك بالرقم')" style="font-size:22px;color:var(--tq)">+</button></div>${db.groups.map(grpRow).join('')}`}
+function vGroup(id){const g=db.groups.find(x=>x.id===id),st=settlements(g),tot=g.exps.reduce((s,x)=>s+x.amt,0);
+ return `<div class="hdr"><button class="ib" onclick="back()">${ic('back',18)}</button><div style="text-align:center"><h2 style="font-size:19px">${g.emoji} ${g.name}</h2><div class="sub">${g.members.length} أفراد · إجمالي ${money(tot)}</div></div><span class="avs">${g.members.map(p=>av(p,26)).join('')}</span></div>
+ <div class="sec">مين يدفع لمين <span style="font-size:12px;color:var(--t2);font-weight:500">أقل عدد تحويلات</span></div>
+ ${st.map(x=>{const k=g.id+x.from+x.to,done=db.paid[k];return `<div class="glass settle"><span class="avs" style="direction:rtl">${av(x.from,30)}</span><div class="arrow"><b style="color:#fff">${PEOPLE[x.from]}</b> ← <b style="color:#fff">${PEOPLE[x.to]}</b><div class="amt" style="text-align:right;color:${done?'var(--t2)':'#fff'};${done?'text-decoration:line-through':''}">${money(x.amt)}</div></div>${x.from==='me'&&!done?`<button class="pay" onclick="payIt('${k}')">ادفع بإنستاباي</button>`:x.to==='me'&&!done?`<button class="pay" onclick="toast('اتبعت تذكير لـ${PEOPLE[x.from]}')">فكّره</button>`:done?'<span class="pay done">✓ اتسوّت</span>':''}</div>`}).join('')||'<div class="glass" style="padding:16px;text-align:center;color:var(--t2)">الحسابات متسوّية 🎉</div>'}
+ <div class="sec" style="margin-top:16px">المصاريف</div>
+ <div class="glass" style="padding:4px 14px">${g.exps.map(x=>`<div class="exp"><div class="e">${x.e}</div><div style="flex:1"><div style="font-weight:600;font-size:14px">${x.t}</div><div style="font-size:12px;color:var(--t2)">دفعها ${PEOPLE[x.by]} · ${x.d}</div></div><div class="amt">${money(x.amt)}</div></div>`).join('')}</div>`}
+function payIt(k){db.paid[k]=1;save();render();toast('اتسجّل الدفع، وصاحبك جاله إشعار')}
+/* ===== المسح ===== */
+function startScan(){scan={step:0,assign:{},sel:'me',people:['me','a','k','s']};stack=[{v:'scan'}];render()}
+function vScan(){const s=scan.step;
+ const head=`<div class="hdr"><button class="ib" onclick="back()">${ic('back',18)}</button><div style="text-align:center"><h2 style="font-size:18px">${['صوّر الفاتورة','بنقرا الفاتورة…','مين أكل إيه؟','كل واحد عليه كام'][s]}</h2></div><span style="width:42px"></span></div><div class="steps">${[0,1,2,3].map(i=>`<i class="${i<=s?'on':''}"></i>`).join('')}</div>`;
+ if(s<2)return head+`<div class="cam ${s===1?'scanning':''}">${receiptHTML()}<div class="frame"></div><div class="beam"></div>${s===1?`<div class="aitag">${ic('spark',14)} الذكاء الاصطناعي بيقرا…</div>`:''}</div>
+  ${s===0?`<button class="big" onclick="doScan()">${ic('scan',22)} امسح الفاتورة</button><div style="text-align:center;font-size:12px;color:var(--t2);margin-top:10px">أو اختار صورة من المعرض</div>`:`<button class="big ghost" disabled>بيستخرج الأصناف والأسعار…</button>`}`;
+ const R=RECEIPT,sub=R.items.reduce((t,x)=>t+x.q*x.p,0),svc=sub*R.service,vat=(sub+svc)*R.vat;
+ if(s===2){const un=R.items.filter((_,i)=>!(scan.assign[i]||[]).length).length;
+  return head+`<div class="glass" style="padding:10px 14px;margin-bottom:12px;display:flex;gap:10px;align-items:center;font-size:13px"><span style="color:var(--tq)">${ic('spark',18)}</span><span style="flex:1">لقينا <b>${R.items.length} أصناف</b> + خدمة 12٪ + ضريبة 14٪ في فاتورة <b>${R.name}</b></span></div>
+  <div style="font-size:13px;color:var(--t2);margin-bottom:8px">اختار الشخص، وبعدين اضغط + جنب اللي أكله:</div>
+  <div class="ppl">${scan.people.map(p=>`<button class="pp ${scan.sel===p?'on':''}" onclick="scan.sel='${p}';render()"><i style="background:${C[p]}">${INI[p]}</i>${PEOPLE[p]}</button>`).join('')}</div>
+  ${R.items.map((x,i)=>{const w=scan.assign[i]||[],on=w.includes(scan.sel);return `<div class="glass item ${w.length?'':'unassigned'}"><div style="flex:1"><div class="nm">${x.n} ${x.q>1?`<span class="q">× ${x.q}</span>`:''}</div><div class="who">${w.length?w.map(p=>av(p)).join(''):'<span style="font-size:11px;color:var(--red)">محدش اختاره</span>'}</div></div><div class="amt">${money(x.q*x.p)}</div><button class="addbtn ${on?'on':''}" onclick="toggleItem(${i})">${on?'✓':'+'}</button></div>`}).join('')}
+  <button class="glass" style="width:100%;padding:11px;border-radius:14px;margin:4px 0 12px;font-size:13px;color:var(--tq);font-weight:600" onclick="evenly()">قسّم الباقي بالتساوي على الكل</button>
+  <button class="big" onclick="${un?`toast('فاضل ${un} أصناف محدش اختارها')`:'scan.step=3;render()'}">احسب نصيب كل واحد</button>`}
+ const per=calc();const tot=sub+svc+vat;
+ return head+`<div class="glass sum"><div class="l"><span>الأصناف</span><b>${money(sub)}</b></div><div class="l"><span>الخدمة 12٪</span><b>${money(svc)}</b></div><div class="l"><span>الضريبة 14٪</span><b>${money(vat)}</b></div><div class="l" style="border-top:1px solid var(--line);margin-top:6px;padding-top:8px;color:#fff;font-weight:700"><span>الإجمالي</span><b style="color:var(--tq)">${money(tot)}</b></div></div>
+ ${scan.people.map(p=>`<div class="glass res"><div class="av" style="background:${C[p]}">${INI[p]}</div><div style="flex:1"><div style="display:flex;justify-content:space-between"><b>${PEOPLE[p]}</b><span class="amt">${money(per[p])}</span></div><div class="bar"><b style="width:${per[p]/tot*100}%"></b></div><div style="font-size:11px;color:var(--t2);margin-top:4px">${R.items.filter((_,i)=>(scan.assign[i]||[]).includes(p)).map(x=>x.n).join('، ')||'—'}</div></div></div>`).join('')}
+ <div style="font-size:12px;color:var(--t2);margin:6px 2px 12px">الخدمة والضريبة اتوزعوا على حسب اللي أكله كل واحد.</div>
+ <button class="big" onclick="saveBill()">ضيفها لجروب «سهرة الخميس» وابعت للكل</button>`}
+function receiptHTML(){const R=RECEIPT,sub=R.items.reduce((t,x)=>t+x.q*x.p,0),svc=sub*R.service,vat=(sub+svc)*R.vat;
+ return `<div class="receipt"><h5>${R.name}</h5><div class="c">فاتورة #4821 · ترابيزة 7</div>${R.items.map(x=>`<div class="l"><span>${x.q} ${x.n}</span><span>${(x.q*x.p).toFixed(2)}</span></div>`).join('')}<hr><div class="l"><span>المجموع</span><span>${sub.toFixed(2)}</span></div><div class="l"><span>خدمة 12%</span><span>${svc.toFixed(2)}</span></div><div class="l"><span>ضريبة 14%</span><span>${vat.toFixed(2)}</span></div><hr><div class="l" style="font-weight:700"><span>الإجمالي</span><span>${(sub+svc+vat).toFixed(2)}</span></div><div class="c" style="margin:8px 0 0">شكراً لزيارتكم</div></div>`}
+function doScan(){scan.step=1;render();setTimeout(()=>{scan.step=2;render()},2600)}
+function toggleItem(i){const w=scan.assign[i]=scan.assign[i]||[];const k=w.indexOf(scan.sel);if(k>=0)w.splice(k,1);else w.push(scan.sel);render()}
+function evenly(){RECEIPT.items.forEach((_,i)=>{if(!(scan.assign[i]||[]).length)scan.assign[i]=[...scan.people]});render()}
+function calc(){const R=RECEIPT,per={};scan.people.forEach(p=>per[p]=0);R.items.forEach((x,i)=>{const w=scan.assign[i]||[];w.forEach(p=>per[p]+=x.q*x.p/w.length)});
+ const f=(1+R.service)*(1+R.vat);for(const p in per)per[p]*=f;return per}
+function saveBill(){const per=calc(),tot=Object.values(per).reduce((a,b)=>a+b,0),split={};for(const p in per)split[p]=Math.round(per[p]);
+ db.groups[0].exps.unshift({t:'فاتورة '+RECEIPT.name,e:'🧾',by:'me',amt:Math.round(tot),d:'دلوقتي',split});save();stack=[];tab='home';go('group','g1');toast('اتضافت للجروب، وكل واحد جاله إشعار بنصيبه')}
+/* ===== التحليلات ===== */
+function vInsights(){const cats=[['أكل وخروجات','#2dd4bf',42],['سكن وفواتير','#10b981',31],['مواصلات','#fbbf24',15],['سفر','#a78bfa',12]];let acc=0;
+ const seg=cats.map(([n,c,v])=>{const s=`<circle r="15.9" cx="21" cy="21" fill="none" stroke="${c}" stroke-width="6" stroke-dasharray="${v} ${100-v}" stroke-dashoffset="${25-acc}"/>`;acc+=v;return s}).join('');
+ return `<div class="hdr"><h2>التحليلات</h2><span class="chip on">نوفمبر</span></div>
+ <div class="glass donut"><svg width="120" height="120" viewBox="0 0 42 42"><circle r="15.9" cx="21" cy="21" fill="none" stroke="rgba(255,255,255,.06)" stroke-width="6"/>${seg}<text x="21" y="20" text-anchor="middle" fill="#fff" font-size="5" font-weight="700" font-family="Inter">4,860</text><text x="21" y="26" text-anchor="middle" fill="rgba(255,255,255,.55)" font-size="3">ج.م الشهر ده</text></svg>
+ <div class="leg">${cats.map(([n,c,v])=>`<div><i style="background:${c}"></i>${n}<b>${v}٪</b></div>`).join('')}</div></div>
+ <div class="sec">مصاريفك آخر 6 شهور</div>
+ <div class="glass bars">${[['يونيو',52],['يوليو',70],['أغسطس',96],['سبتمبر',61],['أكتوبر',74],['نوفمبر',88]].map(([m,h],i)=>`<div class="${i===5?'on':''}"><b style="height:${h}%"></b>${m}</div>`).join('')}</div>
+ <div class="sec">${ic('spark',16)} ملاحظات ذكية</div>
+ <div class="glass insight"><div class="ic">🍔</div><div><b>الخروجات زادت 35٪</b><span>صرفت على الأكل برّه الشهر ده أكتر من الشهر اللي فات بـ 540 ج.م، معظمها يوم الخميس.</span></div></div>
+ <div class="glass insight"><div class="ic">⏰</div><div><b>أحمد متأخر في التسوية</b><span>عليه فلوس في «شقة الشباب» من أكتر من أسبوع. ابعتله تذكير؟</span></div></div>
+ <div class="glass insight"><div class="ic">💡</div><div><b>نصيحة توفير</b><span>لو قسمتوا اشتراك الإنترنت على 4 بدل 3، هتوفر 37 ج.م كل شهر.</span></div></div>`}
+function vProfile(){return `<div class="hdr"><h2>حسابي</h2></div>
+ <div class="glass" style="padding:16px;display:flex;gap:14px;align-items:center;margin-bottom:14px"><div style="width:58px;height:58px;border-radius:50%;background:${C.me};display:grid;place-items:center;font-size:24px;font-weight:700;color:#062019">ي</div><div><b style="font-size:17px">يوسف</b><div style="font-size:13px;color:var(--t2);direction:ltr;text-align:right">+20 100 000 0000</div></div></div>
+ <div class="pro"><div style="display:flex;justify-content:space-between;align-items:center"><b style="font-size:18px">Splitter Pro ✨</b><span class="amt" style="color:var(--tq)">100 ج.م/شهر</span></div>
+ <ul style="margin:10px 0 14px;padding:0 18px;font-size:13.5px;color:#d5e4df;line-height:1.9"><li>مسح فواتير بلا حدود</li><li>من غير إعلانات</li><li>تحليلات وملاحظات ذكية أعمق</li><li>تصدير الحسابات PDF وExcel</li></ul>
+ <button class="big" onclick="toast('في التطبيق بيفتح صفحة الاشتراك')">جرّب Pro مجانًا 7 أيام</button></div>
+ <div class="glass" style="padding:4px 16px">${['طرق الدفع (إنستاباي، فودافون كاش)','الإشعارات','اللغة: العربية','الدعم'].map(t=>`<div class="exp" style="justify-content:space-between"><span style="font-size:14px">${t}</span><span style="color:var(--t2);transform:scaleX(-1);display:flex">${ic('back',16)}</span></div>`).join('')}</div>`}
+function resetAll(){db=seed();save();tab='home';stack=[];render()}
+function clock(){$('clock').textContent=new Date().toLocaleTimeString('en-US',{hour:'numeric',minute:'2-digit'}).replace(/\s?[AP]M/,'')}clock();setInterval(clock,30000);
+render();
+</script>
+</body>
+</html>
