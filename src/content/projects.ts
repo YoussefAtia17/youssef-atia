@@ -330,7 +330,14 @@ export const featuredProjects: Project[] = [
     live: "/demos/mrc/index.html",
     github: `${GH}/MRC`,
     cover: "from-yellow-500 to-amber-700",
-    image: "/projects/mrc.jpg",
+    image: "/projects/mrc/00_cover.webp",
+    gallery: [
+      "/projects/mrc/00_cover.webp",
+      "/projects/mrc/01_login.webp",
+      "/projects/mrc/02_treasury.webp",
+      "/projects/mrc/03_deal_reminder.webp",
+      "/projects/mrc/04_whatsapp_lines.webp",
+    ],
     details: {
       context: {
         en: "Behind the Royal Palace app there is a real team buying and selling watches every day. Deals were tracked in chats and notebooks, cash moved in and out of the safe with no clear record, and salary advances were easy to forget. The owners wanted one Arabic system where every deal, every employee and every pound in the treasury is accounted for.",
