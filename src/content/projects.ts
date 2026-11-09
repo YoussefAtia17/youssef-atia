@@ -328,7 +328,7 @@ export const featuredProjects: Project[] = [
     badge: { en: "Client · Aser Watch", ar: "عميل · Aser Watch" },
     stack: ["JavaScript", "Tailwind", "Supabase", "PostgreSQL", "SheetJS"],
     live: "/demos/mrc/index.html",
-    github: `${GH}/MRC`,
+    github: `${GH}/MRC-redesign`,
     cover: "from-yellow-500 to-amber-700",
     image: "/projects/mrc/00_cover.webp",
     gallery: [
