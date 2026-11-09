@@ -4,7 +4,11 @@ export const contact = {
   email: "youssefatiav@gmail.com",
   github: "https://github.com/YoussefAtia17",
   cv: "/Resume.pdf",
+  /** International format, digits only (e.g. 2010xxxxxxxx). Leave empty to hide the WhatsApp buttons. */
+  whatsapp: "",
 };
+
+export const whatsappUrl = contact.whatsapp ? `https://wa.me/${contact.whatsapp}` : null;
 
 export const bio: Localized = {
   en: "I'm Youssef, a Computer Science student at the Egyptian Chinese University. I build end-to-end products: business systems for real clients, native iOS apps, event platforms, and AI-powered mobile apps. I've also worked part-time as a programming teaching assistant at iSchool.",

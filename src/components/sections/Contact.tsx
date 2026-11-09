@@ -1,8 +1,8 @@
 import type { Dictionary } from "@/i18n/dictionaries";
-import { contact } from "@/content/profile";
+import { contact, whatsappUrl } from "@/content/profile";
 import { ContactForm } from "../ContactForm";
 import { Window } from "../Section";
-import { GithubIcon, MailIcon } from "../icons";
+import { DownloadIcon, GithubIcon, MailIcon, WhatsAppIcon } from "../icons";
 
 export function Contact({ dict }: { dict: Dictionary["contact"] }) {
   return (
@@ -18,6 +18,16 @@ export function Contact({ dict }: { dict: Dictionary["contact"] }) {
 
           <p className="mt-10 font-mono text-xs text-muted">{dict.form.or}</p>
           <div className="mt-3 flex flex-col gap-3 text-sm font-medium">
+            {whatsappUrl && (
+              <a
+                href={whatsappUrl}
+                target="_blank"
+                rel="noreferrer"
+                className="inline-flex w-fit items-center gap-3 rounded-lg border border-[#25d366]/40 bg-[#25d366]/10 px-4 py-2.5 text-[#25d366] transition hover:bg-[#25d366]/20"
+              >
+                <WhatsAppIcon className="size-4" /> {dict.whatsapp}
+              </a>
+            )}
             <a
               href={`mailto:${contact.email}`}
               className="inline-flex w-fit items-center gap-3 rounded-lg border border-border bg-surface px-4 py-2.5 transition hover:border-accent/50"
@@ -31,6 +41,13 @@ export function Contact({ dict }: { dict: Dictionary["contact"] }) {
               className="inline-flex w-fit items-center gap-3 rounded-lg border border-border bg-surface px-4 py-2.5 transition hover:border-accent/50"
             >
               <GithubIcon className="size-4 text-accent" /> <span dir="ltr">github.com/YoussefAtia17</span>
+            </a>
+            <a
+              href={contact.cv}
+              download
+              className="inline-flex w-fit items-center gap-3 rounded-lg border border-border bg-surface px-4 py-2.5 transition hover:border-accent/50"
+            >
+              <DownloadIcon className="size-4 text-accent" /> {dict.cv} <span className="font-mono text-xs text-muted">PDF</span>
             </a>
           </div>
         </div>

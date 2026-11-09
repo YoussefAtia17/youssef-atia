@@ -124,3 +124,34 @@ body {
   width: 0.06em;
   margin-inline-start: 0.08em;
 }
+
+/* Screenshot viewer: soft fade/zoom in, and a quick crossfade between images. */
+.lightbox[open] { animation: lightbox-in 220ms ease-out; }
+.lightbox[open]::backdrop { animation: lightbox-fade 220ms ease-out; }
+.lightbox-img { animation: lightbox-fade 250ms ease-out; }
+@keyframes lightbox-in { from { opacity: 0; transform: scale(0.97); } }
+@keyframes lightbox-fade { from { opacity: 0; } }
+@media (prefers-reduced-motion: reduce) {
+  .lightbox[open], .lightbox[open]::backdrop, .lightbox-img { animation: none; }
+}
+
+/* Project filter: cards fade up when the filter changes. */
+.filter-in { animation: filter-in 380ms cubic-bezier(.2,.7,.2,1) both; }
+@keyframes filter-in { from { opacity: 0; transform: translateY(10px); } }
+
+/* Thin reading-progress bar at the top, driven purely by scroll (no JS). */
+.scroll-progress { display: none; }
+@supports (animation-timeline: scroll()) {
+  .scroll-progress {
+    display: block; position: fixed; inset-inline: 0; top: 0; z-index: 60; height: 2px;
+    background: linear-gradient(90deg, var(--accent), var(--accent-2));
+    box-shadow: 0 0 8px var(--accent);
+    transform-origin: 0 50%;
+    animation: scroll-progress linear both; animation-timeline: scroll(root block);
+  }
+  [dir="rtl"] .scroll-progress { transform-origin: 100% 50%; background: linear-gradient(270deg, var(--accent), var(--accent-2)); }
+  @keyframes scroll-progress { from { transform: scaleX(0); } to { transform: scaleX(1); } }
+}
+@media (prefers-reduced-motion: reduce) {
+  .filter-in { animation: none; }
+}

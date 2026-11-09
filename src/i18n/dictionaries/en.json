@@ -24,7 +24,8 @@
       "projects": "projects shipped",
       "clients": "client products",
       "langs": "Arabic + English"
-    }
+    },
+    "whatsapp": "WhatsApp"
   },
   "about": {
     "title": "About me",
@@ -50,7 +51,40 @@
     "confidential": "This is client work, so the code and real data stay private. Everything below describes what the product does without exposing them.",
     "gallery": "Screenshots",
     "openImage": "Open full size",
-    "featured": "Featured"
+    "close": "Close",
+    "next": "Next screenshot",
+    "prev": "Previous screenshot",
+    "featured": "Featured",
+    "filters": {
+      "all": "all",
+      "mobile": "mobile",
+      "web": "web",
+      "client": "clients",
+      "product": "products"
+    },
+    "filterLabel": "Filter projects",
+    "stats": {
+      "demos": "live demos you can try",
+      "clients": "client systems in real use",
+      "platforms": "platforms: iOS, Android, Web",
+      "tech": "technologies in production"
+    },
+    "demo": {
+      "title": "Try it yourself",
+      "local": "Interactive demo with sample data. It runs in your browser, nothing is saved and no sign-up is needed.",
+      "remote": "This is the real deployed site, open it and look around.",
+      "cta": "Open the demo",
+      "user": "Login",
+      "pass": "Password",
+      "copy": "Copy",
+      "copied": "Copied",
+      "logins": "Sample account"
+    },
+    "nav": "More projects",
+    "prevProject": "Previous",
+    "nextProject": "Next",
+    "testimonials": "What clients say",
+    "preview": "▶ preview"
   },
   "experience": {
     "title": "Experience",
@@ -78,7 +112,9 @@
         "message": "Your message should be at least 10 characters.",
         "send": "Something went wrong. Please try again or email me directly."
       }
-    }
+    },
+    "whatsapp": "Chat on WhatsApp",
+    "cv": "Download CV"
   },
   "footer": {
     "rights": "Built with Next.js & Tailwind.",

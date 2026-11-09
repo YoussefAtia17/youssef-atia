@@ -11,16 +11,26 @@ export type Project = {
   role?: Localized;
   live?: string;
   github?: string;
+  /** Used by the filter tabs on the home page. */
+  kinds: ProjectKind[];
+  /** Sample logins for the live demo, shown with copy buttons on the details page. Demo data only. */
+  demoLogins?: { role: Localized; user: string; pass: string }[];
+  /** Extra hint shown under the demo logins. */
+  demoNote?: Localized;
   /** Repo is private: shows a "private code" note instead of a GitHub link. */
   privateCode?: boolean;
   /** Tailwind gradient: card cover when there is no screenshot, and accent on the details page. */
   cover: string;
   /** Cover screenshot in /public/projects. */
   image?: string;
+  /** Short muted clip of the demo in use; plays over the card cover on hover. */
+  video?: string;
   /** Extra screenshots shown on the details page. */
   gallery?: string[];
   details: ProjectDetails;
 };
+
+export type ProjectKind = "mobile" | "web" | "client" | "product";
 
 export type ProjectDetails = {
   /** Why it exists: the problem or the client's need. */
@@ -40,6 +50,8 @@ const GH = "https://github.com/YoussefAtia17";
 export const featuredProjects: Project[] = [
   {
     slug: "splitter",
+    video: "/projects/splitter/preview.mp4",
+    kinds: ["mobile", "product"],
     title: { en: "Splitter: AI Bill Splitting", ar: "Splitter: تقسيم الفاتورة بالذكاء الاصطناعي" },
     summary: {
       en: "Mobile app that reads a restaurant receipt with AI, lets everyone tap what they ate, spreads service and tax fairly, and settles group balances in the fewest transfers, with InstaPay payments and spending insights.",
@@ -114,6 +126,8 @@ export const featuredProjects: Project[] = [
   },
   {
     slug: "playzone",
+    video: "/projects/playzone/preview.mp4",
+    kinds: ["web", "client"],
     title: { en: "PlayZone: Gaming Café POS", ar: "PlayZone: كاشير محلات البلايستيشن" },
     summary: {
       en: "Cashier and management system for PlayStation, billiards and café shops: a live timer and hourly billing per device, orders and takeaway with stock that updates itself, printable receipts, expenses and daily/monthly profit reports.",
@@ -180,6 +194,8 @@ export const featuredProjects: Project[] = [
   },
   {
     slug: "royal-palace",
+    video: "/projects/royal-palace/preview.mp4",
+    kinds: ["mobile", "client"],
     title: { en: "Royal Palace", ar: "القصر الملكي" },
     summary: {
       en: "Native iOS marketplace for luxury Swiss watches: structured listings with admin review, real-time chat with price offers, smart Arabic/English search and push notifications, all on Supabase.",
@@ -257,6 +273,10 @@ export const featuredProjects: Project[] = [
   },
   {
     slug: "mrc",
+    video: "/projects/mrc/preview.mp4",
+    kinds: ["web", "client"],
+    demoLogins: [{ role: { en: "Owner", ar: "المالك" }, user: "owner@demo.com", pass: "demo1234" }],
+    demoNote: { en: "Locked pages (treasury, salaries) open with the code 1234.", ar: "الصفحات المقفولة (الخزنة والمرتبات) بتفتح بالكود 1234." },
     title: { en: "MRC: Deals & Treasury System", ar: "MRC: نظام الصفقات والخزنة" },
     summary: {
       en: "The internal back-office for Royal Palace: customer deals with WhatsApp reminders, staff and payroll, salary advances and bonuses, and a locked treasury with daily and monthly closing.",
@@ -341,6 +361,7 @@ export const featuredProjects: Project[] = [
   },
   {
     slug: "icpc-orientation",
+    kinds: ["web"],
     title: { en: "ICPC × ECU Orientation Challenge", ar: "تحدي ICPC × ECU للـ Orientation" },
     summary: {
       en: "Mobile web game for the ICPC booth: students scan a QR code, beat three timed puzzles, and land on a live multi-wave leaderboard with an admin panel and CSV export.",
@@ -408,6 +429,9 @@ export const featuredProjects: Project[] = [
   },
   {
     slug: "shop-qr",
+    video: "/projects/shop-qr/preview.mp4",
+    kinds: ["web", "product"],
+    demoLogins: [{ role: { en: "Shop owner", ar: "صاحب المحل" }, user: "nour", pass: "demo123" }],
     title: { en: "Shop QR Payments", ar: "QR الدفع للمحلات" },
     summary: {
       en: "One QR code per shop that opens all its payment options (InstaPay and mobile wallets) and pre-fills the transfer, with scan and tap analytics and an owner dashboard.",
@@ -468,6 +492,7 @@ export const featuredProjects: Project[] = [
   },
   {
     slug: "eventive",
+    kinds: ["web", "product"],
     title: { en: "Eventive", ar: "Eventive" },
     summary: {
       en: "Event RSVP platform: guests browse events, RSVP and manage their bookings, while organizers publish events with photo galleries and see every attendee.",

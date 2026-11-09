@@ -63,6 +63,7 @@ export default async function RootLayout({ children }: LayoutProps<"/[locale]">)
         <script dangerouslySetInnerHTML={{ __html: themeScript }} />
       </head>
       <body className="min-h-full flex flex-col">
+        <div className="scroll-progress" aria-hidden />
         <Navbar locale={locale} nav={dict.nav} />
         <main className="flex-1">{children}</main>
         <Footer name={dict.hero.name} dict={dict.footer} />

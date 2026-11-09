@@ -1,7 +1,8 @@
 import Link from "next/link";
 import type { Locale } from "@/i18n/config";
 import type { Dictionary } from "@/i18n/dictionaries";
-import { contact } from "@/content/profile";
+import { contact, whatsappUrl } from "@/content/profile";
+import { WhatsAppIcon } from "../icons";
 import { earlierProjects, featuredProjects } from "@/content/projects";
 import { Window } from "../Section";
 
@@ -58,6 +59,16 @@ export function Hero({ locale, dict }: { locale: Locale; dict: Dictionary["hero"
             >
               <span className="font-mono text-accent" dir="ltr">↓</span> {dict.ctaCv}
             </a>
+            {whatsappUrl && (
+              <a
+                href={whatsappUrl}
+                target="_blank"
+                rel="noreferrer"
+                className="inline-flex items-center gap-2 rounded-lg border border-[#25d366]/40 bg-[#25d366]/10 px-5 py-3 font-medium text-[#25d366] transition hover:bg-[#25d366]/20"
+              >
+                <WhatsAppIcon className="size-4" /> {dict.whatsapp}
+              </a>
+            )}
           </div>
 
           <dl className="mt-12 grid max-w-md grid-cols-3 gap-6 border-t border-border pt-6">
