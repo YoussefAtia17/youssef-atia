@@ -64,6 +64,7 @@ function ProjectCard({ project: p, locale, dict, wide }: { project: Project; loc
         <Link href={href} tabIndex={-1} className={`relative block aspect-[16/9] flex-1 overflow-hidden bg-gradient-to-br ${p.cover}`}>
           {p.image ? (
             <Image
+              quality={90}
               src={p.image}
               alt={title}
               fill

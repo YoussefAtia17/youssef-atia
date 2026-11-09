@@ -82,7 +82,7 @@ async function ProjectDetails({ params }: { params: PageProps<"/[locale]/project
 
         <Window title={`${p.slug} — preview`} className="mt-10">
           {p.image ? (
-            <Image src={p.image} alt={title} width={1600} height={900} priority sizes="(min-width: 1152px) 1104px, 100vw" className="h-auto w-full" />
+            <Image src={p.image} alt={title} width={1600} height={900} quality={90} priority sizes="(min-width: 1152px) 1104px, 100vw" className="h-auto w-full" />
           ) : (
             <div className={`grid aspect-[16/9] place-items-center bg-gradient-to-br ${p.cover}`}>
               <span className="px-6 text-center text-3xl font-bold text-white drop-shadow">{title}</span>
@@ -199,6 +199,7 @@ async function ProjectDetails({ params }: { params: PageProps<"/[locale]/project
                   className="group overflow-hidden rounded-xl border border-border bg-surface transition hover:border-accent/50"
                 >
                   <Image
+                    quality={90}
                     src={src}
                     alt={`${title} (${i + 1})`}
                     width={1600}

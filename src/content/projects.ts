@@ -336,7 +336,8 @@ export const featuredProjects: Project[] = [
       "/projects/mrc/01_login.webp",
       "/projects/mrc/02_treasury.webp",
       "/projects/mrc/03_deal_reminder.webp",
-      "/projects/mrc/04_whatsapp_lines.webp",
+      "/projects/mrc/04_employees.webp",
+      "/projects/mrc/05_whatsapp_lines.webp",
     ],
     details: {
       context: {
