@@ -57,21 +57,21 @@ function filterWatchBrandsList(query = '') {
         updateWhatsAppPreview();
     }
 
-    let html = `<div onclick="selectWatchBrandOption('')" class="p-2.5 hover:bg-blue-50 cursor-pointer text-slate-500">-- بدون تحديد ماركة --</div>`;
+    let html = `<div onclick="selectWatchBrandOption('')" class="px-3 py-2.5 hover:bg-slate-50 cursor-pointer text-slate-500">-- بدون تحديد ماركة --</div>`;
     html += filtered.map(b => {
         const safeBrand = b.replace(/'/g, "\\'");
         const isCustomSaved = !SWISS_BRANDS.includes(b);
         return `
-        <div onclick="selectWatchBrandOption('${safeBrand}')" class="p-2.5 hover:bg-blue-50 cursor-pointer text-slate-800 flex justify-between items-center">
+        <div onclick="selectWatchBrandOption('${safeBrand}')" class="px-3 py-2.5 hover:bg-slate-50 cursor-pointer text-slate-800 flex justify-between items-center">
             <span>${b}</span>
-            ${isCustomSaved ? '<span class="text-[10px] bg-amber-100 text-amber-800 px-2 py-0.5 rounded-full font-bold">مضاف يدوياً</span>' : ''}
+            ${isCustomSaved ? '<span class="badge badge-gold no-dot !text-[10px] !py-0">مضاف يدوياً</span>' : ''}
         </div>`;
     }).join('');
 
     const safeQuery = qRaw.replace(/'/g, "\\'");
     html += `
-        <div onclick="selectWatchBrandOption('custom', '${safeQuery}')" class="p-2.5 bg-blue-50 hover:bg-blue-100 cursor-pointer text-blue-700 font-extrabold">
-            ➕ نوع آخر (إضافة يدوية)${qRaw ? `: "${qRaw}"` : '...'}
+        <div onclick="selectWatchBrandOption('custom', '${safeQuery}')" class="px-3 py-2.5 bg-amber-50 hover:bg-amber-100 cursor-pointer text-amber-800 font-semibold">
+            + نوع آخر (إضافة يدوية)${qRaw ? `: "${qRaw}"` : '...'}
         </div>`;
 
     container.innerHTML = html;
@@ -433,10 +433,10 @@ function renderDealEmployeeFilter() {
     const countFor = id => state.deals.filter(d => d.employee_id === id).length;
     const active = state.employees.filter(e => !e.archived_at);
     const archived = state.employees.filter(e => e.archived_at && countFor(e.id) > 0);
-    select.innerHTML = `<option value="">👥 كل الموظفين (${state.deals.length})</option>`
-        + active.map(e => `<option value="${e.id}">👤 ${esc(e.full_name)} (${countFor(e.id)})</option>`).join('')
-        + archived.map(e => `<option value="${e.id}">🗂️ ${esc(e.full_name)} - محذوف (${countFor(e.id)})</option>`).join('')
-        + `<option value="none">⚠️ بدون موظف (${state.deals.filter(d => !d.employee_id).length})</option>`;
+    select.innerHTML = `<option value="">كل الموظفين (${state.deals.length})</option>`
+        + active.map(e => `<option value="${e.id}">${esc(e.full_name)} (${countFor(e.id)})</option>`).join('')
+        + archived.map(e => `<option value="${e.id}">${esc(e.full_name)} - محذوف (${countFor(e.id)})</option>`).join('')
+        + `<option value="none">بدون موظف (${state.deals.filter(d => !d.employee_id).length})</option>`;
     if ([...select.options].some(o => o.value === current)) select.value = current;
     return select.value;
 }
@@ -474,15 +474,26 @@ function renderDeals(query = '') {
         const by = s => list.filter(d => d.status === s).length;
         const paid = list.reduce((s, d) => s + Number(d.amount_paid || 0), 0);
         const filtered = list.length !== state.deals.length;
-        summary.innerHTML = `📊 ${filtered ? 'نتيجة الفلتر' : 'كل الديلز'}: <span class="text-slate-900">${list.length} ديل</span>
-            · <span class="text-emerald-700">✅ ${by('completed')} تم</span>
-            · <span class="text-amber-700">⏳ ${by('in_progress')} قيد التواصل</span>
-            · <span class="text-rose-700">❌ ${by('cancelled')} ملغي</span>
-            · <span class="text-blue-700">💵 مدفوع ${paid.toLocaleString()} ج.م</span>`;
+        const tile = (label, value, dot, unit = '') => `
+            <div class="stat">
+                <div class="stat-label"><span class="stat-dot" style="background:${dot}"></span>${label}</div>
+                <div class="stat-value">${value}${unit ? `<small>${unit}</small>` : ''}</div>
+            </div>`;
+        summary.innerHTML =
+            tile(filtered ? 'نتيجة الفلتر' : 'كل الديلز', list.length, 'var(--ink-400)', 'ديل') +
+            tile('قيد التواصل', by('in_progress'), 'var(--gold-500)') +
+            tile('تم الشراء', by('completed'), 'var(--success-600)') +
+            tile('لم يتم الاتفاق', by('cancelled'), 'var(--danger-600)') +
+            tile('إجمالي المدفوع', paid.toLocaleString(), 'var(--primary-500)', 'ج.م');
     }
 
     if (list.length === 0) {
-        tbody.innerHTML = `<tr><td colspan="8" class="p-6 text-center text-slate-400">لا توجد صفقات مطابقة للبحث</td></tr>`;
+        tbody.innerHTML = `<tr><td colspan="8">
+            <div class="empty-state">
+                <div class="empty-icon">${icon('search')}</div>
+                <div class="empty-title">لا توجد صفقات مطابقة</div>
+                <div class="empty-text">جرّب كلمة بحث تانية أو غيّر فلتر الموظف.</div>
+            </div></td></tr>`;
         return;
     }
 
@@ -490,79 +501,78 @@ function renderDeals(query = '') {
         const emp = state.employees.find(e => e.id === d.employee_id);
         const waInst = state.waInstances.find(w => Number(w.id) === Number(d.whatsapp_instance_id));
         let badge = '';
-        let rowBgClass = 'hover:bg-slate-50';
+        let rowBgClass = '';
         let actionButtons = '';
+        const deleteBtn = `<button onclick="deleteRow('deals', '${d.id}')" class="btn btn-danger-soft btn-sm btn-icon" title="حذف" aria-label="حذف">${icon('trash')}</button>`;
 
         if (d.status === 'completed') {
-            rowBgClass = 'bg-emerald-50/50 hover:bg-emerald-50';
-            badge = `<span class="inline-block whitespace-nowrap bg-emerald-600 text-white px-3 py-1 rounded-full text-xs font-extrabold shadow-sm">✅ تم الشراء (Done)</span>`;
+            badge = `<span class="badge badge-success">تم الشراء</span>`;
             actionButtons = `
-                <div class="flex flex-col gap-1.5 items-start">
-                    <span class="whitespace-nowrap text-xs font-extrabold text-emerald-700 bg-emerald-100 px-3 py-1 rounded-lg border border-emerald-300 w-full text-center">
-                        ✔️ الديل منتهي (Done)
-                    </span>
-                    <button onclick="openEditDeal('${d.id}')" class="w-full text-xs bg-blue-600 hover:bg-blue-700 text-white px-2.5 py-1 rounded-lg font-bold">✏️ تعديل الديل</button>
-                    <button onclick="deleteRow('deals', '${d.id}')" class="w-full text-xs bg-rose-100 hover:bg-rose-200 text-rose-700 px-2.5 py-1 rounded-lg font-bold">حذف</button>
+                <div class="cell-actions">
+                    <button onclick="openEditDeal('${d.id}')" class="btn btn-secondary btn-sm">${icon('edit')} تعديل الديل</button>
+                    ${deleteBtn}
                 </div>`;
         } else if (d.status === 'cancelled') {
-            rowBgClass = 'bg-rose-50/40 hover:bg-rose-50/70';
-            badge = `<span class="inline-block whitespace-nowrap bg-rose-100 text-rose-800 border border-rose-300 px-2.5 py-1 rounded-full text-xs font-extrabold">❌ لم يتم الاتفاق</span>`;
+            rowBgClass = 'row-muted';
+            badge = `<span class="badge badge-danger">لم يتم الاتفاق</span>`;
             actionButtons = `
-                <div class="flex flex-col gap-1.5">
-                    <button onclick="reopenCancelledDeal('${d.id}')" class="whitespace-nowrap text-xs bg-indigo-600 hover:bg-indigo-700 text-white px-3 py-1.5 rounded-lg font-bold shadow">
-                        🔄 الرجوع للديل مرة أخرى
-                    </button>
-                    <button onclick="openEditDeal('${d.id}')" class="text-xs bg-blue-600 hover:bg-blue-700 text-white px-3 py-1.5 rounded-lg font-bold">✏️ تعديل البيانات</button>
-                    <button onclick="deleteRow('deals', '${d.id}')" class="text-xs bg-rose-100 hover:bg-rose-200 text-rose-700 px-2.5 py-1 rounded-lg font-bold">حذف</button>
+                <div class="cell-actions">
+                    <button onclick="reopenCancelledDeal('${d.id}')" class="btn btn-secondary btn-sm">${icon('undo')} الرجوع للديل</button>
+                    <button onclick="openEditDeal('${d.id}')" class="btn btn-ghost btn-sm">${icon('edit')} تعديل البيانات</button>
+                    ${deleteBtn}
                 </div>`;
         } else {
-            badge = `<span class="inline-block whitespace-nowrap bg-amber-100 text-amber-800 px-2.5 py-1 rounded-full text-xs font-bold">⏳ قيد التواصل</span>`;
+            badge = `<span class="badge badge-warning">قيد التواصل</span>`;
             actionButtons = `
-                <div class="flex flex-col gap-1.5">
-                    <button onclick="openEditDeal('${d.id}')" class="whitespace-nowrap text-xs bg-blue-600 hover:bg-blue-700 text-white px-3 py-1.5 rounded-lg font-bold shadow-sm">
-                        ✏️ تخليص / تعديل الديل
-                    </button>
-                    <button onclick="deleteRow('deals', '${d.id}')" class="text-xs bg-rose-100 hover:bg-rose-200 text-rose-700 px-2.5 py-1 rounded-lg font-bold">حذف</button>
+                <div class="cell-actions">
+                    <button onclick="openEditDeal('${d.id}')" class="btn btn-primary btn-sm">${icon('edit')} تخليص / تعديل</button>
+                    ${deleteBtn}
                 </div>`;
         }
 
         const images = getDealImages(d);
         const imageHtml = images.length
-            ? `<div onclick="viewDealImage('${d.id}')" class="relative group cursor-pointer inline-block">
-                 <img src="${esc(images[0])}" class="h-14 w-14 rounded-lg object-cover border-2 border-slate-300 group-hover:border-blue-500 transition">
-                 ${images.length > 1 ? `<span class="absolute top-0 left-0 bg-slate-900/80 text-white text-[10px] font-bold px-1.5 rounded-br-lg rounded-tl-lg">${images.length}📷</span>` : ''}
-                 <span class="block text-[10px] text-blue-600 font-bold text-center mt-0.5">🔍 تكبير</span>
+            ? `<div onclick="viewDealImage('${d.id}')" class="thumb" title="تكبير الصور">
+                 <img src="${esc(images[0])}" alt="">
+                 ${images.length > 1 ? `<span class="count">${images.length}</span>` : ''}
                </div>`
-            : '<span class="text-xs text-slate-400">لا توجد</span>';
+            : `<span class="text-slate-300">${icon('image', 'w-5 h-5')}</span>`;
 
         return `
-        <tr class="${rowBgClass} transition">
-            <td class="p-3.5">
-                <div class="font-bold text-slate-900">${esc(d.client_name)}</div>
-                <a href="https://wa.me/2${esc(d.client_phone)}" target="_blank" class="text-xs text-emerald-600 font-bold hover:underline">📱 ${esc(d.client_phone)}</a>
+        <tr class="${rowBgClass}">
+            <td>
+                <div class="client-cell">
+                    <div class="avatar">${initialOf(d.client_name)}</div>
+                    <div>
+                        <div class="cell-primary">${esc(d.client_name) || '—'}</div>
+                        ${esc(d.client_phone) ? `<a href="https://wa.me/2${esc(d.client_phone)}" target="_blank" class="wa-link">${icon('phone')}${esc(d.client_phone)}</a>` : ''}
+                    </div>
+                </div>
             </td>
-            <td class="p-3.5">
-                <div class="font-extrabold text-blue-800">${esc(d.watch_brand) ? '⌚ ' + esc(d.watch_brand) : '-'}</div>
-                <div class="text-xs text-slate-500 mt-0.5">📍 ${esc(d.client_location) || 'غير محدد'}</div>
+            <td class="min-w-[130px]">
+                <div class="cell-primary">${esc(d.watch_brand) || '—'}</div>
+                <div class="cell-sub flex items-center gap-1">${icon('pin', 'w-3 h-3')} ${esc(d.client_location) || 'غير محدد'}</div>
             </td>
-            <td class="p-3.5 max-w-xs font-medium">${esc(d.deal_details)}</td>
-            <td class="p-3.5 space-y-0.5">
-                <div class="text-xs text-rose-600 font-bold">العميل طالب: ${Number(d.amount_requested || 0).toLocaleString()} ج.م</div>
-                <div class="text-xs text-indigo-700 font-bold">رينج البيع: ${esc(d.selling_price_range) || 'غير محدد'}</div>
-                <div class="text-xs text-emerald-700 font-bold">دفعتله: ${Number(d.amount_paid || 0).toLocaleString()} ج.م</div>
+            <td class="min-w-[140px] max-w-[200px]"><div class="clamp-2 text-slate-600">${esc(d.deal_details) || '<span class="text-slate-400">—</span>'}</div></td>
+            <td>
+                <dl class="price-list">
+                    <dt>طالب</dt><dd>${Number(d.amount_requested || 0).toLocaleString()}</dd>
+                    <dt>رينج البيع</dt><dd>${esc(d.selling_price_range) || '—'}</dd>
+                    <dt>دفعتله</dt><dd class="text-emerald-700">${Number(d.amount_paid || 0).toLocaleString()}</dd>
+                </dl>
             </td>
-            <td class="p-3.5 text-xs">
-                <div class="font-semibold text-blue-700">${d.meeting_time ? new Date(d.meeting_time).toLocaleString('ar-EG') : 'غير محدد'}</div>
-                <div class="text-[10px] text-slate-500 mt-0.5 font-bold">📲 خط الإرسال: ${waInst ? `${esc(waInst.instance_name)} (${esc(waInst.phone_number)})` : 'توزيع تلقائي'}</div>
-                ${esc(d.reminder_message) ? `<div class="mt-1 text-[10px] bg-emerald-50 text-emerald-900 p-1.5 rounded border border-emerald-200 max-w-[180px] truncate" title="${esc(d.reminder_message)}">💬 ${esc(d.reminder_message)}</div>` : ''}
-                ${d.followup_message && d.status === 'in_progress' ? `<div class="mt-1 text-[10px] bg-sky-50 text-sky-900 p-1.5 rounded border border-sky-200 max-w-[180px] truncate" title="${esc(d.followup_message)}">🔁 متابعة كل ${Number(d.followup_interval_days) || 15} يوم</div>` : ''}
+            <td class="min-w-[160px] max-w-[200px]">
+                <div class="flex items-center gap-1.5 text-slate-900 font-medium text-xs">${icon('clock', 'w-3.5 h-3.5 text-slate-400')} ${d.meeting_time ? new Date(d.meeting_time).toLocaleString('ar-EG') : 'غير محدد'}</div>
+                <div class="cell-sub">خط الإرسال: ${waInst ? `${esc(waInst.instance_name)} <span class="cell-mono">(${esc(waInst.phone_number)})</span>` : 'توزيع تلقائي'}</div>
+                ${esc(d.reminder_message) ? `<div class="msg-chip reminder" title="${esc(d.reminder_message)}">${icon('chat')}<span class="truncate">${esc(d.reminder_message)}</span></div>` : ''}
+                ${d.followup_message && d.status === 'in_progress' ? `<div class="msg-chip followup" title="${esc(d.followup_message)}">${icon('repeat')} متابعة كل ${Number(d.followup_interval_days) || 15} يوم</div>` : ''}
             </td>
-            <td class="p-3.5">${imageHtml}</td>
-            <td class="p-3.5">
+            <td>${imageHtml}</td>
+            <td>
                 ${badge}
-                <div class="text-xs text-slate-500 mt-1">${emp ? '👤 ' + esc(emp.full_name) : '<span class="text-amber-600">بدون موظف</span>'}</div>
+                <div class="cell-sub mt-1.5">${emp ? esc(emp.full_name) : '<span class="text-amber-700">بدون موظف</span>'}</div>
             </td>
-            <td class="p-3.5">${actionButtons}</td>
+            <td>${actionButtons}</td>
         </tr>`;
     }).join('');
 }

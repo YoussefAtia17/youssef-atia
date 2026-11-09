@@ -196,61 +196,55 @@ function renderEmployees() {
         const net = Number(emp.base_salary) + bonus - loans;
         const isSelected = selectedEmployeeHistoryId === emp.id;
 
+        const historyHint = isSelected ? 'السجل مفتوح' : `السجل (${allRecs.length})`;
+
         if (isOwnerCard) {
             return `
             <div onclick="toggleEmployeeCardHistory('${emp.id}', event)"
-                 class="emp-card-item cursor-pointer bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 text-white p-5 rounded-2xl shadow-lg border-2 transition ${isSelected ? 'border-amber-400 ring-4 ring-amber-300/40' : 'border-amber-500/80 hover:border-amber-400'}">
-                <div class="flex justify-between items-start">
-                    <div>
-                        <span class="inline-block bg-amber-500 text-slate-950 text-[11px] font-extrabold px-2.5 py-0.5 rounded-full mb-1.5 shadow">
-                            👑 حساب أونر (Owner)
-                        </span>
-                        <h3 class="font-extrabold text-base text-amber-300 flex items-center gap-2">
-                            <span>${esc(emp.full_name)}</span>
-                            <span class="text-[11px] px-2.5 py-0.5 rounded-full ${isSelected ? 'bg-amber-400 text-slate-950' : 'bg-slate-700 text-amber-200'}">
-                                ${isSelected ? '▼ السجل مفتوح' : '▶ عرض السجل (' + allRecs.length + ')'}
-                            </span>
-                        </h3>
-                        <p class="text-xs text-slate-300 mt-1">📱 واتساب: <b>${esc(emp.phone_whatsapp) || 'غير مسجل'}</b></p>
+                 class="emp-card-item entity-card owner ${isSelected ? 'is-selected' : ''}">
+                <div class="entity-head">
+                    <div class="avatar gold">${icon('crown', 'w-4 h-4')}</div>
+                    <div class="flex-1 min-w-0">
+                        <div class="entity-name truncate">${esc(emp.full_name)}</div>
+                        <div class="entity-meta cell-mono text-right">${esc(emp.phone_whatsapp) || 'غير مسجل'}</div>
                     </div>
-                    ${currentUser.role === 'owner' && emp.user_id !== currentUser.id ? `
-                        <button onclick="event.stopPropagation(); deleteEmployeeAndUser('${emp.id}', '${emp.user_id || ''}')" class="text-xs bg-rose-500/20 text-rose-300 hover:bg-rose-600 hover:text-white px-2.5 py-1 rounded-lg font-bold">حذف</button>
-                    ` : ''}
+                    <span class="badge badge-gold no-dot">أونر</span>
                 </div>
-                <div class="mt-4 space-y-1 text-xs bg-slate-950/60 p-3 rounded-xl border border-slate-700">
-                    <div class="flex justify-between text-slate-300"><span>الصلاحية:</span><b class="text-amber-400">تحكم كامل في النظام والخزنة</b></div>
-                    <div class="flex justify-between text-emerald-400"><span>مكافآت الدورة الحالية:</span><b>${bonus.toLocaleString()} ج.م</b></div>
-                    <div class="flex justify-between text-rose-400"><span>مسحوبات الدورة الحالية:</span><b>${loans.toLocaleString()} ج.م</b></div>
+                <div class="entity-body">
+                    <div class="kv"><span>الصلاحية</span><b class="!text-amber-300">تحكم كامل</b></div>
+                    <div class="kv"><span>مكافآت الدورة الحالية</span><b>${bonus.toLocaleString()} ج.م</b></div>
+                    <div class="kv"><span>مسحوبات الدورة الحالية</span><b>${loans.toLocaleString()} ج.م</b></div>
+                </div>
+                <div class="entity-foot">
+                    <span class="toggle-hint">${icon('calendar', 'w-3 h-3')} ${historyHint}</span>
+                    ${currentUser.role === 'owner' && emp.user_id !== currentUser.id ? `
+                        <button onclick="event.stopPropagation(); deleteEmployeeAndUser('${emp.id}', '${emp.user_id || ''}')" class="btn btn-sm !text-rose-300 hover:!bg-rose-500/15">${icon('trash')} حذف</button>
+                    ` : ''}
                 </div>
             </div>`;
         }
 
         return `
         <div onclick="toggleEmployeeCardHistory('${emp.id}', event)"
-             class="emp-card-item cursor-pointer bg-white p-5 rounded-2xl shadow-sm border-2 transition ${isSelected ? 'border-blue-600 ring-2 ring-blue-200 bg-blue-50/20' : 'border-slate-200 hover:border-blue-400'}">
-            <div class="flex justify-between items-start">
-                <div>
-                    <span class="inline-block bg-blue-100 text-blue-800 text-[11px] font-extrabold px-2.5 py-0.5 rounded-full mb-1.5">
-                        💼 موظف (يتجدد يوم ${hireDay} شهرياً)
-                    </span>
-                    <h3 class="font-bold text-base text-slate-900 flex items-center gap-1.5">
-                        <span>${esc(emp.full_name)}</span>
-                        <span class="text-[11px] px-2.5 py-0.5 rounded-full ${isSelected ? 'bg-blue-600 text-white' : 'bg-slate-100 text-slate-600'}">
-                            ${isSelected ? '▼ السجل مفتوح' : '▶ عرض السجل (' + allRecs.length + ')'}
-                        </span>
-                    </h3>
-                    <p class="text-xs text-slate-500 mt-1">📱 واتساب: <b>${esc(emp.phone_whatsapp) || 'غير مسجل'}</b></p>
+             class="emp-card-item entity-card ${isSelected ? 'is-selected' : ''}">
+            <div class="entity-head">
+                <div class="avatar">${initialOf(emp.full_name)}</div>
+                <div class="flex-1 min-w-0">
+                    <div class="entity-name truncate">${esc(emp.full_name)}</div>
+                    <div class="entity-meta cell-mono text-right">${esc(emp.phone_whatsapp) || 'غير مسجل'}</div>
                 </div>
-                ${currentUser.role === 'owner' ? `<button onclick="event.stopPropagation(); deleteEmployeeAndUser('${emp.id}', '${emp.user_id || ''}')" class="text-xs text-rose-600 font-bold hover:underline">حذف</button>` : ''}
+                <span class="badge badge-primary no-dot">موظف · يوم ${hireDay}</span>
             </div>
-            <div class="mt-3 space-y-1 text-sm bg-slate-50 p-3 rounded-xl border border-slate-100">
-                <div class="flex justify-between"><span>المرتب الأساسي:</span><b>${Number(emp.base_salary).toLocaleString()} ج.م</b></div>
-                <div class="flex justify-between text-emerald-700"><span>+ إجمالي البونص (الشهر الحالي):</span><b>${bonus.toLocaleString()} ج.م</b></div>
-                <div class="flex justify-between text-rose-600"><span>- إجمالي السلف (الشهر الحالي):</span><b>${loans.toLocaleString()} ج.م</b></div>
-                <div class="border-t pt-1.5 flex justify-between font-extrabold text-blue-700"><span>صافي المرتب:</span><span>${net.toLocaleString()} ج.م</span></div>
-                <div class="text-[10px] text-slate-400 pt-1 text-center font-semibold">
-                    🔄 يتصفر تلقائياً ويعود للمرتب الأساسي يوم: ${nextResetDate.toLocaleDateString('ar-EG')}
-                </div>
+            <div class="entity-body">
+                <div class="kv"><span>المرتب الأساسي</span><b>${Number(emp.base_salary).toLocaleString()} ج.م</b></div>
+                <div class="kv"><span>+ البونص (الدورة الحالية)</span><b class="!text-emerald-700">${bonus.toLocaleString()} ج.م</b></div>
+                <div class="kv"><span>− السلف (الدورة الحالية)</span><b class="!text-rose-700">${loans.toLocaleString()} ج.م</b></div>
+                <div class="kv total"><span>صافي المرتب</span><b>${net.toLocaleString()} ج.م</b></div>
+            </div>
+            <div class="entity-foot">
+                <span class="toggle-hint">${icon('calendar', 'w-3 h-3')} ${historyHint}</span>
+                <span class="flex items-center gap-1">${icon('refresh', 'w-3 h-3')} يتصفر ${nextResetDate.toLocaleDateString('ar-EG')}</span>
+                ${currentUser.role === 'owner' ? `<button onclick="event.stopPropagation(); deleteEmployeeAndUser('${emp.id}', '${emp.user_id || ''}')" class="btn btn-danger-soft btn-sm">${icon('trash')} حذف</button>` : ''}
             </div>
         </div>`;
     }).join('');
@@ -263,28 +257,28 @@ function renderEmployees() {
         if (selectedEmp) {
             const cycleStart = getEmployeeCycleStartDate(selectedEmp.created_at);
             historyBox.classList.remove('hidden');
-            document.getElementById('selectedEmpHistoryTitle').textContent = `📅 سجل السلف والبونص الخاص بـ: (${selectedEmp.full_name})${selectedEmp.archived_at ? ' — 🗂️ محذوف' : ''}`;
+            document.getElementById('selectedEmpHistoryTitle').textContent = `سجل السلف والبونص — ${selectedEmp.full_name}${selectedEmp.archived_at ? ' (محذوف)' : ''}`;
             const empRecs = state.empFinancials.filter(f => f.employee_id === selectedEmployeeHistoryId);
 
             if (empRecs.length === 0) {
-                document.getElementById('empFinancialsTableBody').innerHTML = `<tr><td colspan="6" class="p-5 text-center text-slate-400">لا توجد سلف أو مكافآت مسجلة</td></tr>`;
+                document.getElementById('empFinancialsTableBody').innerHTML = `<tr><td colspan="6"><div class="empty-state"><div class="empty-icon">${icon('inbox')}</div><div class="empty-title">لا توجد سلف أو مكافآت</div><div class="empty-text">أي سلفة أو بونص هيتسجل هنا.</div></div></td></tr>`;
             } else {
                 document.getElementById('empFinancialsTableBody').innerHTML = empRecs.map(f => {
                     const fDate = new Date(f.transaction_date || f.created_at);
                     const isCurrentCycle = fDate >= cycleStart;
                     return `
-                        <tr class="${isCurrentCycle ? '' : 'bg-slate-50 text-slate-400'}">
-                            <td class="p-3">${f.transaction_type === 'loan' ? '<span class="text-rose-600 font-bold">🔻 سلفة مخصومة</span>' : '<span class="text-emerald-600 font-bold">🎁 بونص</span>'}</td>
-                            <td class="p-3 font-bold">${Number(f.amount).toLocaleString()} ج.م</td>
-                            <td class="p-3">${esc(f.notes) || '-'}</td>
-                            <td class="p-3 text-xs">${fDate.toLocaleString('ar-EG')}</td>
-                            <td class="p-3">
+                        <tr class="${isCurrentCycle ? '' : 'row-muted'}">
+                            <td>${f.transaction_type === 'loan' ? `<span class="badge badge-danger no-dot">${icon('trendDown', 'w-3.5 h-3.5')} سلفة مخصومة</span>` : `<span class="badge badge-success no-dot">${icon('gift', 'w-3.5 h-3.5')} بونص</span>`}</td>
+                            <td class="${f.transaction_type === 'loan' ? 'amount-out' : 'amount-in'}">${f.transaction_type === 'loan' ? '−' : '+'}${Number(f.amount).toLocaleString()} ج.م</td>
+                            <td>${esc(f.notes) || '—'}</td>
+                            <td class="text-xs text-slate-500 whitespace-nowrap">${fDate.toLocaleString('ar-EG')}</td>
+                            <td>
                                 ${isCurrentCycle
-                                    ? '<span class="bg-emerald-100 text-emerald-800 px-2 py-0.5 rounded text-xs font-bold">🟢 في دورة الشهر الحالي</span>'
-                                    : '<span class="bg-slate-200 text-slate-600 px-2 py-0.5 rounded text-xs font-bold">📦 دورة شهر سابق</span>'}
+                                    ? '<span class="badge badge-primary">الدورة الحالية</span>'
+                                    : '<span class="badge badge-neutral">دورة سابقة</span>'}
                             </td>
-                            <td class="p-3 ${currentUser.role === 'owner' ? '' : 'hidden'}">
-                                <button onclick="deleteRow('employee_financials', '${f.id}')" class="bg-rose-100 text-rose-700 px-2 py-1 rounded text-xs font-bold">حذف</button>
+                            <td class="${currentUser.role === 'owner' ? '' : 'hidden'}">
+                                <button onclick="deleteRow('employee_financials', '${f.id}')" class="btn btn-danger-soft btn-sm">${icon('trash')} حذف</button>
                             </td>
                         </tr>
                     `;
@@ -305,21 +299,24 @@ function renderArchivedEmployees(archivedEmployees) {
     }
     box.classList.remove('hidden');
     box.innerHTML = `
-        <details class="bg-slate-50 border border-slate-200 rounded-2xl p-4">
-            <summary class="cursor-pointer font-extrabold text-slate-700">🗂️ الموظفين المحذوفين (${archivedEmployees.length}) — معاملاتهم محفوظة</summary>
-            <div class="mt-3 space-y-2">
+        <details class="card">
+            <summary class="cursor-pointer px-5 py-3.5 font-semibold text-slate-700 flex items-center gap-2">${icon('archive', 'w-4 h-4 text-slate-400')} الموظفين المحذوفين (${archivedEmployees.length}) <span class="text-xs font-normal text-slate-400">— معاملاتهم محفوظة</span></summary>
+            <div class="px-5 pb-4 space-y-2">
                 ${archivedEmployees.map(emp => {
                     const recsCount = state.empFinancials.filter(f => f.employee_id === emp.id).length;
                     const dealsCount = state.deals.filter(d => d.employee_id === emp.id).length;
                     return `
-                    <div class="flex flex-wrap items-center justify-between gap-2 bg-white border border-slate-200 rounded-xl p-3">
-                        <div>
-                            <div class="font-bold text-slate-800">${esc(emp.full_name)}</div>
-                            <div class="text-[11px] text-slate-500">📱 ${esc(emp.phone_whatsapp) || 'غير مسجل'} · ${recsCount} سلفة/بونص · ${dealsCount} ديل · اتحذف ${new Date(emp.archived_at).toLocaleDateString('ar-EG')}</div>
+                    <div class="flex flex-wrap items-center justify-between gap-2 bg-slate-50 border border-slate-200 rounded-xl p-3">
+                        <div class="flex items-center gap-3">
+                            <div class="avatar !bg-slate-200 !text-slate-500">${initialOf(emp.full_name)}</div>
+                            <div>
+                                <div class="font-semibold text-slate-800">${esc(emp.full_name)}</div>
+                                <div class="text-[11px] text-slate-500">${esc(emp.phone_whatsapp) || 'غير مسجل'} · ${recsCount} سلفة/بونص · ${dealsCount} ديل · اتحذف ${new Date(emp.archived_at).toLocaleDateString('ar-EG')}</div>
+                            </div>
                         </div>
                         <div class="flex gap-2">
-                            <button onclick="toggleEmployeeCardHistory('${emp.id}', event)" class="text-xs bg-slate-100 text-slate-700 px-2.5 py-1 rounded-lg font-bold">📅 السجل</button>
-                            <button onclick="restoreEmployee('${emp.id}')" class="text-xs bg-emerald-100 text-emerald-800 px-2.5 py-1 rounded-lg font-bold">♻️ استرجاع</button>
+                            <button onclick="toggleEmployeeCardHistory('${emp.id}', event)" class="btn btn-secondary btn-sm">${icon('calendar')} السجل</button>
+                            <button onclick="restoreEmployee('${emp.id}')" class="btn btn-secondary btn-sm">${icon('undo')} استرجاع</button>
                         </div>
                     </div>`;
                 }).join('')}

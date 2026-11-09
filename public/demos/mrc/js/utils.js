@@ -9,16 +9,13 @@ function esc(value) {
 
 function showToast(message, type = 'info') {
     const container = document.getElementById('toastContainer');
-    const colors = {
-        success: 'bg-emerald-600 border-emerald-700',
-        info: 'bg-blue-600 border-blue-700',
-        warning: 'bg-amber-600 border-amber-700'
-    };
+    const kind = ['success', 'info', 'warning'].includes(type) ? type : 'info';
     const toast = document.createElement('div');
-    toast.className = `toast-animate pointer-events-auto ${colors[type] || colors.info} text-white p-4 rounded-2xl shadow-2xl border flex justify-between items-start gap-3 text-xs font-bold`;
+    toast.className = `toast toast-animate pointer-events-auto ${kind}`;
     toast.innerHTML = `
-        <div>🔔 ${message}</div>
-        <button onclick="this.parentElement.remove()" class="text-white/80 hover:text-white font-extrabold">✕</button>
+        <span class="toast-dot"></span>
+        <div class="leading-relaxed">${message}</div>
+        <button onclick="this.parentElement.remove()" aria-label="إغلاق">${icon('x', 'w-4 h-4')}</button>
     `;
     container.appendChild(toast);
     setTimeout(() => { if (toast.parentElement) toast.remove(); }, 6000);
@@ -147,8 +144,8 @@ function renderDealImagesPreview() {
     const box = document.getElementById('imagePreview');
     box.innerHTML = dealImages.map((src, i) => `
         <div class="relative">
-            <img src="${esc(src)}" class="h-24 w-24 rounded-lg border object-cover">
-            <button type="button" onclick="removeDealImage(${i})" title="شيل الصورة" class="absolute -top-2 -left-2 bg-rose-600 hover:bg-rose-700 text-white w-6 h-6 rounded-full text-xs font-bold shadow">✕</button>
+            <img src="${esc(src)}" class="h-24 w-24 rounded-xl border border-slate-200 object-cover">
+            <button type="button" onclick="removeDealImage(${i})" title="شيل الصورة" class="absolute -top-2 -left-2 bg-slate-900 hover:bg-rose-600 text-white w-6 h-6 rounded-full grid place-items-center shadow ring-2 ring-white">${icon('x', 'w-3 h-3')}</button>
         </div>`).join('');
     box.classList.toggle('hidden', dealImages.length === 0);
     document.getElementById('imageCountLabel').textContent = dealImages.length ? `(${dealImages.length} صورة)` : '';

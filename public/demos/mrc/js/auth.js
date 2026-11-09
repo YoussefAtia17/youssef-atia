@@ -60,7 +60,7 @@ async function handleSignIn(e) {
 
     if (submitBtn) {
         submitBtn.disabled = true;
-        submitBtn.textContent = "⏳ جاري تسجيل الدخول...";
+        submitBtn.textContent = "جاري تسجيل الدخول…";
     }
 
     try {
@@ -108,7 +108,7 @@ async function launchApp() {
     document.getElementById('appScreen').classList.remove('hidden');
 
     document.getElementById('currentUserName').textContent = currentUser.full_name;
-    const roleNames = { owner: '👑 الأونر (Full Admin)', employee: '💼 موظف' };
+    const roleNames = { owner: 'أونر · صلاحية كاملة', employee: 'موظف' };
     document.getElementById('currentUserRoleBadge').textContent = roleNames[currentUser.role] || 'موظف';
 
     document.querySelectorAll('.owner-only').forEach(el => el.classList.toggle('hidden', currentUser.role !== 'owner'));
@@ -189,12 +189,17 @@ function renderUsers() {
     const visibleUsers = state.users.filter(u => !SYSTEM_LOCK_EMAILS.includes(u.email) && !u.archived_at);
     document.getElementById('usersTableBody').innerHTML = visibleUsers.map(u => `
         <tr>
-            <td class="p-3 font-bold">${esc(u.full_name)}</td>
-            <td class="p-3">${esc(u.email) && !esc(u.email).endsWith('@mrc.local') ? esc(u.email) : '<span class="text-xs text-slate-400">يدخل بالاسم فقط</span>'}</td>
-            <td class="p-3 font-semibold text-emerald-700">${esc(u.phone) || '-'}</td>
-            <td class="p-3 font-bold">${u.role === 'owner' ? '<span class="bg-amber-100 text-amber-900 px-2.5 py-0.5 rounded-full text-xs">👑 أونر</span>' : '<span class="bg-blue-100 text-blue-800 px-2.5 py-0.5 rounded-full text-xs">💼 موظف</span>'}</td>
-            <td class="p-3 text-xs">${new Date(u.created_at).toLocaleString('ar-EG')}</td>
-            <td class="p-3">${u.role !== 'owner' ? `<button onclick="deleteEmployeeAndUser('', '${u.id}')" class="text-xs bg-rose-100 text-rose-700 px-2 py-1 rounded font-bold">حذف الحساب</button>` : '-'}</td>
+            <td>
+                <div class="flex items-center gap-2.5">
+                    <div class="avatar ${u.role === 'owner' ? 'gold' : ''}">${initialOf(u.full_name)}</div>
+                    <span class="cell-primary">${esc(u.full_name)}</span>
+                </div>
+            </td>
+            <td>${esc(u.email) && !esc(u.email).endsWith('@mrc.local') ? esc(u.email) : '<span class="text-xs text-slate-400">يدخل بالاسم فقط</span>'}</td>
+            <td class="cell-mono text-right">${esc(u.phone) || '—'}</td>
+            <td>${u.role === 'owner' ? `<span class="badge badge-gold no-dot">${icon('crown', 'w-3 h-3')} أونر</span>` : `<span class="badge badge-primary no-dot">${icon('briefcase', 'w-3 h-3')} موظف</span>`}</td>
+            <td class="text-xs text-slate-500 whitespace-nowrap">${new Date(u.created_at).toLocaleString('ar-EG')}</td>
+            <td>${u.role !== 'owner' ? `<button onclick="deleteEmployeeAndUser('', '${u.id}')" class="btn btn-danger-soft btn-sm">${icon('trash')} حذف الحساب</button>` : '<span class="text-slate-300">—</span>'}</td>
         </tr>
     `).join('');
 }

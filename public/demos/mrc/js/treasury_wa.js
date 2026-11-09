@@ -95,9 +95,9 @@ function closeWaDealsHistory() {
 
 function renderWhatsappInstances() {
     const connectedNumbers = state.waInstances.filter(w => w.status === 'connected');
-    let waSelectHtml = `<option value="">🔄 توزيع تلقائي ذكي بين أرقام الشركة (${connectedNumbers.length} متصل)</option>`;
+    let waSelectHtml = `<option value="">توزيع تلقائي بين خطوط الشركة (${connectedNumbers.length} متصل)</option>`;
     waSelectHtml += state.waInstances.map(w => `
-        <option value="${w.id}">📱 ${esc(w.instance_name)} - (${esc(w.phone_number)}) ${w.status === 'connected' ? '🟢' : '🔴'}</option>
+        <option value="${w.id}">${esc(w.instance_name)} — ${esc(w.phone_number)} ${w.status === 'connected' ? '· متصل' : '· فاصل'}</option>
     `).join('');
     const dealWaSelect = document.getElementById('dealWhatsappInstance');
     if (dealWaSelect) dealWaSelect.innerHTML = waSelectHtml;
@@ -107,8 +107,10 @@ function renderWhatsappInstances() {
 
     if (state.waInstances.length === 0) {
         grid.innerHTML = `
-            <div class="col-span-full bg-white p-8 rounded-2xl border text-center text-slate-400">
-                لا توجد أرقام واتساب مضافة للشركة حالياً. اضغط على (+ إضافة رقم واتساب للشركة) ليظهر لك هنا وفي نافذة الديل.
+            <div class="col-span-full card empty-state">
+                <div class="empty-icon">${icon('chat')}</div>
+                <div class="empty-title">لا توجد خطوط واتساب للشركة</div>
+                <div class="empty-text">دوس على (إضافة خط) عشان يظهر هنا وفي نافذة الديل.</div>
             </div>`;
         return;
     }
@@ -120,30 +122,28 @@ function renderWhatsappInstances() {
 
         return `
         <div onclick="toggleWaCardDeals(${w.id}, event)"
-             class="wa-card-item cursor-pointer bg-white p-5 rounded-2xl shadow-sm border-2 transition ${isSelected ? 'border-emerald-600 ring-4 ring-emerald-200 bg-emerald-50/20' : (isConn ? 'border-emerald-500/60 hover:border-emerald-600' : 'border-rose-300 bg-rose-50/20')} flex flex-col justify-between">
-            <div>
-                <div class="flex justify-between items-start">
-                    <span class="bg-slate-900 text-white text-xs font-extrabold px-2.5 py-1 rounded-lg">خط شركة #${idx + 1}</span>
-                    <span class="text-xs font-extrabold px-2.5 py-1 rounded-full ${isConn ? 'bg-emerald-100 text-emerald-800' : 'bg-rose-100 text-rose-800'}">
-                        ${isConn ? '🟢 متصل (Connected)' : '🔴 فاصل (Disconnected)'}
-                    </span>
+             class="wa-card-item entity-card ${isSelected ? 'is-selected' : ''} ${isConn ? '' : 'is-off'}">
+            <div class="entity-head">
+                <div class="avatar ${isConn ? '!bg-emerald-50 !text-emerald-700' : '!bg-rose-50 !text-rose-600'}">${icon('chat', 'w-4 h-4')}</div>
+                <div class="flex-1 min-w-0">
+                    <div class="entity-name truncate">${esc(w.instance_name)}</div>
+                    <div class="entity-meta cell-mono text-right">${esc(w.phone_number)}</div>
                 </div>
-                <div class="flex justify-between items-center mt-3">
-                    <h3 class="font-extrabold text-base text-slate-900">${esc(w.instance_name)}</h3>
-                    <span class="text-[11px] font-bold px-2.5 py-0.5 rounded-full ${isSelected ? 'bg-emerald-600 text-white' : 'bg-slate-100 text-slate-700'}">
-                        ${isSelected ? '▼ الصفقات مفتوحة' : '▶ عرض الصفقات (' + linkedDeals.length + ')'}
-                    </span>
-                </div>
-                <p class="text-sm text-emerald-700 font-bold mt-1">📱 ${esc(w.phone_number)}</p>
-                <p class="text-[11px] text-slate-500 mt-2 font-semibold">📋 عدد الـ Deals المربوطة بالرقم: <b class="text-slate-900">${linkedDeals.length} ديل</b></p>
+                <span class="badge ${isConn ? 'badge-success' : 'badge-danger'}">${isConn ? 'متصل' : 'فاصل'}</span>
             </div>
-            <div class="flex justify-between items-center gap-2 mt-4 pt-3 border-t" onclick="event.stopPropagation()">
-                <button onclick="toggleWaInstanceStatus(${w.id}, '${w.status}')" class="text-xs font-bold px-3 py-1.5 rounded-lg ${isConn ? 'bg-amber-100 text-amber-800 hover:bg-amber-200' : 'bg-emerald-600 text-white hover:bg-emerald-700'}">
-                    ${isConn ? 'تعطيل مؤقت' : 'تفعيل كمتصل'}
-                </button>
-                <button onclick="deleteRow('whatsapp_instances', ${w.id})" class="text-xs bg-rose-100 text-rose-700 hover:bg-rose-200 px-3 py-1.5 rounded-lg font-bold">
-                    حذف الرقم
-                </button>
+            <div class="entity-body">
+                <div class="kv"><span>رقم الخط</span><b>#${idx + 1}</b></div>
+                <div class="kv"><span>الديلز المربوطة</span><b>${linkedDeals.length} ديل</b></div>
+                <div class="kv"><span>قيد التواصل منها</span><b>${linkedDeals.filter(d => d.status === 'in_progress').length}</b></div>
+            </div>
+            <div class="entity-foot" onclick="event.stopPropagation()">
+                <button onclick="toggleWaCardDeals(${w.id}, event)" class="toggle-hint">${icon('inbox', 'w-3 h-3')} ${isSelected ? 'الصفقات مفتوحة' : 'عرض الصفقات (' + linkedDeals.length + ')'}</button>
+                <div class="flex gap-1">
+                    <button onclick="toggleWaInstanceStatus(${w.id}, '${w.status}')" class="btn btn-sm ${isConn ? 'btn-ghost' : 'btn-success'}">
+                        ${isConn ? 'تعطيل مؤقت' : 'تفعيل كمتصل'}
+                    </button>
+                    <button onclick="deleteRow('whatsapp_instances', ${w.id})" class="btn btn-danger-soft btn-sm">${icon('trash')} حذف</button>
+                </div>
             </div>
         </div>`;
     }).join('');
@@ -154,11 +154,11 @@ function renderWhatsappInstances() {
         const selectedWa = state.waInstances.find(w => Number(w.id) === Number(selectedWaInstanceId));
         if (selectedWa) {
             dealsBox.classList.remove('hidden');
-            document.getElementById('selectedWaDealsTitle').textContent = `📱 الصفقات المربوطة بخط: ${selectedWa.instance_name} (${selectedWa.phone_number})`;
+            document.getElementById('selectedWaDealsTitle').textContent = `الصفقات المربوطة بخط ${selectedWa.instance_name} (${selectedWa.phone_number})`;
             const linkedDeals = state.deals.filter(d => Number(d.whatsapp_instance_id) === Number(selectedWaInstanceId));
 
             if (linkedDeals.length === 0) {
-                dealsTbody.innerHTML = `<tr><td colspan="6" class="p-6 text-center text-slate-400">لا توجد صفقات مربوطة بهذا الرقم حتى الآن</td></tr>`;
+                dealsTbody.innerHTML = `<tr><td colspan="6"><div class="empty-state"><div class="empty-icon">${icon('inbox')}</div><div class="empty-title">لا توجد صفقات مربوطة بالخط ده</div><div class="empty-text">اختار الخط من نافذة الديل عشان يتربط هنا.</div></div></td></tr>`;
             } else {
                 dealsTbody.innerHTML = linkedDeals.map(d => {
                     const emp = state.employees.find(e => e.id === d.employee_id);
@@ -168,35 +168,33 @@ function renderWhatsappInstances() {
                     const personRole = d.assigned_by_role || (linkedUser ? linkedUser.role : 'employee');
 
                     const roleBadge = personRole === 'owner'
-                        ? `<span class="inline-block whitespace-nowrap bg-amber-100 text-amber-900 border border-amber-300 px-2.5 py-0.5 rounded-full text-[11px] font-extrabold">👑 أونر: ${personName}</span>`
-                        : `<span class="inline-block whitespace-nowrap bg-blue-100 text-blue-800 border border-blue-200 px-2.5 py-0.5 rounded-full text-[11px] font-bold">💼 موظف: ${personName}</span>`;
+                        ? `<span class="badge badge-gold no-dot">${icon('crown', 'w-3 h-3')} ${esc(personName)}</span>`
+                        : `<span class="badge badge-primary no-dot">${icon('briefcase', 'w-3 h-3')} ${esc(personName)}</span>`;
 
-                    let statusBadge = `<span class="inline-block whitespace-nowrap bg-amber-100 text-amber-800 px-2 py-0.5 rounded-full text-xs font-bold">⏳ قيد التواصل</span>`;
-                    if (d.status === 'completed') statusBadge = `<span class="inline-block whitespace-nowrap bg-emerald-600 text-white px-2 py-0.5 rounded-full text-xs font-bold">✅ تم الشراء (Done)</span>`;
-                    else if (d.status === 'cancelled') statusBadge = `<span class="inline-block whitespace-nowrap bg-rose-100 text-rose-800 px-2 py-0.5 rounded-full text-xs font-bold">❌ لم يتم الاتفاق</span>`;
+                    let statusBadge = `<span class="badge badge-warning">قيد التواصل</span>`;
+                    if (d.status === 'completed') statusBadge = `<span class="badge badge-success">تم الشراء</span>`;
+                    else if (d.status === 'cancelled') statusBadge = `<span class="badge badge-danger">لم يتم الاتفاق</span>`;
 
                     return `
-                    <tr class="hover:bg-slate-50">
-                        <td class="p-3">
-                            <div class="font-bold text-slate-900">${esc(d.client_name)}</div>
-                            <div class="text-xs text-emerald-600 font-bold">📱 ${esc(d.client_phone)}</div>
+                    <tr>
+                        <td>
+                            <div class="cell-primary">${esc(d.client_name) || '—'}</div>
+                            <div class="cell-sub cell-mono text-right">${esc(d.client_phone)}</div>
                         </td>
-                        <td class="p-3">
-                            <div class="font-extrabold text-blue-800 text-xs">${esc(d.watch_brand) ? '⌚ ' + esc(d.watch_brand) : '-'}</div>
-                            <div class="text-xs text-slate-600 mt-0.5">${esc(d.deal_details)}</div>
+                        <td class="min-w-[200px]">
+                            <div class="cell-primary text-xs">${esc(d.watch_brand) || '—'}</div>
+                            <div class="cell-sub clamp-2">${esc(d.deal_details)}</div>
                         </td>
-                        <td class="p-3">
+                        <td>
                             ${roleBadge}
-                            ${emp && esc(d.assigned_by_name) && esc(emp.full_name) !== esc(d.assigned_by_name) ? `<div class="text-[10px] text-slate-500 mt-1">مسؤول الديل: ${esc(emp.full_name)}</div>` : ''}
+                            ${emp && esc(d.assigned_by_name) && esc(emp.full_name) !== esc(d.assigned_by_name) ? `<div class="cell-sub mt-1">مسؤول الديل: ${esc(emp.full_name)}</div>` : ''}
                         </td>
-                        <td class="p-3 text-xs font-semibold text-blue-700">
+                        <td class="text-xs text-slate-700 whitespace-nowrap">
                             ${d.meeting_time ? new Date(d.meeting_time).toLocaleString('ar-EG') : 'غير محدد'}
                         </td>
-                        <td class="p-3">${statusBadge}</td>
-                        <td class="p-3">
-                            <button onclick="openEditDeal('${d.id}')" class="whitespace-nowrap text-xs bg-blue-600 hover:bg-blue-700 text-white px-3 py-1 rounded-lg font-bold">
-                                ✏️ فتح الديل
-                            </button>
+                        <td>${statusBadge}</td>
+                        <td>
+                            <button onclick="openEditDeal('${d.id}')" class="btn btn-secondary btn-sm">${icon('edit')} فتح الديل</button>
                         </td>
                     </tr>`;
                 }).join('');
@@ -319,18 +317,20 @@ function renderTreasury() {
     });
 
     if (list.length === 0) {
-        document.getElementById('treasuryTableBody').innerHTML = `<tr><td colspan="5" class="p-6 text-center text-slate-400">لا توجد حركات مسجلة في هذا التصنيف</td></tr>`;
+        document.getElementById('treasuryTableBody').innerHTML = `<tr><td colspan="5"><div class="empty-state"><div class="empty-icon">${icon('vault')}</div><div class="empty-title">لا توجد حركات في التصنيف ده</div><div class="empty-text">غيّر الفلتر أو سجّل حركة خزنة جديدة.</div></div></td></tr>`;
         return;
     }
 
     document.getElementById('treasuryTableBody').innerHTML = list.map(t => `
         <tr>
-            <td class="p-3.5 font-bold ${t.transaction_type === 'in' ? 'text-emerald-600' : 'text-rose-600'}">${t.transaction_type === 'in' ? '🟢 دخلت الخزنة' : '🔴 اتصرفت من الخزنة'}</td>
-            <td class="p-3.5 font-extrabold">${Number(t.amount).toLocaleString()} ج.م</td>
-            <td class="p-3.5">${esc(t.description)}</td>
-            <td class="p-3.5 text-xs">${new Date(t.transaction_date || t.created_at).toLocaleString('ar-EG')}</td>
-            <td class="p-3.5 ${currentUser.role === 'owner' ? '' : 'hidden'}">
-                <button onclick="deleteRow('treasury_transactions', '${t.id}')" class="text-xs bg-rose-100 text-rose-700 px-2 py-1 rounded font-bold">حذف</button>
+            <td>${t.transaction_type === 'in'
+                ? `<span class="badge badge-success no-dot">${icon('trendUp', 'w-3.5 h-3.5')} إيداع</span>`
+                : `<span class="badge badge-danger no-dot">${icon('trendDown', 'w-3.5 h-3.5')} صرف</span>`}</td>
+            <td class="${t.transaction_type === 'in' ? 'amount-in' : 'amount-out'} whitespace-nowrap">${t.transaction_type === 'in' ? '+' : '−'}${Number(t.amount).toLocaleString()} ج.م</td>
+            <td class="text-slate-700">${esc(t.description)}</td>
+            <td class="text-xs text-slate-500 whitespace-nowrap">${new Date(t.transaction_date || t.created_at).toLocaleString('ar-EG')}</td>
+            <td class="${currentUser.role === 'owner' ? '' : 'hidden'}">
+                <button onclick="deleteRow('treasury_transactions', '${t.id}')" class="btn btn-danger-soft btn-sm">${icon('trash')} حذف</button>
             </td>
         </tr>
     `).join('');
