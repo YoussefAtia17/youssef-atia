@@ -7,15 +7,15 @@ export const contact = {
 };
 
 export const bio: Localized = {
-  en: "I'm Youssef, a Computer Science student at the Egyptian Chinese University. I build end-to-end products: business systems for real clients, native iOS apps, event platforms, and AI research in federated learning. I've also worked part-time as a programming teaching assistant at iSchool.",
-  ar: "أنا يوسف، طالب علوم حاسب في الجامعة المصرية الصينية. ببني منتجات كاملة من أولها لآخرها: أنظمة إدارة لعملاء حقيقيين، تطبيقات iOS، منصات للإيفنتات، وأبحاث في الـ Federated Learning. واشتغلت بدوام جزئي مساعد مدرّس برمجة في iSchool.",
+  en: "I'm Youssef, a Computer Science student at the Egyptian Chinese University. I build end-to-end products: business systems for real clients, native iOS apps, event platforms, and AI-powered mobile apps. I've also worked part-time as a programming teaching assistant at iSchool.",
+  ar: "أنا يوسف، طالب علوم حاسب في الجامعة المصرية الصينية. ببني منتجات كاملة من أولها لآخرها: أنظمة إدارة لعملاء حقيقيين، تطبيقات iOS، منصات للإيفنتات، وتطبيقات موبايل بالذكاء الاصطناعي. واشتغلت بدوام جزئي مساعد مدرّس برمجة في iSchool.",
 };
 
 export const skillGroups: { title: Localized; items: string[] }[] = [
   { title: { en: "Languages", ar: "لغات البرمجة" }, items: ["Python", "JavaScript", "TypeScript", "Swift", "C++", "SQL", "Dart"] },
   { title: { en: "Web & Mobile", ar: "ويب وموبايل" }, items: ["HTML", "CSS", "Tailwind", "Flask", "FastAPI", "SwiftUI", "Flutter"] },
   { title: { en: "Data & Backend", ar: "داتا وباك إند" }, items: ["Supabase", "PostgreSQL", "MySQL", "Firebase"] },
-  { title: { en: "AI & Automation", ar: "AI وأتمتة" }, items: ["Federated Learning", "NumPy", "Gemini API", "Ollama", "n8n"] },
+  { title: { en: "AI & Automation", ar: "AI وأتمتة" }, items: ["NumPy", "Gemini API", "Ollama", "n8n"] },
   { title: { en: "Tools & Hardware", ar: "أدوات وهاردوير" }, items: ["Git", "Docker", "Vercel", "Raspberry Pi", "Arduino"] },
 ];
 

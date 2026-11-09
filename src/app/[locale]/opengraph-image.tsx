@@ -15,7 +15,7 @@ export default function Image() {
     eyebrow: "github.com/YoussefAtia17",
     title: en.hero.name,
     text: en.hero.tagline,
-    tags: ["Next.js", "SwiftUI", "Supabase", "Python", "Federated Learning"],
+    tags: ["Next.js", "SwiftUI", "Supabase", "Python", "Flutter"],
     colors: ["#6366f1", "#22d3ee"],
   });
 }

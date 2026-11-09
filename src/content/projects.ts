@@ -179,69 +179,6 @@ export const featuredProjects: Project[] = [
     },
   },
   {
-    slug: "ara-fed",
-    title: { en: "ARA-Fed", ar: "ARA-Fed" },
-    summary: {
-      en: "Adaptive, resource-aware federated learning framework. Smarter client scheduling and loss-adaptive aggregation beat FedAvg, FedProx, SCAFFOLD, FedNova and MOON across vision, NLP and audio on 100 simulated clients (CIFAR-10: 71% vs 52% for FedAvg).",
-      ar: "إطار Federated Learning بيتكيّف مع موارد الأجهزة. جدولة أذكى للعملاء وتجميع بيتكيّف مع الـ loss، ونتايجه أحسن من FedAvg وFedProx وSCAFFOLD وFedNova وMOON في الصور والنصوص والصوت على 100 عميل.",
-    },
-    badge: { en: "Research", ar: "بحث" },
-    stack: ["Python", "NumPy", "Matplotlib", "Federated Learning"],
-    github: `${GH}/ARA-Fed-Simulation`,
-    cover: "from-indigo-500 to-cyan-400",
-    details: {
-      context: {
-        en: "Federated learning lets phones, sensors and hospitals train one shared model without ever uploading their private data. In practice two things hold it back: devices are very different (some are slow or on weak networks, so a training round waits for the slowest one), and each device's data looks nothing like the others' (non-IID), so simply averaging their updates pulls the model in conflicting directions. ARA-Fed is my research answer to both problems.",
-        ar: "الـ Federated Learning بيخلّي الموبايلات والحساسات والمستشفيات يدرّبوا موديل واحد مشترك من غير ما حد فيهم يرفع الداتا الخاصة بتاعته. بس في الواقع فيه مشكلتين: الأجهزة مختلفة جدًا (في البطيء وفي اللي على نت ضعيف، فالجولة كلها بتستنى أبطأ جهاز)، والداتا اللي على كل جهاز مختلفة تمامًا عن التانيين (non-IID)، فلما تاخد متوسط التحديثات بتاعتهم ببساطة الموديل بيتشد في اتجاهات متعارضة. ARA-Fed هو الحل اللي قدمته في البحث للمشكلتين دول.",
-      },
-      overview: {
-        en: "Each training round, the server first decides which clients are worth asking, based on their resources and network conditions, instead of picking at random. The selected clients train locally and send back only their model updates. The server then aggregates those updates with weights that adapt to each client's loss, so clients that help the global model count for more and noisy ones count for less. The framework was evaluated on 100 clients with strict Dirichlet (α = 0.5) partitioning, across vision, text and audio, against five state-of-the-art baselines. This repository holds the scripts that reproduce the paper's comparison charts.",
-        ar: "في كل جولة تدريب، السيرفر الأول بيقرر مين من العملاء يستاهل يتسأل، على حسب موارد كل جهاز وحالة الشبكة بتاعته، بدل ما يختار عشوائي. العملاء اللي اتختاروا بيدرّبوا عندهم محليًا ويبعتوا التحديثات بتاعة الموديل بس. بعد كده السيرفر بيجمّع التحديثات دي بأوزان بتتغير حسب الـ loss بتاع كل عميل، فالعميل اللي بيفيد الموديل العام بياخد وزن أكبر، واللي داتاه مشوشة بياخد وزن أقل. الإطار اتقيّم على 100 عميل بتقسيم Dirichlet صارم (α = 0.5)، في الصور والنصوص والصوت، قدام 5 من أحدث الطرق. الريبو ده فيه السكريبتات اللي بتطلّع رسومات المقارنة اللي في البحث.",
-      },
-      modules: [
-        {
-          title: { en: "Strategic client scheduling", ar: "جدولة ذكية للعملاء" },
-          body: {
-            en: "Clients are profiled by their available resources, bandwidth and latency, and the scheduler picks the ones that can contribute in time. Fewer stragglers means shorter rounds and less wasted communication.",
-            ar: "كل عميل بيتعمله profile بالموارد المتاحة والـ bandwidth والـ latency، والـ scheduler بيختار اللي يقدر يساهم في الوقت. أجهزة بطيئة أقل يعني جولات أقصر واتصال أقل على الفاضي.",
-          },
-        },
-        {
-          title: { en: "Loss-adaptive aggregation", ar: "تجميع بيتكيّف مع الـ loss" },
-          body: {
-            en: "Instead of FedAvg's plain weighted average, the server weighs each update by how it affects the loss. This keeps the global model stable when every client's data is skewed differently.",
-            ar: "بدل المتوسط العادي بتاع FedAvg، السيرفر بيدي كل تحديث وزن على حسب تأثيره على الـ loss. ده بيخلّي الموديل العام ثابت حتى لو داتا كل عميل منحازة بشكل مختلف.",
-          },
-        },
-        {
-          title: { en: "Multi-modal evaluation", ar: "تقييم على أنواع داتا مختلفة" },
-          body: {
-            en: "Three simulation scripts cover vision (MNIST, CIFAR-10), NLP (AG News, IMDB) and audio (Speech Commands, UrbanSound8K), plotting test accuracy over 30 communication rounds for every algorithm.",
-            ar: "3 سكريبتات محاكاة بتغطي الصور (MNIST وCIFAR-10)، والنصوص (AG News وIMDB)، والصوت (Speech Commands وUrbanSound8K)، وبترسم دقة الاختبار على 30 جولة اتصال لكل خوارزمية.",
-          },
-        },
-        {
-          title: { en: "Framework comparison", ar: "مقارنة مع الأدوات التانية" },
-          body: {
-            en: "A radar chart compares the ARA-Fed simulator with FedML, Flower and LEAF on multi-modal support, network profiling, non-IID granularity, modularity and baseline coverage.",
-            ar: "رسم radar بيقارن محاكي ARA-Fed بـ FedML وFlower وLEAF في دعم أنواع الداتا، وقياس الشبكة، ودقة تقسيم الـ non-IID، وسهولة التعديل، وعدد الطرق المدعومة.",
-          },
-        },
-      ],
-      engineering: [
-        { en: "Benchmarked against FedAvg, FedProx, SCAFFOLD, FedNova and MOON on the same 100-client setup", ar: "اتقارن بـ FedAvg وFedProx وSCAFFOLD وFedNova وMOON على نفس الإعداد بتاع 100 عميل" },
-        { en: "Strict Dirichlet α = 0.5 partitioning to model realistic non-IID data", ar: "تقسيم Dirichlet صارم α = 0.5 عشان يمثّل داتا non-IID زي الواقع" },
-        { en: "Lightweight on purpose: plain Python, NumPy and Matplotlib, easy to modify and rerun", ar: "خفيف عن قصد: Python وNumPy وMatplotlib بس، سهل تعدّل فيه وتشغّله تاني" },
-        { en: "Written up as the paper “Federated Learning for Privacy-Preserving AI: An Optimized Client-Server Aggregation Protocol”", ar: "متكتب كبحث بعنوان «Federated Learning for Privacy-Preserving AI: An Optimized Client-Server Aggregation Protocol»" },
-      ],
-      highlights: [
-        { label: { en: "CIFAR-10 accuracy", ar: "دقة CIFAR-10" }, value: "71.05%", baseline: { en: "FedAvg 51.82%", ar: "FedAvg ‏51.82%" } },
-        { label: { en: "AG News accuracy", ar: "دقة AG News" }, value: "88.94%", baseline: { en: "FedAvg 62.23%", ar: "FedAvg ‏62.23%" } },
-        { label: { en: "Speech Commands accuracy", ar: "دقة Speech Commands" }, value: "92.78%", baseline: { en: "FedAvg 53.54%", ar: "FedAvg ‏53.54%" } },
-      ],
-    },
-  },
-  {
     slug: "royal-palace",
     title: { en: "Royal Palace", ar: "القصر الملكي" },
     summary: {

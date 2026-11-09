@@ -9,7 +9,7 @@ const stack: [string, string[]][] = [
   ["web", ["Flask", "FastAPI", "Tailwind", "JS/TS"]],
   ["mobile", ["SwiftUI", "Flutter"]],
   ["data", ["Supabase", "PostgreSQL"]],
-  ["ai", ["OCR", "Federated Learning", "n8n"]],
+  ["ai", ["OCR", "Gemini API", "n8n"]],
 ];
 
 export function Hero({ locale, dict }: { locale: Locale; dict: Dictionary["hero"] }) {
