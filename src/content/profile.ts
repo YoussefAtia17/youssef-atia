@@ -5,7 +5,7 @@ export const contact = {
   github: "https://github.com/YoussefAtia17",
   cv: "/Resume.pdf",
   /** International format, digits only (e.g. 2010xxxxxxxx). Leave empty to hide the WhatsApp buttons. */
-  whatsapp: "",
+  whatsapp: "201098504605",
 };
 
 export const whatsappUrl = contact.whatsapp ? `https://wa.me/${contact.whatsapp}` : null;
