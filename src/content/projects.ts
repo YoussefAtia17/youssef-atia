@@ -435,6 +435,7 @@ export const featuredProjects: Project[] = [
     github: `${GH}/Eventive`,
     cover: "from-fuchsia-500 to-purple-700",
     image: "/projects/eventive.jpg",
+    video: "/projects/eventive/preview.mp4",
     details: {
       context: {
         en: "Organizers of small, curated events wanted something that feels more premium than a Google Form: a page that sells the event with photos and video, lets guests confirm in a click, and gives the organizer a clean list of who's coming.",
