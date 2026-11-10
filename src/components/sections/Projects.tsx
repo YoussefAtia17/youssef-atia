@@ -6,7 +6,6 @@ import { earlierProjects, featuredProjects, type Project } from "@/content/proje
 import { pick } from "@/content/types";
 import { Section, Tag } from "../Section";
 import { ProjectFilter } from "../ProjectFilter";
-import { HoverVideo } from "../HoverVideo";
 import { Testimonials } from "../Testimonials";
 import { testimonials } from "@/content/testimonials";
 import { ExternalIcon, GithubIcon, LockIcon } from "../icons";
@@ -23,8 +22,7 @@ export function Projects({ locale, dict }: { locale: Locale; dict: Dict }) {
         items={featuredProjects.map((p, i) => ({
           slug: p.slug,
           kinds: p.kinds,
-          card: <ProjectCard project={p} locale={locale} dict={dict} wide={false} />,
-          wideCard: i === 0 ? <ProjectCard project={p} locale={locale} dict={dict} wide /> : undefined,
+          card: <ProjectPanel project={p} n={i + 1} locale={locale} dict={dict} />,
         }))}
       />
 
@@ -59,117 +57,152 @@ export function Projects({ locale, dict }: { locale: Locale; dict: Dict }) {
   );
 }
 
-function ProjectCard({ project: p, locale, dict, wide }: { project: Project; locale: Locale; dict: Dict; wide: boolean }) {
+/** One project as a full-width panel. On wide screens the panels stick and stack as you scroll. */
+function ProjectPanel({ project: p, n, locale, dict }: { project: Project; n: number; locale: Locale; dict: Dict }) {
   const title = pick(p.title, locale);
   const href = `/${locale}/projects/${p.slug}`;
-  return (
-    <article
-      className={`group relative flex w-full flex-col overflow-hidden rounded-xl border border-border bg-surface transition duration-300 hover:-translate-y-1 hover:border-accent/50 hover:shadow-[0_0_0_1px_var(--accent),0_20px_60px_-20px_color-mix(in_srgb,var(--accent)_45%,transparent)] ${
-        wide ? "md:grid md:grid-cols-[1.35fr_1fr]" : ""
-      }`}
-    >
-      <div className="flex flex-col">
-        <div className="flex h-9 items-center gap-2 border-b border-border bg-surface-2/70 px-4" dir="ltr">
-          <span className="size-2.5 rounded-full bg-border group-hover:bg-[#ff5f57]" />
-          <span className="size-2.5 rounded-full bg-border group-hover:bg-[#febc2e]" />
-          <span className="size-2.5 rounded-full bg-border group-hover:bg-[#28c840]" />
-          <span className="ms-3 truncate font-mono text-xs text-muted">~/projects/{p.slug}</span>
-        </div>
-        <Link href={href} tabIndex={-1} className={`relative block aspect-[16/9] flex-1 overflow-hidden bg-gradient-to-br ${p.cover}`}>
-          {p.image ? (
-            <>
-              <Image
-                quality={90}
-                src={p.image}
-                alt={title}
-                fill
-                sizes={wide ? "(min-width: 768px) 640px, 100vw" : "(min-width: 768px) 560px, 100vw"}
-                className="object-cover object-top transition duration-700 group-hover:scale-[1.04]"
-              />
-              {p.video && <HoverVideo src={p.video} label={dict.preview} />}
-            </>
-          ) : (
-            <span
-              className="absolute inset-0 flex flex-col justify-center gap-1.5 bg-[#0b0f14]/85 px-8 font-mono text-xs leading-relaxed sm:text-sm"
-              dir="ltr"
-            >
-              <span className="text-white/40">
-                {"// "}
-                {p.slug}.config
-              </span>
-              <span>
-                <span className="text-[#c792ea]">const</span> <span className="text-[#82aaff]">project</span>{" "}
-                <span className="text-white/60">= {"{"}</span>
-              </span>
-              <span className="ps-4">
-                <span className="text-white/60">name:</span> <span className="text-[#c3e88d]">&quot;{p.title.en}&quot;</span>,
-              </span>
-              <span className="ps-4">
-                <span className="text-white/60">stack:</span>{" "}
-                <span className="text-[#c3e88d]">
-                  [
-                  {p.stack
-                    .slice(0, 3)
-                    .map((s) => `"${s}"`)
-                    .join(", ")}
-                  ]
-                </span>
-                ,
-              </span>
-              <span className="text-white/60">{"};"}</span>
-            </span>
-          )}
-        </Link>
-      </div>
+  const side = (p.gallery ?? []).filter((g) => !g.includes("features")).slice(0, 2);
 
-      <div className={`flex flex-1 flex-col p-6 ${wide ? "md:border-s md:border-border md:p-8" : ""}`}>
-        {p.badge && (
-          <p className="font-mono text-xs text-accent">
-            <span dir="ltr">{"// "}</span>
-            {pick(p.badge, locale)}
+  return (
+    <article className="stack-card group relative overflow-hidden rounded-2xl border border-border bg-surface shadow-[0_-20px_60px_-30px_rgba(0,0,0,0.6)] transition-[border-color,transform,filter] duration-500 hover:border-accent/40">
+      <span
+        className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-accent/60 to-transparent"
+        aria-hidden
+      />
+
+      {/* Header: number, kind, title and actions */}
+      <div className="flex flex-col gap-5 p-5 sm:p-7 md:flex-row md:items-center md:gap-8">
+        <span
+          className="stack-num shrink-0 font-mono text-6xl leading-none font-bold tracking-tighter sm:text-7xl md:text-8xl"
+          dir="ltr"
+          aria-hidden
+        >
+          {String(n).padStart(2, "0")}
+        </span>
+
+        <div className="min-w-0 flex-1">
+          <p className="flex flex-wrap gap-x-3 font-mono text-xs text-accent" dir="ltr">
+            {p.kinds.map((k) => (
+              <span key={k}>--{dict.filters[k]}</span>
+            ))}
+            {p.badge && (
+              <span className="text-muted" dir="auto">
+                {"// "}
+                {pick(p.badge, locale)}
+              </span>
+            )}
           </p>
-        )}
-        <h3 className={`mt-2 font-semibold tracking-tight ${wide ? "text-2xl sm:text-3xl" : "text-xl"}`}>
-          <Link href={href} className="after:absolute after:inset-0 hover:text-accent">
-            {title}
-          </Link>
-        </h3>
-        <p className={`mt-3 flex-1 text-sm leading-relaxed text-muted ${wide ? "" : "line-clamp-4"}`}>{pick(p.summary, locale)}</p>
-        {p.role && (
-          <p className="mt-3 text-sm">
-            <span className="font-medium">{dict.role}:</span> <span className="text-muted">{pick(p.role, locale)}</span>
-          </p>
-        )}
-        <div className="mt-5 flex flex-wrap gap-1.5">
-          {p.stack.map((s) => (
-            <Tag key={s}>{s}</Tag>
-          ))}
+          <h3 className="mt-2 text-2xl font-semibold tracking-tight sm:text-3xl">
+            <Link href={href} className="after:absolute after:inset-0 hover:text-accent">
+              {title}
+            </Link>
+          </h3>
+          <p className="mt-2 line-clamp-2 max-w-3xl text-sm leading-relaxed text-muted">{pick(p.summary, locale)}</p>
         </div>
-        <div className="relative z-10 mt-6 flex flex-wrap items-center gap-x-5 gap-y-2 border-t border-border pt-4 font-mono text-xs">
-          <Link href={href} className="inline-flex items-center gap-1 text-foreground hover:text-accent">
-            {dict.details} <span className="inline-block rtl:rotate-180">→</span>
-          </Link>
+
+        <div className="relative z-10 flex shrink-0 flex-wrap items-center gap-2 font-mono text-xs">
           {p.live && (
-            <a href={p.live} target="_blank" rel="noreferrer" className="inline-flex items-center gap-1.5 text-accent hover:underline">
+            <a
+              href={p.live}
+              target="_blank"
+              rel="noreferrer"
+              className="inline-flex items-center gap-1.5 rounded-full border border-accent/50 bg-accent/10 px-4 py-2 text-accent transition hover:bg-accent hover:text-black"
+            >
               <ExternalIcon className="size-3.5" /> {dict.live}
             </a>
           )}
+          <Link
+            href={href}
+            className="inline-flex items-center gap-1 rounded-full border border-border px-4 py-2 text-foreground transition hover:border-accent/50 hover:text-accent"
+          >
+            {dict.details} <span className="inline-block rtl:rotate-180">→</span>
+          </Link>
           {p.github && (
             <a
               href={p.github}
               target="_blank"
               rel="noreferrer"
-              className="inline-flex items-center gap-1.5 text-muted hover:text-foreground"
+              aria-label={`${dict.code}: ${title}`}
+              className="grid size-9 place-items-center rounded-full border border-border text-muted transition hover:border-accent/50 hover:text-foreground"
             >
-              <GithubIcon className="size-3.5" /> {dict.code}
+              <GithubIcon className="size-4" />
             </a>
           )}
           {p.privateCode && (
-            <span className="inline-flex items-center gap-1.5 text-muted">
-              <LockIcon className="size-3.5" /> {dict.privateCode}
+            <span title={dict.privateCode} className="grid size-9 place-items-center rounded-full border border-border text-muted">
+              <LockIcon className="size-3.5" />
+              <span className="sr-only">{dict.privateCode}</span>
             </span>
           )}
         </div>
+      </div>
+
+      {/* Media: the demo clip (or cover) large, two screens beside it */}
+      <div className="grid gap-3 px-5 pb-5 sm:px-7 sm:pb-7 md:grid-cols-[2fr_1fr]">
+        <div className={`relative aspect-[16/9] overflow-hidden rounded-xl border border-border bg-gradient-to-br ${p.cover}`}>
+          {p.image && (
+            <Image
+              quality={90}
+              src={p.image}
+              alt={title}
+              fill
+              sizes="(min-width: 1152px) 720px, (min-width: 768px) 66vw, 100vw"
+              className="object-cover object-top transition duration-700 group-hover:scale-[1.02]"
+            />
+          )}
+          {p.video && (
+            <>
+              <video
+                data-preview
+                src={p.video}
+                muted
+                loop
+                playsInline
+                preload="none"
+                aria-hidden
+                tabIndex={-1}
+                className="peer absolute inset-0 size-full object-cover object-top opacity-0 transition-opacity duration-700 data-[playing]:opacity-100"
+              />
+              <span
+                className="pointer-events-none absolute bottom-3 end-3 inline-flex items-center gap-1.5 rounded-md border border-white/10 bg-black/70 px-2 py-1 font-mono text-[10px] text-white/85 backdrop-blur transition peer-data-[playing]:opacity-0"
+                dir="ltr"
+              >
+                <span className="size-1.5 rounded-full bg-accent" /> {dict.preview}
+              </span>
+            </>
+          )}
+        </div>
+
+        {side.length === 0 && (
+          <div className="hidden flex-col overflow-hidden rounded-xl border border-border bg-surface-2/40 md:flex">
+            <p className="border-b border-border px-4 py-2.5 font-mono text-xs text-muted" dir="ltr">
+              <span className="text-accent">➜</span> cat README.md
+            </p>
+            <p className="flex-1 overflow-hidden p-4 text-sm leading-relaxed text-muted">{pick(p.summary, locale)}</p>
+          </div>
+        )}
+        {side.length > 0 && (
+          <div className="hidden gap-3 sm:grid sm:grid-cols-2 md:grid-cols-1 md:grid-rows-2">
+            {side.map((src, i) => (
+              <div key={src} className="relative aspect-[16/9] overflow-hidden rounded-xl border border-border bg-surface-2 md:aspect-auto">
+                <Image
+                  quality={90}
+                  src={src}
+                  alt={`${title} (${i + 2})`}
+                  fill
+                  sizes="(min-width: 1152px) 360px, (min-width: 768px) 33vw, 50vw"
+                  className="object-cover object-top transition duration-700 group-hover:scale-[1.03]"
+                />
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
+
+      <div className="flex flex-wrap gap-1.5 border-t border-border px-5 py-4 sm:px-7">
+        {p.stack.map((s) => (
+          <Tag key={s}>{s}</Tag>
+        ))}
       </div>
     </article>
   );

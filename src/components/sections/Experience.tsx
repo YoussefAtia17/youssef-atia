@@ -15,11 +15,14 @@ export function Experience({ locale, dict }: { locale: Locale; dict: Dictionary[
   return (
     <Section id="experience" index="03" title={dict.title}>
       <Window title="git log --oneline --graph" bodyClassName="p-5 sm:p-8">
-        <ol className="relative space-y-8 border-s border-dashed border-border ps-7">
-          {experience.map((item, i) => (
-            <TimelineEntry key={item.title.en} item={item} locale={locale} head={i === 0} />
-          ))}
-        </ol>
+        <div className="relative">
+          <span className="exp-line absolute inset-y-0 start-0 w-0.5 -translate-x-1/2 rtl:translate-x-1/2" aria-hidden />
+          <ol className="relative space-y-8 border-s border-dashed border-border ps-7">
+            {experience.map((item, i) => (
+              <TimelineEntry key={item.title.en} item={item} locale={locale} head={i === 0} />
+            ))}
+          </ol>
+        </div>
       </Window>
 
       <div className="mt-6 grid gap-6 md:grid-cols-2">
@@ -51,7 +54,7 @@ function TimelineEntry({ item, locale, head }: { item: TimelineItem; locale: Loc
   return (
     <li className="relative">
       <span
-        className={`absolute -start-[2.15rem] top-1.5 size-3 rounded-full border-2 ${
+        className={`exp-dot absolute -start-[2.15rem] top-1.5 size-3 rounded-full border-2 ${
           head ? "border-accent bg-accent shadow-[0_0_12px_var(--accent)]" : "border-muted bg-background"
         }`}
       />

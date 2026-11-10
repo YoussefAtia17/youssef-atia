@@ -25,11 +25,24 @@
       "clients": "منتجات لعملاء",
       "langs": "عربي وإنجليزي"
     },
-    "whatsapp": "واتساب"
+    "whatsapp": "واتساب",
+    "badge": {
+      "role": "مطوّر Full-stack",
+      "location": "المكان",
+      "locationValue": "القاهرة، مصر",
+      "focus": "التخصص",
+      "stack": "التقنيات",
+      "status": "الحالة",
+      "statusValue": "● متاح للشغل",
+      "hint": "اسحبني · دوس عشان تقلبني",
+      "flip": "اقلب الكارت"
+    },
+    "techLabel": "الأدوات اللي بشتغل بيها"
   },
   "about": {
     "title": "عنّي",
-    "skills": "المهارات"
+    "skills": "المهارات",
+    "photoAlt": "يوسف عطية ببدلة سوداء"
   },
   "projects": {
     "title": "المشاريع",
@@ -119,5 +132,11 @@
   "footer": {
     "rights": "معمول بـ Next.js وTailwind.",
     "top": "ارجع لفوق"
+  },
+  "cta": {
+    "line1": "عندك فكرة؟",
+    "line2": "يلا نبنيها سوا.",
+    "button": "ابدأ مشروعك",
+    "whatsapp": "واتساب"
   }
 }

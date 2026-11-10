@@ -25,11 +25,24 @@
       "clients": "client products",
       "langs": "Arabic + English"
     },
-    "whatsapp": "WhatsApp"
+    "whatsapp": "WhatsApp",
+    "badge": {
+      "role": "Full-stack Developer",
+      "location": "Location",
+      "locationValue": "Cairo, Egypt",
+      "focus": "Focus",
+      "stack": "Stack",
+      "status": "Status",
+      "statusValue": "● Open to work",
+      "hint": "drag me · click to flip",
+      "flip": "Flip the card"
+    },
+    "techLabel": "Tools I build with"
   },
   "about": {
     "title": "About me",
-    "skills": "Skills"
+    "skills": "Skills",
+    "photoAlt": "Youssef Atia in a dark suit"
   },
   "projects": {
     "title": "Projects",
@@ -119,5 +132,11 @@
   "footer": {
     "rights": "Built with Next.js & Tailwind.",
     "top": "Back to top"
+  },
+  "cta": {
+    "line1": "Got an idea?",
+    "line2": "Let's build it.",
+    "button": "Start a project",
+    "whatsapp": "WhatsApp"
   }
 }

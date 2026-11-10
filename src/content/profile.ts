@@ -10,10 +10,44 @@ export const contact = {
 
 export const whatsappUrl = contact.whatsapp ? `https://wa.me/${contact.whatsapp}` : null;
 
-export const bio: Localized = {
-  en: "I'm Youssef, a Computer Science student at the Egyptian Chinese University. I build end-to-end products: business systems for real clients, native iOS apps, event platforms, and AI-powered mobile apps. I've also worked part-time as a programming teaching assistant at iSchool.",
-  ar: "أنا يوسف، طالب علوم حاسب في الجامعة المصرية الصينية. ببني منتجات كاملة من أولها لآخرها: أنظمة إدارة لعملاء حقيقيين، تطبيقات iOS، منصات للإيفنتات، وتطبيقات موبايل بالذكاء الاصطناعي. واشتغلت بدوام جزئي مساعد مدرّس برمجة في iSchool.",
+/** Big opening line of the About section. The middle part is highlighted. */
+export const lead: { en: [string, string, string]; ar: [string, string, string] } = {
+  en: ["I build software that ", "real businesses run on", ", from the database to the app in your hand."],
+  ar: ["ببني سوفتوير ", "بيشتغل عليه بيزنس حقيقي", "، من الداتابيز لحد الأبلكيشن اللي في إيدك."],
 };
+
+export const bio: Localized = {
+  en: "Most of what I build starts with a real problem: a gaming shop that needs a cashier system, an event that needs a live leaderboard, friends arguing over a restaurant bill. I design the data, build the backend and the app, and ship it to the people who actually use it.",
+  ar: "أغلب اللي ببنيه بيبدأ بمشكلة حقيقية: محل بلايستيشن محتاج سيستم كاشير، إيفنت محتاج leaderboard لايف، أو صحاب بيتخانقوا على حساب المطعم. بصمّم الداتا، وببني الباك إند والأبلكيشن، وبسلّمه للناس اللي هتستخدمه فعلًا.",
+};
+
+/** What I bring, in three lines. */
+export const pillars: { key: "backend" | "mobile" | "ai"; title: Localized; text: Localized }[] = [
+  {
+    key: "backend",
+    title: { en: "Backend & data", ar: "باك إند وداتا" },
+    text: {
+      en: "Postgres schemas, auth and row-level security, built so the data stays right when real users hit it.",
+      ar: "داتابيز Postgres بصلاحيات وحماية على مستوى كل صف، عشان الداتا تفضل مظبوطة لما المستخدمين الحقيقيين يدخلوا.",
+    },
+  },
+  {
+    key: "mobile",
+    title: { en: "iOS & mobile", ar: "iOS وموبايل" },
+    text: {
+      en: "Native SwiftUI and Flutter apps with clean flows in Arabic and English.",
+      ar: "تطبيقات SwiftUI و Flutter بتجربة نضيفة بالعربي والإنجليزي.",
+    },
+  },
+  {
+    key: "ai",
+    title: { en: "AI & automation", ar: "AI وأتمتة" },
+    text: {
+      en: "Gemini, OCR and n8n workflows that take the boring manual steps off people's hands.",
+      ar: "أدوات زي Gemini و n8n وقراءة الصور بالـ AI، بتشيل الخطوات اليدوية المملة من على الناس.",
+    },
+  },
+];
 
 export const skillGroups: { title: Localized; items: string[] }[] = [
   { title: { en: "Languages", ar: "لغات البرمجة" }, items: ["Python", "JavaScript", "TypeScript", "Swift", "C++", "SQL", "Dart"] },

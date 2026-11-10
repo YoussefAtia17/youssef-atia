@@ -1,12 +1,14 @@
 "use client";
 
-import { useState, type ReactNode } from "react";
+import { useEffect, useRef, useState, type ReactNode } from "react";
 
-type Item = { slug: string; kinds: string[]; card: ReactNode; wideCard?: ReactNode };
+type Item = { slug: string; kinds: string[]; card: ReactNode };
 
 /**
- * Terminal-style filter over the project cards. Cards are rendered on the server and passed in,
- * so this only decides which ones show. The first card is wide only in the unfiltered view.
+ * Terminal-style filter over the project panels, and the controller for the stacked scroll.
+ * Panels are rendered on the server and passed in. On wide screens each panel sticks a little
+ * lower than the one before, so they pile up as you scroll. Only the panel on top plays its
+ * demo clip; the ones underneath pause and dim.
  */
 export function ProjectFilter({
   items,
@@ -18,12 +20,63 @@ export function ProjectFilter({
   label: string;
 }) {
   const [active, setActive] = useState("all");
+  const list = useRef<HTMLDivElement>(null);
   const visible = active === "all" ? items : items.filter((i) => i.kinds.includes(active));
   const count = (key: string) => (key === "all" ? items.length : items.filter((i) => i.kinds.includes(key)).length);
 
+  useEffect(() => {
+    const root = list.current;
+    if (!root) return;
+    const reduce = matchMedia("(prefers-reduced-motion: reduce)").matches;
+    const saveData = (navigator as Navigator & { connection?: { saveData?: boolean } }).connection?.saveData;
+    const autoplay = !reduce && !saveData;
+    let frame = 0;
+    let current = -2;
+
+    const update = () => {
+      frame = 0;
+      const cards = [...root.querySelectorAll<HTMLElement>("[data-stack]")];
+      const vh = innerHeight;
+      // The card on top is the last one whose top has passed the middle of the screen.
+      let top = -1;
+      cards.forEach((c, i) => {
+        const r = c.getBoundingClientRect();
+        if (r.top < vh * 0.55 && r.bottom > vh * 0.25) top = i;
+      });
+      if (top === current) return;
+      current = top;
+      cards.forEach((c, i) => {
+        c.toggleAttribute("data-covered", top > -1 && i < top);
+        const video = c.querySelector<HTMLVideoElement>("video[data-preview]");
+        if (!video) return;
+        if (i === top && autoplay) {
+          video
+            .play()
+            .then(() => video.setAttribute("data-playing", ""))
+            .catch(() => {});
+        } else {
+          video.pause();
+          video.removeAttribute("data-playing");
+        }
+      });
+    };
+    const onScroll = () => {
+      if (!frame) frame = requestAnimationFrame(update);
+    };
+
+    update();
+    addEventListener("scroll", onScroll, { passive: true });
+    addEventListener("resize", onScroll);
+    return () => {
+      cancelAnimationFrame(frame);
+      removeEventListener("scroll", onScroll);
+      removeEventListener("resize", onScroll);
+    };
+  }, [active]);
+
   return (
     <>
-      <div className="mb-8 overflow-hidden rounded-xl border border-border bg-surface">
+      <div className="mb-10 overflow-hidden rounded-xl border border-border bg-surface">
         <p className="border-b border-border bg-surface-2/70 px-4 py-2.5 font-mono text-xs text-muted" dir="ltr">
           <span className="text-accent">➜</span> <span className="text-accent-2">~</span> ls projects/
           {active !== "all" && <span className="text-foreground"> --{active}</span>}
@@ -55,14 +108,15 @@ export function ProjectFilter({
         </div>
       </div>
 
-      <div key={active} className="grid gap-6 md:grid-cols-2">
+      <div ref={list} key={active} className="stack-list space-y-8 md:space-y-16">
         {visible.map((item, i) => (
           <div
             key={item.slug}
-            className={`filter-in flex ${active === "all" && i === 0 && item.wideCard ? "md:col-span-2" : ""}`}
-            style={{ animationDelay: `${i * 50}ms` }}
+            data-stack
+            className="filter-in"
+            style={{ animationDelay: `${Math.min(i, 3) * 60}ms`, top: `calc(5rem + ${i * 14}px)` }}
           >
-            {active === "all" && i === 0 && item.wideCard ? item.wideCard : item.card}
+            {item.card}
           </div>
         ))}
       </div>

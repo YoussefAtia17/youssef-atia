@@ -1,3 +1,4 @@
+import Image from "next/image";
 import Link from "next/link";
 import type { Locale } from "@/i18n/config";
 import type { Dictionary } from "@/i18n/dictionaries";
@@ -5,6 +6,7 @@ import { contact, whatsappUrl } from "@/content/profile";
 import { WhatsAppIcon } from "../icons";
 import { earlierProjects, featuredProjects } from "@/content/projects";
 import { Window } from "../Section";
+import { HeroBadge } from "../HeroBadge";
 
 const stack: [string, string[]][] = [
   ["web", ["Flask", "FastAPI", "Tailwind", "JS/TS"]],
@@ -82,42 +84,49 @@ export function Hero({ locale, dict }: { locale: Locale; dict: Dictionary["hero"
           </dl>
         </div>
 
-        <Window title="~/youssef-atia — zsh" className="rise [animation-delay:150ms]" bodyClassName="p-5 font-mono text-[13px] leading-relaxed">
-          <div dir="ltr" className="text-start">
-            <Prompt cmd="whoami" />
-            <p className="text-foreground">Youssef Atia · full-stack developer · CS @ ECU</p>
+        <HeroBadge
+          hint={dict.badge.hint}
+          flipLabel={dict.badge.flip}
+          front={<BadgeFront dict={dict} />}
+          back={
+            <Window title="~/youssef-atia — zsh" className="flex size-full flex-col !shadow-none" bodyClassName="flex-1 p-4 font-mono text-[10.5px] leading-relaxed">
+              <div dir="ltr" className="text-start">
+                <Prompt cmd="whoami" />
+                <p className="text-foreground">Youssef Atia · full-stack developer</p>
 
-            <Prompt cmd="cat stack.json" className="mt-4" />
-            <p className="text-muted">{"{"}</p>
-            {stack.map(([key, items], i) => (
-              <p key={key} className="ps-4">
-                <span className="text-accent-2">&quot;{key}&quot;</span>
-                <span className="text-muted">: [</span>
-                {items.map((s, j) => (
-                  <span key={s}>
-                    <span className="text-accent">&quot;{s}&quot;</span>
-                    {j < items.length - 1 && <span className="text-muted">, </span>}
-                  </span>
+                <Prompt cmd="cat stack.json" className="mt-3" />
+                <p className="text-muted">{"{"}</p>
+                {stack.map(([key, items], i) => (
+                  <p key={key} className="ps-3">
+                    <span className="text-accent-2">&quot;{key}&quot;</span>
+                    <span className="text-muted">: [</span>
+                    {items.map((s, j) => (
+                      <span key={s}>
+                        <span className="text-accent">&quot;{s}&quot;</span>
+                        {j < items.length - 1 && <span className="text-muted">, </span>}
+                      </span>
+                    ))}
+                    <span className="text-muted">]{i < stack.length - 1 ? "," : ""}</span>
+                  </p>
                 ))}
-                <span className="text-muted">]{i < stack.length - 1 ? "," : ""}</span>
-              </p>
-            ))}
-            <p className="text-muted">{"}"}</p>
+                <p className="text-muted">{"}"}</p>
 
-            <Prompt cmd="ls projects/" className="mt-4" />
-            <p className="flex flex-wrap gap-x-4">
-              {featuredProjects.map((p) => (
-                <Link key={p.slug} href={`/${locale}/projects/${p.slug}`} className="text-accent-2 hover:underline">
-                  {p.slug}/
-                </Link>
-              ))}
-            </p>
+                <Prompt cmd="ls projects/" className="mt-3" />
+                <p className="flex flex-wrap gap-x-3">
+                  {featuredProjects.map((p) => (
+                    <Link key={p.slug} href={`/${locale}/projects/${p.slug}`} className="text-accent-2 hover:underline">
+                      {p.slug}/
+                    </Link>
+                  ))}
+                </p>
 
-            <p className="mt-4">
-              <span className="text-accent">➜</span> <span className="text-accent-2">~</span> <span className="cursor" />
-            </p>
-          </div>
-        </Window>
+                <p className="mt-3">
+                  <span className="text-accent">➜</span> <span className="text-accent-2">~</span> <span className="cursor" />
+                </p>
+              </div>
+            </Window>
+          }
+        />
       </div>
     </section>
   );
@@ -129,5 +138,60 @@ function Prompt({ cmd, className = "" }: { cmd: string; className?: string }) {
       <span className="text-accent">➜</span> <span className="text-accent-2">~</span>{" "}
       <span className="text-foreground">{cmd}</span>
     </p>
+  );
+}
+
+/** Front of the hanging ID card. */
+function BadgeFront({ dict }: { dict: Dictionary["hero"] }) {
+  const b = dict.badge;
+  const fields = [
+    [b.location, b.locationValue],
+    [b.focus, "Backend · iOS · Web"],
+    [b.stack, "Supabase · SwiftUI"],
+    [b.status, b.statusValue],
+  ];
+  // Fixed bar pattern so the barcode looks the same on every render.
+  const bars = [3, 1, 2, 1, 1, 3, 1, 2, 2, 1, 3, 1, 1, 2, 1, 3, 2, 1, 1, 2, 3, 1, 2, 1, 1, 3, 1, 2];
+
+  return (
+    <div className="flex size-full flex-col overflow-hidden rounded-2xl border border-border bg-surface shadow-[0_30px_80px_-20px_rgba(0,0,0,0.55)]">
+      <div className="badge-band relative h-28 shrink-0">
+        <span className="absolute start-1/2 top-3 h-2 w-14 -translate-x-1/2 rounded-full border border-border bg-background/80 rtl:translate-x-1/2" />
+        <p className="absolute start-4 bottom-3 font-mono text-[10px] tracking-widest text-white/80" dir="ltr">
+          DEV ID · 2026
+        </p>
+      </div>
+      <div className="flex flex-1 flex-col px-5 pb-5">
+        <Image
+          src="/youssef-avatar.jpg"
+          alt={dict.name}
+          width={176}
+          height={176}
+          quality={90}
+          draggable={false}
+          className="relative -mt-11 size-[5.5rem] rounded-2xl bg-surface-2 object-cover ring-4 ring-surface"
+        />
+        <p className="mt-3 text-xl font-bold tracking-tight">{dict.name}</p>
+        <p className="font-mono text-xs text-accent">{b.role}</p>
+
+        <dl className="mt-4 grid grid-cols-2 gap-x-4 gap-y-3 border-t border-border pt-4">
+          {fields.map(([k, v]) => (
+            <div key={k}>
+              <dt className="font-mono text-[9px] tracking-widest text-muted uppercase">{k}</dt>
+              <dd className="mt-0.5 text-[12px] leading-snug font-medium">{v}</dd>
+            </div>
+          ))}
+        </dl>
+
+        <div className="mt-auto flex items-end justify-between gap-3 border-t border-border pt-4" dir="ltr">
+          <div className="flex h-9 items-stretch gap-[2px]" aria-hidden>
+            {bars.map((w, i) => (
+              <span key={i} className="bg-foreground/80" style={{ width: w }} />
+            ))}
+          </div>
+          <span className="font-mono text-[10px] text-muted">@YoussefAtia17</span>
+        </div>
+      </div>
+    </div>
   );
 }
