@@ -2,7 +2,8 @@ import type { Locale } from "@/i18n/config";
 import type { Dictionary } from "@/i18n/dictionaries";
 import { certifications, education, experience, type TimelineItem } from "@/content/profile";
 import { pick } from "@/content/types";
-import { Section, Window } from "../Section";
+import { Section, Tag, Window } from "../Section";
+import { TimelineProgress } from "../TimelineProgress";
 
 /** Stable fake commit hash so each entry reads like a git log line. */
 function shortHash(text: string) {
@@ -15,14 +16,13 @@ export function Experience({ locale, dict }: { locale: Locale; dict: Dictionary[
   return (
     <Section id="experience" index="03" title={dict.title}>
       <Window title="git log --oneline --graph" bodyClassName="p-5 sm:p-8">
-        <div className="relative">
-          <span className="exp-line absolute inset-y-0 start-0 w-0.5 -translate-x-1/2 rtl:translate-x-1/2" aria-hidden />
-          <ol className="relative space-y-8 border-s border-dashed border-border ps-7">
+        <TimelineProgress>
+          <ol className="relative space-y-10 border-s border-dashed border-border ps-7">
             {experience.map((item, i) => (
               <TimelineEntry key={item.title.en} item={item} locale={locale} head={i === 0} />
             ))}
           </ol>
-        </div>
+        </TimelineProgress>
       </Window>
 
       <div className="mt-6 grid gap-6 md:grid-cols-2">
@@ -52,12 +52,8 @@ export function Experience({ locale, dict }: { locale: Locale; dict: Dictionary[
 
 function TimelineEntry({ item, locale, head }: { item: TimelineItem; locale: Locale; head: boolean }) {
   return (
-    <li className="relative">
-      <span
-        className={`exp-dot absolute -start-[2.15rem] top-1.5 size-3 rounded-full border-2 ${
-          head ? "border-accent bg-accent shadow-[0_0_12px_var(--accent)]" : "border-muted bg-background"
-        }`}
-      />
+    <li data-exp className="exp-item relative">
+      <span className="exp-dot absolute -start-[2.15rem] top-1.5 size-3 rounded-full border-2 border-muted bg-background" />
       <p className="flex flex-wrap items-center gap-x-3 gap-y-1 font-mono text-xs" dir="ltr">
         <span className="text-[#e3b341]">{shortHash(item.title.en)}</span>
         {head && <span className="text-accent-2">(HEAD -&gt; main)</span>}
@@ -68,6 +64,30 @@ function TimelineEntry({ item, locale, head }: { item: TimelineItem; locale: Loc
       <h3 className="mt-2 text-lg font-semibold">{pick(item.title, locale)}</h3>
       <p className="text-sm text-accent">{pick(item.place, locale)}</p>
       {item.text && <p className="mt-2 max-w-2xl text-muted">{pick(item.text, locale)}</p>}
+      {item.points && (
+        <ul className="mt-4 max-w-3xl space-y-2.5">
+          {item.points.map((pt) => {
+            const text = pick(pt, locale);
+            const cut = text.indexOf(":");
+            return (
+              <li key={pt.en} className="relative ps-5 text-sm leading-relaxed text-muted">
+                <span className="absolute start-0 top-0 font-mono text-accent" aria-hidden>
+                  ▸
+                </span>
+                <span className="font-medium text-foreground">{text.slice(0, cut + 1)}</span>
+                {text.slice(cut + 1)}
+              </li>
+            );
+          })}
+        </ul>
+      )}
+      {item.tags && (
+        <div className="mt-4 flex flex-wrap gap-1.5">
+          {item.tags.map((t) => (
+            <Tag key={t}>{t}</Tag>
+          ))}
+        </div>
+      )}
     </li>
   );
 }

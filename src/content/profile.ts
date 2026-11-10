@@ -12,13 +12,13 @@ export const whatsappUrl = contact.whatsapp ? `https://wa.me/${contact.whatsapp}
 
 /** Big opening line of the About section. The middle part is highlighted. */
 export const lead: { en: [string, string, string]; ar: [string, string, string] } = {
-  en: ["I build software that ", "real businesses run on", ", from the database to the app in your hand."],
-  ar: ["ببني سوفتوير ", "بيشتغل عليه بيزنس حقيقي", "، من الداتابيز لحد الأبلكيشن اللي في إيدك."],
+  en: ["I'm Youssef, a full-stack developer who ", "turns ideas into working products", ", from the database to the app in your hand."],
+  ar: ["أنا يوسف، مطوّر Full-stack ", "بحوّل الفكرة لمنتج شغّال", "، من الداتابيز لحد الأبلكيشن اللي في إيدك."],
 };
 
 export const bio: Localized = {
-  en: "Most of what I build starts with a real problem: a gaming shop that needs a cashier system, an event that needs a live leaderboard, friends arguing over a restaurant bill. I design the data, build the backend and the app, and ship it to the people who actually use it.",
-  ar: "أغلب اللي ببنيه بيبدأ بمشكلة حقيقية: محل بلايستيشن محتاج سيستم كاشير، إيفنت محتاج leaderboard لايف، أو صحاب بيتخانقوا على حساب المطعم. بصمّم الداتا، وببني الباك إند والأبلكيشن، وبسلّمه للناس اللي هتستخدمه فعلًا.",
+  en: "I work across the whole stack: I design the database, build secure backends and APIs, and ship native iOS, mobile and web apps on top of them. I can own a product end to end, pick up a new tool fast, and add AI where it actually saves time. I care about clean code, fast interfaces, and apps that work just as well in Arabic as in English.",
+  ar: "بشتغل على الـ stack كله: بصمّم الداتابيز، وببني باك إند و APIs آمنة، وفوقهم تطبيقات iOS وموبايل وويب. أقدر أمسك المنتج من أوله لآخره، وأتعلم أي أداة جديدة بسرعة، وأضيف AI في المكان اللي فعلًا بيوفّر وقت. بهتم بالكود النضيف، والواجهات السريعة، وإن التطبيق يشتغل بالعربي زي الإنجليزي بالظبط.",
 };
 
 /** What I bring, in three lines. */
@@ -27,24 +27,24 @@ export const pillars: { key: "backend" | "mobile" | "ai"; title: Localized; text
     key: "backend",
     title: { en: "Backend & data", ar: "باك إند وداتا" },
     text: {
-      en: "Postgres schemas, auth and row-level security, built so the data stays right when real users hit it.",
-      ar: "داتابيز Postgres بصلاحيات وحماية على مستوى كل صف، عشان الداتا تفضل مظبوطة لما المستخدمين الحقيقيين يدخلوا.",
+      en: "I design Postgres databases, auth and APIs that stay secure and fast once real users arrive.",
+      ar: "بصمّم داتابيز Postgres، وأنظمة تسجيل دخول وصلاحيات، و APIs تفضل آمنة وسريعة لما المستخدمين الحقيقيين يدخلوا.",
     },
   },
   {
     key: "mobile",
     title: { en: "iOS & mobile", ar: "iOS وموبايل" },
     text: {
-      en: "Native SwiftUI and Flutter apps with clean flows in Arabic and English.",
-      ar: "تطبيقات SwiftUI و Flutter بتجربة نضيفة بالعربي والإنجليزي.",
+      en: "I build native SwiftUI and Flutter apps with smooth interfaces in Arabic and English.",
+      ar: "ببني تطبيقات SwiftUI و Flutter بواجهات سلسة بالعربي والإنجليزي.",
     },
   },
   {
     key: "ai",
     title: { en: "AI & automation", ar: "AI وأتمتة" },
     text: {
-      en: "Gemini, OCR and n8n workflows that take the boring manual steps off people's hands.",
-      ar: "أدوات زي Gemini و n8n وقراءة الصور بالـ AI، بتشيل الخطوات اليدوية المملة من على الناس.",
+      en: "I connect Gemini, OCR and n8n to automate the boring manual work.",
+      ar: "بربط Gemini و n8n وقراءة الصور بالـ AI عشان أشيل الشغل اليدوي الممل.",
     },
   },
 ];
@@ -57,31 +57,58 @@ export const skillGroups: { title: Localized; items: string[] }[] = [
   { title: { en: "Tools & Hardware", ar: "أدوات وهاردوير" }, items: ["Git", "Docker", "Vercel", "Raspberry Pi", "Arduino"] },
 ];
 
-export type TimelineItem = { title: Localized; place: Localized; date: Localized; text?: Localized };
+export type TimelineItem = {
+  title: Localized;
+  place: Localized;
+  date: Localized;
+  text?: Localized;
+  points?: Localized[];
+  tags?: string[];
+};
 
 export const experience: TimelineItem[] = [
   {
-    title: { en: "Programming Teaching Assistant", ar: "مساعد مدرّس برمجة" },
-    place: { en: "iSchool · Part-time", ar: "iSchool · دوام جزئي" },
+    title: { en: "Freelance Software Engineer", ar: "Software Engineer فريلانس" },
+    place: { en: "Self-employed · Cairo", ar: "شغل حر · القاهرة" },
+    date: { en: "Sep 2026 – Present", ar: "سبتمبر 2026 – لحد دلوقتي" },
+    text: {
+      en: "Three systems for two paying clients, each one designed, built and shipped end-to-end on my own.",
+      ar: "3 سيستمات لعميلين بيدفعوا، كل واحد صمّمته وبنيته وسلّمته من أوله لآخره لوحدي.",
+    },
+    points: [
+      {
+        en: "MRC (Aser Watch): the deals and treasury back-office the client's staff uses every day, with WhatsApp reminders, payroll and a locked daily/monthly closing.",
+        ar: "MRC (Aser Watch): سيستم الصفقات والخزنة اللي فريق العميل بيشتغل عليه كل يوم، بتذكيرات واتساب ومرتبات وقفل يومي وشهري للخزنة.",
+      },
+      {
+        en: "Royal Palace (Aser Watch): a native iOS marketplace for pre-owned Swiss watches with real-time chat, price offers, row-level security and push notifications.",
+        ar: "Royal Palace (Aser Watch): ماركت بليس iOS للساعات السويسري المستعملة، فيه شات لايف وعروض أسعار و row-level security وإشعارات push.",
+      },
+      {
+        en: "PlayZone (PlayStation café): a POS with live per-device timers, hourly billing, stock tracking and daily/monthly profit reports.",
+        ar: "PlayZone (كافيه بلايستيشن): سيستم كاشير بتايمر لايف لكل جهاز، وحساب بالساعة، ومخزون، وتقارير أرباح يومية وشهرية.",
+      },
+    ],
+    tags: ["Supabase", "PostgreSQL", "SwiftUI", "TypeScript", "JavaScript", "Tailwind"],
+  },
+  {
+    title: { en: "Assistant Tutor", ar: "Assistant Tutor" },
+    place: { en: "iSchool · 2-week placement", ar: "iSchool · تدريب أسبوعين" },
     date: { en: "Jul 2026", ar: "يوليو 2026" },
     text: {
-      en: "Supported instructors in programming classes and helped students debug and finish their projects.",
-      ar: "ساعدت المدرّسين في حصص البرمجة وساعدت الطلاب يصلّحوا الأخطاء ويخلّصوا مشاريعهم.",
+      en: "Ran hands-on coding practice with students and helped them get unstuck on their projects.",
+      ar: "كنت بدير تدريب عملي على البرمجة مع الطلاب وبساعدهم لما يقفوا في مشاريعهم.",
     },
   },
   {
-    title: { en: "Event Organizer: GIS Event", ar: "منظّم فعالية GIS" },
-    place: { en: "Egyptian Chinese University", ar: "الجامعة المصرية الصينية" },
-    date: { en: "Mar 2024", ar: "مارس 2024" },
+    title: { en: "Head of Technical", ar: "Head of Technical" },
+    place: { en: "ICPC Community", ar: "مجتمع ICPC" },
+    date: { en: "Oct 2025 – Present", ar: "أكتوبر 2025 – لحد دلوقتي" },
     text: {
-      en: "Helped organize and coordinate a Geographic Information Systems event.",
-      ar: "شاركت في تنظيم وتنسيق فعالية عن نظم المعلومات الجغرافية.",
+      en: "Lead the technical side of the community: I teach problem-solving sessions on algorithms and data structures and follow up one-on-one with members on problems they get stuck on.",
+      ar: "مسؤول عن الجانب التقني في المجتمع: بشرح سيشنز problem solving في الخوارزميات و data structures، وبتابع مع الأعضاء واحد واحد في المسائل اللي بيقفوا فيها.",
     },
-  },
-  {
-    title: { en: "Member: Programming & Tech Community", ar: "عضو في مجتمع البرمجة والتكنولوجيا" },
-    place: { en: "Egyptian Chinese University", ar: "الجامعة المصرية الصينية" },
-    date: { en: "Ongoing", ar: "مستمر" },
+    tags: ["Algorithms", "Data Structures", "C++", "Mentoring"],
   },
 ];
 

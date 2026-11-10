@@ -231,29 +231,20 @@ body {
 }
 
 /* ---------- Experience line that fills as you read ---------- */
-.exp-line { display: none; }
-@supports (animation-timeline: view()) {
-  .exp-line {
-    display: block;
-    z-index: 1;
-    background: linear-gradient(180deg, var(--accent), var(--accent-2));
-    box-shadow: 0 0 10px color-mix(in srgb, var(--accent) 60%, transparent);
-    transform-origin: 50% 0;
-    animation: exp-fill linear both;
-    /* The "viewport" is a line across the middle of the screen: the fill follows it. */
-    animation-timeline: view(block 50% 49.9%);
-  }
-  .exp-dot {
-    z-index: 2;
-    animation: exp-dot linear both;
-    animation-timeline: view(block 50% 49.9%);
-  }
+.exp-line {
+  z-index: 1;
+  background: linear-gradient(180deg, var(--accent), var(--accent-2));
+  box-shadow: 0 0 10px color-mix(in srgb, var(--accent) 60%, transparent);
+  transform-origin: 50% 0;
+  scale: 1 var(--p, 0);
+  transition: scale 120ms linear;
 }
-@keyframes exp-fill { from { scale: 1 0; } to { scale: 1 1; } }
-@keyframes exp-dot { to { border-color: var(--accent); background: var(--accent); box-shadow: 0 0 12px var(--accent); } }
+.exp-dot { z-index: 2; transition: border-color .3s, background-color .3s, box-shadow .3s, scale .3s; }
+.exp-item { opacity: .35; translate: 0 14px; transition: opacity .5s ease, translate .5s ease; }
+.exp-item[data-active] { opacity: 1; translate: 0 0; }
+.exp-item[data-active] .exp-dot { border-color: var(--accent); background: var(--accent); box-shadow: 0 0 12px var(--accent); scale: 1.15; }
 @media (prefers-reduced-motion: reduce) {
-  .exp-line { animation: none; scale: 1 1; }
-  .exp-dot { animation: none; }
+  .exp-line, .exp-item, .exp-dot { transition: none; }
 }
 
 /* ---------- Closing call to action ---------- */
