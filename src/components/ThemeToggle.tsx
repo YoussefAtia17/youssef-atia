@@ -18,6 +18,7 @@ export function ThemeToggle({ label }: { label: string }) {
 
   function apply() {
     const root = document.documentElement;
+    root.removeAttribute("data-theme-switching");
     const next = root.getAttribute("data-theme") === "dark" ? "light" : "dark";
     root.setAttribute("data-theme", next);
     try {
@@ -60,6 +61,9 @@ export function ThemeToggle({ label }: { label: string }) {
     }`;
     document.head.appendChild(style);
 
+    // The old page is a still snapshot, so the background pulses would freeze in it. Leave them
+    // out of that snapshot; they keep running live in the new theme as it's revealed.
+    document.documentElement.setAttribute("data-theme-switching", "");
     const vt = document.startViewTransition(apply);
     vt.ready
       .then(() => {

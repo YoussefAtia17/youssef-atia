@@ -136,6 +136,8 @@ body {
 @media (max-width: 640px) {
   .pulse:nth-child(even) { display: none; }
 }
+/* Kept out of the still snapshot taken for the theme switch (see ThemeToggle). */
+[data-theme-switching] .pulse { visibility: hidden; }
 @media (prefers-reduced-motion: reduce) {
   .pulse { display: none; }
 }
