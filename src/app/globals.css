@@ -135,6 +135,17 @@ body {
   .lightbox[open], .lightbox[open]::backdrop, .lightbox-img { animation: none; }
 }
 
+/* Theme switch: ThemeToggle masks the new snapshot band by band, so drop the default crossfade. */
+::view-transition-old(root),
+::view-transition-new(root) {
+  animation: none;
+  mix-blend-mode: normal;
+}
+/* The toggle icon rolls in whenever it appears. */
+.theme-icon { animation: theme-icon-in 520ms cubic-bezier(.2,.9,.3,1.3) both; }
+@keyframes theme-icon-in { from { opacity: 0; transform: rotate(-120deg) scale(.4); } }
+@media (prefers-reduced-motion: reduce) { .theme-icon { animation: none; } }
+
 /* Project filter: cards fade up when the filter changes. */
 .filter-in { animation: filter-in 380ms cubic-bezier(.2,.7,.2,1) both; }
 @keyframes filter-in { from { opacity: 0; transform: translateY(10px); } }
