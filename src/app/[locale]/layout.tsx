@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Inter, IBM_Plex_Sans_Arabic, JetBrains_Mono } from "next/font/google";
 import { locales, dirOf } from "@/i18n/config";
 import { getDictionary, getLocale } from "@/i18n/dictionaries";
+import { AmbientBackground } from "@/components/AmbientBackground";
 import { Navbar } from "@/components/Navbar";
 import { Footer } from "@/components/Footer";
 import { ogLocale, siteUrl } from "@/lib/site";
@@ -63,6 +64,7 @@ export default async function RootLayout({ children }: LayoutProps<"/[locale]">)
         <script dangerouslySetInnerHTML={{ __html: themeScript }} />
       </head>
       <body className="min-h-full flex flex-col">
+        <AmbientBackground />
         <div className="scroll-progress" aria-hidden />
         <Navbar locale={locale} nav={dict.nav} />
         <main className="flex-1">{children}</main>

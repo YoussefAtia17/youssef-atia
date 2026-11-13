@@ -71,6 +71,85 @@ body {
   mask-image: radial-gradient(ellipse 80% 70% at 50% 0%, #000 40%, transparent 100%);
 }
 
+/* Site-wide ambient backdrop (AmbientBackground). Sits under everything, including hero grids. */
+:root, [data-theme="light"] { --blob-o: 0.17; --dot: rgb(11 18 32 / 0.1); --grain-o: 0.05; --spot-o: 0.85; }
+[data-theme="dark"] { --blob-o: 0.24; --dot: rgb(230 237 243 / 0.085); --grain-o: 0.045; --spot-o: 1; }
+.ambient {
+  position: fixed;
+  inset: 0;
+  z-index: -20;
+  overflow: hidden;
+  pointer-events: none;
+  --sp: 0;
+  --mx: -1000px;
+  --my: -1000px;
+}
+.amb-blob {
+  position: absolute;
+  width: 62vmax;
+  height: 62vmax;
+  border-radius: 50%;
+  opacity: var(--blob-o);
+  will-change: transform;
+}
+.amb-a {
+  top: -26vmax;
+  inset-inline-start: -18vmax;
+  background: radial-gradient(closest-side, var(--accent), transparent);
+  translate: calc(var(--sp) * 30vw) calc(var(--sp) * 55vh);
+  animation: amb-a 34s ease-in-out infinite alternate;
+}
+.amb-b {
+  top: 18vh;
+  inset-inline-end: -24vmax;
+  background: radial-gradient(closest-side, var(--accent-2), transparent);
+  translate: calc(var(--sp) * -25vw) calc(var(--sp) * -20vh);
+  animation: amb-b 41s ease-in-out infinite alternate;
+}
+.amb-c {
+  bottom: -34vmax;
+  inset-inline-start: 22vw;
+  width: 54vmax;
+  height: 54vmax;
+  opacity: calc(var(--blob-o) * 0.75);
+  background: radial-gradient(closest-side, #6366f1, transparent);
+  translate: calc(var(--sp) * -20vw) calc(var(--sp) * -45vh);
+  animation: amb-c 47s ease-in-out infinite alternate;
+}
+@keyframes amb-a { to { transform: translate(14vw, 10vh) scale(1.15); } }
+@keyframes amb-b { to { transform: translate(-12vw, 16vh) scale(0.9); } }
+@keyframes amb-c { to { transform: translate(10vw, -12vh) scale(1.2); } }
+.amb-dots,
+.amb-spot {
+  position: absolute;
+  inset: 0;
+  background-image: radial-gradient(circle at 1px 1px, var(--dot) 1px, transparent 1.5px);
+  background-size: 26px 26px;
+}
+.amb-dots {
+  mask-image: radial-gradient(ellipse 110% 85% at 50% 35%, #000 25%, transparent 90%);
+}
+/* Flashlight: brighter accent dots plus a faint glow, cut to a circle around the mouse. */
+.amb-spot {
+  background-image:
+    radial-gradient(circle at 1px 1px, var(--accent) 1.1px, transparent 1.6px),
+    radial-gradient(circle at var(--mx) var(--my), color-mix(in srgb, var(--accent) 14%, transparent), transparent 280px);
+  background-size: 26px 26px, 100% 100%;
+  mask-image: radial-gradient(260px circle at var(--mx) var(--my), #000, transparent 75%);
+  opacity: 0;
+  transition: opacity 0.5s;
+}
+.ambient[data-spot] .amb-spot { opacity: var(--spot-o); }
+.amb-grain {
+  position: absolute;
+  inset: 0;
+  opacity: var(--grain-o);
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 .5 0 0 0 0 .5 0 0 0 0 .5 0 0 0 1 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+@media (prefers-reduced-motion: reduce) {
+  .amb-blob { animation: none; }
+}
+
 /* Soft accent glow behind the hero */
 .glow {
   background: radial-gradient(
