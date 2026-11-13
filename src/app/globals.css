@@ -62,92 +62,82 @@ body {
   background: color-mix(in srgb, var(--accent) 30%, transparent);
 }
 
-/* Faint engineering grid, fading out toward the bottom of the element */
-.bg-grid {
-  background-image:
-    linear-gradient(var(--grid) 1px, transparent 1px),
-    linear-gradient(90deg, var(--grid) 1px, transparent 1px);
-  background-size: 44px 44px;
-  mask-image: radial-gradient(ellipse 80% 70% at 50% 0%, #000 40%, transparent 100%);
-}
-
-/* Site-wide ambient backdrop (AmbientBackground). Sits under everything, including hero grids. */
-:root, [data-theme="light"] { --blob-o: 0.17; --dot: rgb(11 18 32 / 0.1); --grain-o: 0.05; --spot-o: 0.85; }
-[data-theme="dark"] { --blob-o: 0.24; --dot: rgb(230 237 243 / 0.085); --grain-o: 0.045; --spot-o: 1; }
+/* Site-wide backdrop (AmbientBackground): a circuit grid with soft corner lighting, painted once,
+   plus a few short light pulses that run along the grid lines. Only the pulses move, and only
+   with transform/opacity, so it costs nothing while scrolling. */
+:root, [data-theme="light"] { --grid-line: rgb(11 18 32 / 0.055); --glow-a: 11%; --glow-b: 9%; }
+[data-theme="dark"] { --grid-line: rgb(230 237 243 / 0.045); --glow-a: 13%; --glow-b: 10%; }
 .ambient {
   position: fixed;
   inset: 0;
   z-index: -20;
   overflow: hidden;
   pointer-events: none;
-  --sp: 0;
-  --mx: -1000px;
-  --my: -1000px;
+  background:
+    radial-gradient(60% 55% at 0% 0%, color-mix(in srgb, var(--accent) var(--glow-a), transparent), transparent 70%),
+    radial-gradient(55% 55% at 100% 100%, color-mix(in srgb, var(--accent-2) var(--glow-b), transparent), transparent 70%);
 }
-.amb-blob {
-  position: absolute;
-  width: 62vmax;
-  height: 62vmax;
-  border-radius: 50%;
-  opacity: var(--blob-o);
-  will-change: transform;
-}
-.amb-a {
-  top: -26vmax;
-  inset-inline-start: -18vmax;
-  background: radial-gradient(closest-side, var(--accent), transparent);
-  translate: calc(var(--sp) * 30vw) calc(var(--sp) * 55vh);
-  animation: amb-a 34s ease-in-out infinite alternate;
-}
-.amb-b {
-  top: 18vh;
-  inset-inline-end: -24vmax;
-  background: radial-gradient(closest-side, var(--accent-2), transparent);
-  translate: calc(var(--sp) * -25vw) calc(var(--sp) * -20vh);
-  animation: amb-b 41s ease-in-out infinite alternate;
-}
-.amb-c {
-  bottom: -34vmax;
-  inset-inline-start: 22vw;
-  width: 54vmax;
-  height: 54vmax;
-  opacity: calc(var(--blob-o) * 0.75);
-  background: radial-gradient(closest-side, #6366f1, transparent);
-  translate: calc(var(--sp) * -20vw) calc(var(--sp) * -45vh);
-  animation: amb-c 47s ease-in-out infinite alternate;
-}
-@keyframes amb-a { to { transform: translate(14vw, 10vh) scale(1.15); } }
-@keyframes amb-b { to { transform: translate(-12vw, 16vh) scale(0.9); } }
-@keyframes amb-c { to { transform: translate(10vw, -12vh) scale(1.2); } }
-.amb-dots,
-.amb-spot {
+.ambient::before {
+  content: "";
   position: absolute;
   inset: 0;
-  background-image: radial-gradient(circle at 1px 1px, var(--dot) 1px, transparent 1.5px);
-  background-size: 26px 26px;
-}
-.amb-dots {
-  mask-image: radial-gradient(ellipse 110% 85% at 50% 35%, #000 25%, transparent 90%);
-}
-/* Flashlight: brighter accent dots plus a faint glow, cut to a circle around the mouse. */
-.amb-spot {
   background-image:
-    radial-gradient(circle at 1px 1px, var(--accent) 1.1px, transparent 1.6px),
-    radial-gradient(circle at var(--mx) var(--my), color-mix(in srgb, var(--accent) 14%, transparent), transparent 280px);
-  background-size: 26px 26px, 100% 100%;
-  mask-image: radial-gradient(260px circle at var(--mx) var(--my), #000, transparent 75%);
-  opacity: 0;
-  transition: opacity 0.5s;
+    linear-gradient(var(--grid-line) 1px, transparent 1px),
+    linear-gradient(90deg, var(--grid-line) 1px, transparent 1px);
+  background-size: 44px 44px;
+  mask-image: radial-gradient(ellipse 95% 85% at 50% 40%, #000 35%, transparent 100%);
 }
-.ambient[data-spot] .amb-spot { opacity: var(--spot-o); }
-.amb-grain {
+.pulse {
   position: absolute;
-  inset: 0;
-  opacity: var(--grain-o);
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 .5 0 0 0 0 .5 0 0 0 0 .5 0 0 0 1 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  opacity: 0;
+  will-change: transform, opacity;
+  animation: var(--dur) linear var(--delay) infinite;
+}
+/* Bright head with a glow, trailing off into the line. */
+.pulse::after {
+  content: "";
+  position: absolute;
+  width: 3px;
+  height: 3px;
+  border-radius: 50%;
+  background: var(--accent);
+  box-shadow: 0 0 8px 1px var(--accent);
+}
+.pulse-h {
+  top: calc(var(--line) * 44px);
+  left: 0;
+  width: 150px;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--accent));
+  animation-name: pulse-h;
+}
+.pulse-h::after { right: -1px; top: -1px; }
+.pulse-v {
+  left: calc(var(--line) * 44px);
+  top: 0;
+  width: 1px;
+  height: 150px;
+  background: linear-gradient(180deg, transparent, var(--accent-2));
+  animation-name: pulse-v;
+}
+.pulse-v::after { bottom: -1px; left: -1px; background: var(--accent-2); box-shadow: 0 0 8px 1px var(--accent-2); }
+@keyframes pulse-h {
+  0% { transform: translateX(-160px); opacity: 0; }
+  6%, 48% { opacity: 0.85; }
+  55% { transform: translateX(calc(100vw + 20px)); opacity: 0; }
+  100% { transform: translateX(calc(100vw + 20px)); opacity: 0; }
+}
+@keyframes pulse-v {
+  0% { transform: translateY(-160px); opacity: 0; }
+  6%, 48% { opacity: 0.75; }
+  55% { transform: translateY(calc(100vh + 20px)); opacity: 0; }
+  100% { transform: translateY(calc(100vh + 20px)); opacity: 0; }
+}
+@media (max-width: 640px) {
+  .pulse:nth-child(even) { display: none; }
 }
 @media (prefers-reduced-motion: reduce) {
-  .amb-blob { animation: none; }
+  .pulse { display: none; }
 }
 
 /* Soft accent glow behind the hero */

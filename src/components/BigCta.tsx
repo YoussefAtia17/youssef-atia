@@ -6,7 +6,6 @@ import { WhatsAppIcon } from "./icons";
 export function BigCta({ dict }: { dict: Dictionary["cta"] }) {
   return (
     <section className="relative isolate overflow-hidden border-t border-border py-24 sm:py-36">
-      <div className="bg-grid absolute inset-0 -z-10 opacity-60" aria-hidden />
       <div className="mx-auto max-w-6xl px-6 text-center">
         <p className="font-mono text-sm text-muted" dir="ltr">
           <span className="text-accent">➜</span> <span className="text-accent-2">~</span> ./start-project.sh

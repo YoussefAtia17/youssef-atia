@@ -1,66 +1,31 @@
-"use client";
+import type { CSSProperties } from "react";
 
-import { useEffect, useRef } from "react";
+// Grid line index (44px apart), travel time and start offset for each pulse.
+const pulses: { axis: "h" | "v"; line: number; dur: number; delay: number }[] = [
+  { axis: "h", line: 3, dur: 11, delay: 0 },
+  { axis: "v", line: 6, dur: 13, delay: 2.5 },
+  { axis: "h", line: 9, dur: 14, delay: 5 },
+  { axis: "v", line: 22, dur: 12, delay: 7.5 },
+  { axis: "h", line: 14, dur: 12, delay: 9 },
+  { axis: "v", line: 15, dur: 15, delay: 4 },
+  { axis: "h", line: 18, dur: 13, delay: 11 },
+  { axis: "v", line: 29, dur: 14, delay: 0.8 },
+];
 
 /**
- * Site-wide backdrop that sits behind every section: slow aurora blobs that also travel as you
- * scroll (so each section is lit a little differently), a faint dot grid, a flashlight that
- * lights up the dots around the mouse, and a touch of film grain. Only transforms and two CSS
- * variables change, so it stays on the compositor. Reduced motion keeps it still.
+ * Site-wide backdrop: a fixed circuit grid with soft corner lighting, and a few light pulses
+ * running along its lines like signals. Pure CSS, no listeners; see `.ambient` in globals.css.
  */
 export function AmbientBackground() {
-  const root = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    const el = root.current;
-    if (!el) return;
-    const reduce = matchMedia("(prefers-reduced-motion: reduce)").matches;
-    let frame = 0;
-    let mx = -1000;
-    let my = -1000;
-
-    const update = () => {
-      frame = 0;
-      const max = document.documentElement.scrollHeight - innerHeight;
-      el.style.setProperty("--sp", max > 0 ? (scrollY / max).toFixed(4) : "0");
-      el.style.setProperty("--mx", `${mx}px`);
-      el.style.setProperty("--my", `${my}px`);
-    };
-    const request = () => {
-      if (!frame) frame = requestAnimationFrame(update);
-    };
-    const onMove = (e: PointerEvent) => {
-      if (e.pointerType !== "mouse") return;
-      mx = e.clientX;
-      my = e.clientY;
-      el.setAttribute("data-spot", "");
-      request();
-    };
-    const onLeave = () => el.removeAttribute("data-spot");
-
-    update();
-    if (reduce) return;
-    addEventListener("scroll", request, { passive: true });
-    addEventListener("resize", request);
-    addEventListener("pointermove", onMove, { passive: true });
-    document.documentElement.addEventListener("pointerleave", onLeave);
-    return () => {
-      cancelAnimationFrame(frame);
-      removeEventListener("scroll", request);
-      removeEventListener("resize", request);
-      removeEventListener("pointermove", onMove);
-      document.documentElement.removeEventListener("pointerleave", onLeave);
-    };
-  }, []);
-
   return (
-    <div ref={root} className="ambient" aria-hidden>
-      <div className="amb-blob amb-a" />
-      <div className="amb-blob amb-b" />
-      <div className="amb-blob amb-c" />
-      <div className="amb-dots" />
-      <div className="amb-spot" />
-      <div className="amb-grain" />
+    <div className="ambient" aria-hidden>
+      {pulses.map((p, i) => (
+        <span
+          key={i}
+          className={`pulse pulse-${p.axis}`}
+          style={{ "--line": p.line, "--dur": `${p.dur}s`, "--delay": `${p.delay}s` } as CSSProperties}
+        />
+      ))}
     </div>
   );
 }

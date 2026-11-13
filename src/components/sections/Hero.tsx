@@ -25,7 +25,6 @@ export function Hero({ locale, dict }: { locale: Locale; dict: Dictionary["hero"
 
   return (
     <section className="relative isolate overflow-hidden">
-      <div className="bg-grid absolute inset-0 -z-10" aria-hidden />
       <div className="glow absolute -top-40 start-1/2 -z-10 size-[42rem] -translate-x-1/2 rtl:translate-x-1/2" aria-hidden />
 
       <div className="mx-auto grid min-h-[calc(100svh-4rem)] max-w-6xl items-center gap-14 px-6 py-20 lg:grid-cols-[1.1fr_1fr]">

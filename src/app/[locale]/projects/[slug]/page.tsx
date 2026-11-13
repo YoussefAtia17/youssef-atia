@@ -64,7 +64,6 @@ async function ProjectDetails({ params }: { params: PageProps<"/[locale]/project
 
   return (
     <article className="relative isolate">
-      <div className="bg-grid absolute inset-x-0 top-0 -z-10 h-[36rem]" aria-hidden />
       <div className="mx-auto max-w-6xl px-6 py-12 sm:py-16">
         <p className="font-mono text-xs text-muted" dir="ltr">
           <Link href={`/${locale}#projects`} className="text-accent hover:underline">
