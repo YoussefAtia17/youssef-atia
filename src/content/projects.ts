@@ -360,6 +360,157 @@ export const featuredProjects: Project[] = [
     },
   },
   {
+    slug: "sys-maher",
+    kinds: ["web", "client"],
+    title: { en: "Sys Maher: Phone Shop Management", ar: "سيستم ماهر: إدارة محلات الموبايلات" },
+    summary: {
+      en: "Web app (installable as a PWA) that runs two synced phone shops: mobile-wallet cash in/out with automatic commission tiers and monthly limits, Fawry machines, accessories stock, repairs, debts, expenses and a daily drawer close, with Telegram alerts.",
+      ar: "سيستم ويب (بيتثبت على الموبايل كأنه برنامج) بيدير محلين موبايلات متربطين لايف: سحب وإيداع المحافظ بعمولة بالشرايح وليميت شهري، مكن فوري، مخزن الإكسسوارات، الصيانة، الديون، المصروفات، وتقفيل الدرج اليومي، مع تنبيهات على تليجرام.",
+    },
+    badge: { en: "Client · Two phone shops", ar: "عميل · محلين موبايلات" },
+    stack: ["React", "TypeScript", "Vite", "Tailwind", "Supabase", "PostgreSQL", "Telegram Bot"],
+    privateCode: true,
+    cover: "from-teal-500 to-emerald-700",
+    image: "/projects/sys-maher/00_cover.webp",
+    gallery: [
+      "/projects/sys-maher/00_cover.webp",
+      "/projects/sys-maher/01_login.webp",
+      "/projects/sys-maher/02_machine.webp",
+      "/projects/sys-maher/03_accessories.webp",
+      "/projects/sys-maher/04_maintenance.webp",
+      "/projects/sys-maher/05_close.webp",
+    ],
+    details: {
+      context: {
+        en: "Maher runs a phone shop that does a bit of everything: Vodafone, Etisalat, Orange Cash and InstaPay transfers, bill payments on a Fawry machine, accessories and phone repairs, and he was opening a second branch. Everything lived in notebooks, so he never knew exactly how much cash should be in the drawer, how close each wallet line was to its monthly limit, or what each branch earned. He needed one system both shops share in real time, that works on a weak shop PC, a laptop and his own phone.",
+        ar: "ماهر عنده محل موبايلات بيعمل كل حاجة: تحويلات فودافون واتصالات وأورنج كاش وإنستاباي، دفع فواتير على مكنة فوري، إكسسوارات، وصيانة موبايلات، وكان بيفتح فرع تاني. كل ده كان في كشاكيل، فمكنش بيعرف بالظبط المفروض يبقى في الدرج كام، ولا كل خط محفظة فاضل له كام على الليميت الشهري، ولا كل فرع كسب كام. كان محتاج سيستم واحد المحلين شغالين عليه لايف، ويفتح على كمبيوتر المحل الضعيف واللابتوب وموبايله.",
+      },
+      overview: {
+        en: "Each branch signs in with its own account, and the employee on shift picks their name so every movement is tagged with who did it. The four main tabs are Cash (wallets), Machine, Accessories and Repairs. When an employee records a withdrawal or deposit, the system works out the commission from the tier table, updates the wallet balance, the monthly limit and the cash drawer at once, and warns when a line gets close to its limit. Any account can switch to view the other branch or both together. Profits and commissions stay hidden behind the owner's PIN, and the daily close shows where every pound came from and went, with the total money the business holds right now across drawer, wallets, machines, stock and debts.",
+        ar: "كل فرع بيدخل بحسابه، والموظف اللي في الشيفت بيختار اسمه، فكل حركة بتتسجل باسم اللي عملها. السيستم متقسم 4 خانات رئيسية: كاش (المحافظ)، مكنة، إكسسوارات، وصيانة. لما الموظف يسجل سحب أو إيداع، السيستم بيحسب العمولة من جدول الشرايح، ويحدّث رصيد المحفظة والليميت الشهري والدرج مع بعض، وينبّه لو خط قرب يخلّص الليميت. أي حساب يقدر يبدّل ويتفرج على الفرع التاني أو الفرعين مع بعض. المكسب والعمولات مخفيين ورا باسورد ماهر، والتقفيل اليومي بيوضح كل جنيه دخل منين وخرج فين، ومعاه إجمالي الفلوس اللي عند المحل دلوقتي في الدرج والمحافظ والمكن والبضاعة والديون.",
+      },
+      modules: [
+        {
+          title: { en: "Cash (mobile wallets)", ar: "كاش (المحافظ)" },
+          body: {
+            en: "Any number of lines per provider, each with its balance and a monthly limit bar. Withdrawals, deposits and transfers price themselves from editable commission tiers, and the screen also covers balance suppliers and next-day Fawry liquidity.",
+            ar: "عدد مفتوح من الخطوط لكل شركة، كل خط برصيده وشريط الليميت الشهري. السحب والإيداع والتحويل بيتحسب عمولته لوحده من شرايح بتتعدّل، وفي نفس الخانة موردين الرصيد وسيولة فوري اللي بتوصل تاني يوم.",
+          },
+        },
+        {
+          title: { en: "Machines", ar: "المكن" },
+          body: {
+            en: "Fawry and other machines with a bills account and an airtime account. A balance can go negative, the field rep tops it up, and the shop's debt to the rep is tracked until it is paid.",
+            ar: "فوري وأي مكنة تانية بحساب فواتير وحساب إير تايم. الرصيد ممكن ينزل بالسالب، المندوب يحوّل، والمحل يفضل عارف عليه كام للمندوب لحد ما يدفعه.",
+          },
+        },
+        {
+          title: { en: "Accessories", ar: "الإكسسوارات" },
+          body: {
+            en: "Shared product list with stock per branch, quick sales, purchases, returns and a low-stock list.",
+            ar: "لستة أصناف واحدة ومخزن لكل فرع، بيع سريع، شراء بضاعة، مرتجعات، وتنبيه بالأصناف اللي قربت تخلص.",
+          },
+        },
+        {
+          title: { en: "Repairs", ar: "الصيانة" },
+          body: {
+            en: "Devices received, in progress, ready and delivered, with deposits, spare parts, profit per job and a printable list of every device in the shop.",
+            ar: "الأجهزة من الاستلام لحد التسليم، بالعربون وقطع الغيار والمكسب في كل جهاز، وكشف مطبوع بكل الأجهزة اللي في المحل.",
+          },
+        },
+        {
+          title: { en: "Debts, expenses & home spending", ar: "الديون والمصروفات ومصاريف البيت" },
+          body: {
+            en: "Customers who pay later, settled in instalments; shop expenses by category; and the owner's home spending kept apart from shop profit, with a daily limit.",
+            ar: "الزباين اللي بيدفعوا بعدين وبيسددوا على دفعات، مصروفات المحل بالتصنيف، ومصاريف البيت متسجلة لوحدها بعيد عن مكسب المحل وبحد يومي.",
+          },
+        },
+        {
+          title: { en: "Daily close & owner area", ar: "التقفيل وخانة ماهر" },
+          body: {
+            en: "Daily and monthly close by section, the expected drawer balance and every entry behind it. The PIN-locked owner area shows profit by day and the total money across the business.",
+            ar: "تقفيل يومي وشهري بالخانات، والمفروض يبقى في الدرج كام وكل حركة وراه. وخانة ماهر المقفولة بباسورد فيها المكسب بالأيام وإجمالي فلوس المحل كلها.",
+          },
+        },
+      ],
+      engineering: [
+        { en: "Balances live in Postgres triggers: every transaction updates the wallet, machine, stock and drawer together, and deleting it reverses all of them", ar: "الأرصدة بتتحسب في triggers جوه Postgres: كل عملية بتحدّث المحفظة والمكنة والمخزن والدرج مع بعض، ومسحها بيرجّع كله زي ما كان" },
+        { en: "Both branches update live through Supabase Realtime, and every record carries its branch so reports work per branch or combined", ar: "الفرعين بيتحدّثوا لايف بـ Supabase Realtime، وكل سجل عليه الفرع بتاعه، فالتقارير تطلع لكل فرع أو للاتنين مع بعض" },
+        { en: "Closing reports computed by SQL functions (drawer entries, breakdowns, profit by day) instead of in the browser", ar: "حسابات التقفيل معمولة بـ SQL functions (حركات الدرج، التفاصيل، المكسب بالأيام) مش في المتصفح" },
+        { en: "Telegram bot notifications sent from the database for key events, kept on free tiers to fit the client's budget", ar: "إشعارات على بوت تليجرام بتتبعت من الداتابيز للأحداث المهمة، وكل حاجة على الخطط المجانية عشان تناسب ميزانية العميل" },
+        { en: "Arabic, right-to-left React app installable as a PWA, tuned for a low-end shop PC and phones", ar: "واجهة React عربي من اليمين للشمال، بتتثبت كـ PWA، ومعمولة تشتغل كويس على كمبيوتر محل ضعيف وعلى الموبايل" },
+      ],
+    },
+  },
+  {
+    slug: "scale-x",
+    kinds: ["web", "client"],
+    title: { en: "Scale X: Marketing Agency Portfolio", ar: "Scale X: بورتفوليو وكالة تسويق" },
+    summary: {
+      en: "Bilingual Arabic/English portfolio for Mohamed R. Elsherif, founder of the Scale X marketing agency: an interactive ID card on a lanyard, services, client case studies with growth charts, and a contact form that emails him directly.",
+      ar: "بورتفوليو عربي وإنجليزي لمحمد الشريف، مؤسس وكالة التسويق Scale X: كارت تعريف تفاعلي متعلق في لانيارد، الخدمات، شغله مع العملاء بجرافات النمو، وفورم تواصل بيبعتله إيميل على طول.",
+    },
+    badge: { en: "Client · Scale X", ar: "عميل · Scale X" },
+    stack: ["HTML", "CSS", "JavaScript", "Vercel Functions", "Resend"],
+    live: "https://scalex-marketing.vercel.app",
+    privateCode: true,
+    cover: "from-lime-300 to-neutral-900",
+    image: "/projects/scale-x/00_cover.webp",
+    gallery: [
+      "/projects/scale-x/00_cover.webp",
+      "/projects/scale-x/01_services.webp",
+      "/projects/scale-x/02_results.webp",
+      "/projects/scale-x/03_clients.webp",
+      "/projects/scale-x/04_process.webp",
+    ],
+    details: {
+      context: {
+        en: "Mohamed runs Scale X, a digital marketing agency focused on media buying and growth. His work was spread across ad accounts and client chats, with nothing a new client could open to see who he is and what he has done. He wanted a site in his brand colours (phosphor, black and white) that puts his real client work up front, in both Arabic and English.",
+        ar: "محمد عنده Scale X، وكالة تسويق رقمي متخصصة في الميديا باينج والنمو. شغله كان متفرق بين حسابات الإعلانات وشاتات العملاء، ومفيش حاجة العميل الجديد يفتحها يعرف منها هو مين وعمل إيه. كان عايز موقع بألوان البراند بتاعته (فسفوري وأسود وأبيض)، يعرض شغله الحقيقي مع العملاء في الأول، بالعربي والإنجليزي.",
+      },
+      overview: {
+        en: "Visitors land on an ID card hanging from a lanyard that flips to show his logo, quote and contacts, next to the agency's pitch. They scroll through who the agency is, eight services, and a results section where each client's growth is drawn as a curve of the steps taken, from where the brand started to where it got. Then come the brands he worked with, the process, why Scale X, an FAQ and a contact form. A switch in the nav flips the whole site between Arabic (right-to-left) and English and remembers the choice.",
+        ar: "الزائر بيفتح على كارت تعريف متعلق في لانيارد بيتقلب يوريه اللوجو والكلمة والكونتاكت، وجنبه كلام الوكالة. وبعدين يعدّي على مين إحنا، و8 خدمات، وقسم النتايج اللي فيه نمو كل عميل مرسوم كمنحنى بالخطوات اللي اتعملت، من البراند كان فين لحد ما وصل فين. وبعدها البراندات اللي اشتغل معاها، وطريقة الشغل، وليه Scale X، والأسئلة، وفورم التواصل. وفيه زرار في الناف بيقلب الموقع كله بين العربي (من اليمين للشمال) والإنجليزي ويفتكر اختيارك.",
+      },
+      modules: [
+        {
+          title: { en: "Interactive ID card", ar: "كارت التعريف التفاعلي" },
+          body: {
+            en: "A badge on a phosphor lanyard instead of a plain hero photo. Tap to flip it: the front has his role, focus and status, the back his logo, slogan and contacts, plus an About me bubble.",
+            ar: "بادج متعلق في لانيارد فسفوري بدل صورة عادية. دوسة بتقلبه: الوش فيه دوره وتخصصه وحالته، والضهر فيه اللوجو والشعار والكونتاكت، ومعاه دايرة «عنّي».",
+          },
+        },
+        {
+          title: { en: "Results without inflated numbers", ar: "نتايج من غير أرقام مضروبة" },
+          body: {
+            en: "Each case study is a chart whose points are pieces of work done for the client, with a before and after line, so the growth story is clear without publishing private figures.",
+            ar: "كل عميل ليه جراف، كل نقطة فيه حاجة اتعملت للعميل، ومعاه سطر قبل وبعد، فقصة النمو باينة من غير ما ننشر أرقام خاصة.",
+          },
+        },
+        {
+          title: { en: "Services, clients & process", ar: "الخدمات والعملاء وطريقة الشغل" },
+          body: {
+            en: "Eight services with their deliverables, the brands he has worked with grouped by industry, a seven-step process and an FAQ.",
+            ar: "8 خدمات بتفاصيلها، والبراندات اللي اشتغل معاها متقسمة بالمجال، وطريقة شغل من 7 خطوات، وأسئلة شائعة.",
+          },
+        },
+        {
+          title: { en: "Contact form", ar: "فورم التواصل" },
+          body: {
+            en: "Messages go straight to his inbox, and replying answers the visitor directly. If sending fails, the form falls back to his email link.",
+            ar: "الرسايل بتوصل على إيميله على طول، والرد عليها بيروح للزائر مباشرة. ولو الإرسال فشل، الفورم بيديله لينك الإيميل بداله.",
+          },
+        },
+      ],
+      engineering: [
+        { en: "No framework or build step: one data file holds every text as { en, ar }, so the client's content can change without touching the layout", ar: "من غير framework ولا build: ملف داتا واحد فيه كل النصوص { en, ar }، فالمحتوى يتغير من غير ما نلمس التصميم" },
+        { en: "Full Arabic/English switch with right-to-left layout, saved per visitor", ar: "تبديل كامل بين العربي والإنجليزي، والاتجاه من اليمين للشمال، ومحفوظ لكل زائر" },
+        { en: "Growth charts drawn in plain JavaScript from the case-study data", ar: "جرافات النمو مرسومة بـ JavaScript عادي من داتا العملاء" },
+        { en: "Contact form handled by a Vercel serverless function that sends through Resend, with the visitor set as reply-to", ar: "فورم التواصل شغال بـ Vercel serverless function بتبعت عن طريق Resend، والزائر متحط reply-to" },
+      ],
+    },
+  },
+  {
     slug: "shop-qr",
     video: "/projects/shop-qr/preview.mp4",
     kinds: ["web", "product"],
