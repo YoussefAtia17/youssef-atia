@@ -361,6 +361,7 @@ export const featuredProjects: Project[] = [
   },
   {
     slug: "sys-maher",
+    video: "/projects/sys-maher/preview.mp4",
     kinds: ["web", "client"],
     title: { en: "Sys Maher: Phone Shop Management", ar: "سيستم ماهر: إدارة محلات الموبايلات" },
     summary: {
@@ -444,6 +445,7 @@ export const featuredProjects: Project[] = [
   },
   {
     slug: "scale-x",
+    video: "/projects/scale-x/preview.mp4",
     kinds: ["web", "client"],
     title: { en: "Scale X: Marketing Agency Portfolio", ar: "Scale X: بورتفوليو وكالة تسويق" },
     summary: {
