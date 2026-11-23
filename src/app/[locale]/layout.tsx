@@ -68,7 +68,7 @@ export default async function RootLayout({ children }: LayoutProps<"/[locale]">)
         <div className="scroll-progress" aria-hidden />
         <Navbar locale={locale} nav={dict.nav} />
         <main className="flex-1">{children}</main>
-        <Footer name={dict.hero.name} dict={dict.footer} />
+        <Footer name={dict.hero.name} dict={dict.footer} locale={locale} />
       </body>
     </html>
   );

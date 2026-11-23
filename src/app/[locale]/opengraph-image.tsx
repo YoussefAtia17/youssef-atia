@@ -2,7 +2,7 @@ import { ogCard, ogSize } from "@/lib/og";
 import en from "@/i18n/dictionaries/en.json";
 import { locales } from "@/i18n/config";
 
-export const alt = "Youssef Atia, full-stack developer";
+export const alt = "Youssef Atia, software engineer";
 export const size = ogSize;
 export const contentType = "image/png";
 

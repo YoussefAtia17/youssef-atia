@@ -12,13 +12,13 @@ export const whatsappUrl = contact.whatsapp ? `https://wa.me/${contact.whatsapp}
 
 /** Big opening line of the About section. The middle part is highlighted. */
 export const lead: { en: [string, string, string]; ar: [string, string, string] } = {
-  en: ["I'm Youssef, a full-stack developer who ", "turns ideas into working products", ", from the database to the app in your hand."],
-  ar: ["أنا يوسف، مطوّر Full-stack ", "بحوّل الفكرة لمنتج شغّال", "، من الداتابيز لحد الأبلكيشن اللي في إيدك."],
+  en: ["I'm Youssef, a computer science student at ECU ", "who already ships software people use every day", ", mostly for shops and small businesses in Egypt."],
+  ar: ["أنا يوسف، طالب علوم حاسب في ECU ", "وبعمل سوفتوير ناس بتستخدمه كل يوم", "، أغلبه لمحلات وبيزنس صغير في مصر."],
 };
 
 export const bio: Localized = {
-  en: "I work across the whole stack: I design the database, build secure backends and APIs, and ship native iOS, mobile and web apps on top of them. I can own a product end to end, pick up a new tool fast, and add AI where it actually saves time. I care about clean code, fast interfaces, and apps that work just as well in Arabic as in English.",
-  ar: "بشتغل على الـ stack كله: بصمّم الداتابيز، وببني باك إند و APIs آمنة، وفوقهم تطبيقات iOS وموبايل وويب. أقدر أمسك المنتج من أوله لآخره، وأتعلم أي أداة جديدة بسرعة، وأضيف AI في المكان اللي فعلًا بيوفّر وقت. بهتم بالكود النضيف، والواجهات السريعة، وإن التطبيق يشتغل بالعربي زي الإنجليزي بالظبط.",
+  en: "Most of what I've built is for people running a real business who needed a system to run it on: a PlayStation caf\u00e9 that wanted hours and orders tracked without paper, two phone shops whose cash, wallets and stock had to add up, a watch dealer who wanted an iOS app for customers and a back-office for staff. I usually take it from the start: I sit with the owner to learn how the work really goes, design the database, write the backend, then build the app or site on top. If there's a step someone does by hand that AI can take over, like reading the receipt in Splitter, that's where I put it.",
+  ar: "أغلب اللي عملته كان لناس عندها شغل حقيقي ومحتاجة سيستم يمشّيه: محل بلايستيشن عايز يحسب الساعات والطلبات من غير ورق، ومحلين موبايلات عايزين الكاش والمحافظ والمخزن يطلعوا مظبوطين على بعض، ومعرض ساعات عايز أبلكيشن iOS لزباينه وسيستم إدارة للموظفين. غالبًا بمسك الحاجة من أولها: بقعد مع صاحب الشغل أفهم الدنيا ماشية إزاي، أصمّم الداتابيز، أكتب الباك إند، وبعدين أعمل الأبلكيشن أو الموقع. ولو في خطوة حد بيعملها بإيده والـ AI يقدر يعملها، زي قراية الفاتورة في Splitter، بحطه هناك.",
 };
 
 /** What I bring, in three lines. */

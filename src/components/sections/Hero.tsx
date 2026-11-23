@@ -20,7 +20,6 @@ export function Hero({ locale, dict }: { locale: Locale; dict: Dictionary["hero"
   const stats = [
     { value: `${featuredProjects.length + earlierProjects.length}+`, label: dict.stats.projects },
     { value: String(clients), label: dict.stats.clients },
-    { value: "2", label: dict.stats.langs },
   ];
 
   return (
@@ -72,7 +71,7 @@ export function Hero({ locale, dict }: { locale: Locale; dict: Dictionary["hero"
             )}
           </div>
 
-          <dl className="mt-12 grid max-w-md grid-cols-3 gap-6 border-t border-border pt-6">
+          <dl className="mt-12 grid max-w-xs grid-cols-2 gap-6 border-t border-border pt-6">
             {stats.map((s) => (
               <div key={s.label}>
                 <dt className="sr-only">{s.label}</dt>
@@ -91,7 +90,7 @@ export function Hero({ locale, dict }: { locale: Locale; dict: Dictionary["hero"
             <Window title="~/youssef-atia — zsh" className="flex size-full flex-col !shadow-none" bodyClassName="flex-1 p-4 font-mono text-[10.5px] leading-relaxed">
               <div dir="ltr" className="text-start">
                 <Prompt cmd="whoami" />
-                <p className="text-foreground">Youssef Atia · full-stack developer</p>
+                <p className="text-foreground">Youssef Atia · software engineer</p>
 
                 <Prompt cmd="cat stack.json" className="mt-3" />
                 <p className="text-muted">{"{"}</p>
@@ -145,8 +144,8 @@ function BadgeFront({ dict }: { dict: Dictionary["hero"] }) {
   const b = dict.badge;
   const fields = [
     [b.location, b.locationValue],
-    [b.focus, "Backend · iOS · Web"],
-    [b.stack, "Supabase · SwiftUI"],
+    [b.focus, b.focusValue],
+    [b.stack, b.stackValue],
     [b.status, b.statusValue],
   ];
   // Fixed bar pattern so the barcode looks the same on every render.

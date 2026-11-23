@@ -21,7 +21,7 @@ export default async function Home() {
     "@type": "Person",
     name: "Youssef Atia",
     alternateName: "يوسف عطية",
-    jobTitle: "Full-stack Developer",
+    jobTitle: "Software Engineer",
     description: hero.tagline,
     url: new URL(`/${locale}`, siteUrl).href,
     email: `mailto:${contact.email}`,

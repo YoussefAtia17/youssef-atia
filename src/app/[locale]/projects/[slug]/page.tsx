@@ -16,6 +16,8 @@ import { testimonials } from "@/content/testimonials";
 import type { Locale } from "@/i18n/config";
 import type { Dictionary } from "@/i18n/dictionaries";
 import type { Project } from "@/content/projects";
+import { architectures } from "@/content/architecture";
+import { ArchitectureDiagram } from "@/components/ArchitectureDiagram";
 
 const findProject = (slug: string) => featuredProjects.find((p) => p.slug === slug);
 
@@ -142,6 +144,13 @@ async function ProjectDetails({ params }: { params: PageProps<"/[locale]/project
                 ))}
               </div>
             </Block>
+
+            {architectures[p.slug] && (
+              <Block title={t.architecture}>
+                <ArchitectureDiagram arch={architectures[p.slug]} locale={locale} />
+                <p className="mt-3 text-xs text-muted">{t.architectureHint}</p>
+              </Block>
+            )}
 
             <Block title={t.engineering}>
               <ul className="space-y-3">

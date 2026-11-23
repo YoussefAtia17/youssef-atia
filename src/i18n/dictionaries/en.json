@@ -1,7 +1,7 @@
 {
   "meta": {
-    "title": "Youssef Atia | Full-stack Developer",
-    "description": "Full-stack developer shipping web, mobile and AI projects."
+    "title": "Youssef Atia | Software Engineer",
+    "description": "Software engineer in Cairo building the systems small businesses run on: bookings, orders, stock and staff."
   },
   "nav": {
     "about": "About",
@@ -16,22 +16,23 @@
   "hero": {
     "greeting": "Hi, I'm",
     "name": "Youssef Atia",
-    "tagline": "Full-stack developer shipping web, mobile and AI projects.",
+    "tagline": "I build the systems small businesses actually run on: bookings, orders, stock and staff, from the database to the screen.",
     "ctaProjects": "View my work",
     "ctaCv": "Download CV",
     "status": "Available for freelance & internships",
     "stats": {
       "projects": "projects shipped",
-      "clients": "client products",
-      "langs": "Arabic + English"
+      "clients": "client products"
     },
     "whatsapp": "WhatsApp",
     "badge": {
-      "role": "Full-stack Developer",
+      "role": "Software Engineer",
       "location": "Location",
       "locationValue": "Cairo, Egypt",
-      "focus": "Focus",
-      "stack": "Stack",
+      "focus": "Studying",
+      "focusValue": "CS · ECU '28",
+      "stack": "Builds",
+      "stackValue": "Business systems",
       "status": "Status",
       "statusValue": "● Open to work",
       "hint": "drag me · click to flip",
@@ -61,6 +62,8 @@
     "context": "The problem",
     "modules": "What's inside",
     "engineering": "Under the hood",
+    "architecture": "How it's wired",
+    "architectureHint": "Signals move along each connection the way data does in the real app.",
     "confidential": "This is client work, so the code and real data stay private. Everything below describes what the product does without exposing them.",
     "gallery": "Screenshots",
     "openImage": "Open full size",
@@ -130,8 +133,9 @@
     "cv": "Download CV"
   },
   "footer": {
-    "rights": "Built with Next.js & Tailwind.",
-    "top": "Back to top"
+    "rights": "Designed and built in Cairo",
+    "top": "Back to top",
+    "updated": "last updated"
   },
   "cta": {
     "line1": "Got an idea?",
